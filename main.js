@@ -6,6 +6,7 @@ const BANK_NUMBER = "0058168424";
 const BANK_NAME = "Muhammad Haris Nugroho";
 const MY_EMAIL = "mhdharisn21@gmail.com";
 const CC_EMAIL = "muhammad_nugroho@app.co.id"; // Email CC yang tidak diketahui user
+const DANA_QR_CODE_PATH = "QR-Dana.jpeg"; // Path ke gambar QR Code DANA Anda
 
 // DOM Elements
 const container = document.getElementById("menu-container");
@@ -60,6 +61,9 @@ const bugTitleInput = document.getElementById("bug-title");
 const bugDescriptionInput = document.getElementById("bug-description");
 const bugCharCount = document.getElementById("bug-char-count");
 const submitReportBugBtn = document.getElementById("submit-report-bug");
+
+// QR Code element
+const danaQrCodeImg = document.getElementById("dana-qr-code"); // New: Get QR code image element
 
 // ---------- Data ----------
 const productList = [
@@ -150,6 +154,11 @@ function closeModal(modal) {
       overlay.setAttribute("aria-hidden", "true");
     }, 300);
   }
+  // New: Hide QR code when closing info modal
+  if (modal.id === 'info-modal') {
+    danaQrCodeImg.classList.add('hidden');
+    danaQrCodeImg.src = ''; // Clear src
+  }
 }
 
 function goBackToPreviousModal() {
@@ -167,6 +176,11 @@ function goBackToPreviousModal() {
     previousModal.setAttribute("aria-hidden", "false");
     previousModal.focus();
   }, 350);
+  // New: Hide QR code if going back from info modal
+  if (currentModal.id === 'info-modal') {
+    danaQrCodeImg.classList.add('hidden');
+    danaQrCodeImg.src = ''; // Clear src
+  }
 }
 
 function closeAllModals() {
@@ -179,6 +193,9 @@ function closeAllModals() {
     overlay.classList.remove("show");
     overlay.setAttribute("aria-hidden", "true");
   }, 300);
+  // New: Hide QR code when closing all modals
+  danaQrCodeImg.classList.add('hidden');
+  danaQrCodeImg.src = ''; // Clear src
 }
 
 // ---------- Cart Functions ----------
@@ -682,7 +699,10 @@ document.addEventListener('DOMContentLoaded', () => {
         <p class="font-semibold text-lg">Total: Rp ${Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0).toLocaleString('id-ID')}</p>
       </div>
     `;
-    
+    // Hide QR code for cash payment
+    danaQrCodeImg.classList.add('hidden');
+    danaQrCodeImg.src = '';
+
     paymentModal.classList.remove("show");
     paymentModal.setAttribute("aria-hidden", "true");
     setTimeout(() => openModal(infoModal), 350);
@@ -716,10 +736,13 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="info-left">Total Bayar:</span>
           <span class="info-right">Rp ${Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0).toLocaleString('id-ID')}</span>
         </div>
-        <p class="text-sm text-center text-gray-500 dark:text-gray-300">Silakan transfer ke nomor DANA di atas, lalu klik "Kirim WA" untuk konfirmasi pesanan</p>
+        <p class="text-sm text-center text-gray-500 dark:text-gray-300">Silakan scan QR Code atau transfer ke nomor DANA di atas, lalu klik "Kirim WA" untuk konfirmasi pesanan</p>
       </div>
     `;
-    
+    // Show QR code for DANA payment
+    danaQrCodeImg.src = DANA_QR_CODE_PATH;
+    danaQrCodeImg.classList.remove('hidden');
+
     paymentModal.classList.remove("show");
     paymentModal.setAttribute("aria-hidden", "true");
     setTimeout(() => openModal(infoModal), 350);
@@ -756,7 +779,10 @@ document.addEventListener('DOMContentLoaded', () => {
         <p class="text-sm text-center text-gray-500 dark:text-gray-300">Silakan transfer ke rekening di atas, lalu klik "Kirim WA" untuk konfirmasi pesanan</p>
       </div>
     `;
-    
+    // Hide QR code for bank transfer
+    danaQrCodeImg.classList.add('hidden');
+    danaQrCodeImg.src = '';
+
     paymentModal.classList.remove("show");
     paymentModal.setAttribute("aria-hidden", "true");
     setTimeout(() => openModal(infoModal), 350);
@@ -774,7 +800,7 @@ document.addEventListener('DOMContentLoaded', () => {
       darkModeIcon.classList.remove('fa-moon');
       darkModeIcon.classList.add('fa-sun');
     } else {
-      darkModeIcon.classList.remove('fa-sun');
+      document.body.classList.remove('fa-sun');
       darkModeIcon.classList.add('fa-moon');
     }
     try {
