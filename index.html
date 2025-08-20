@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KEDAI MAS HARIS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+  <!-- Icon Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Swiper CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+  <link rel="stylesheet" href="style.css" />
+
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+<!-- Notifikasi -->
+<div id="notif" class="notif text-sm">Berhasiil ditambahkan ke keranjang</div>
+<div id="copied" class="copied-badge">Nomor disalin</div>
+<div id="sent" class="sent-badge">Pesanan terkirim</div>
+<div id="login-success-badge" class="login-success-badge">Berhasil Login!</div>
+
+<!-- === HEADER === -->
+<header class="top">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between w-full">
+    <!-- Kiri: Logo & Navigasi (Desktop) -->
+    <div class="flex items-center gap-6">
+      <!-- Logo (Desktop & Mobile) -->
+      <div class="flex items-center gap-2 logo-desktop">
+        <i class="fas fa-store text-2xl text-orange-500"></i>
+        <span class="logo-text font-semibold text-lg">eCatalog</span>
+      </div>
+      <!-- Navigasi Desktop (Hanya terlihat di layar > 1024px) -->
+      <nav class="header-nav-desktop hidden lg:flex gap-6 items-center">
+        <a href="#home-section" class="nav-link hover:text-orange-500 transition-colors">Home</a>
+        <a href="#categories-section" class="nav-link hover:text-orange-500 transition-colors">Kategori</a>
+        <a href="#menu-section" class="nav-link hover:text-orange-500 transition-colors">Menu</a>
+        <a href="#contact-section" class="nav-link hover:text-orange-500 transition-colors">Kontak</a>
+      </nav>
+    </div>
+
+    <!-- Tengah: Search Trigger -->
+    <div id="search-container" class="flex-1 flex justify-center mx-4">
+      <div class="search-trigger-wrapper"> <!-- FIX: Wrapper for scale animation -->
+        <div id="search-trigger" class="search-trigger">
+          <i class="fas fa-search"></i>
+          <span>Cari produk anda...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kanan: Dark Mode, Wishlist, Cart (Desktop) & Hamburger (Mobile) -->
+    <div class="flex gap-4 items-center header-actions-desktop">
+      <!-- Tombol Dark Mode (Desktop) -->
+      <button id="darkToggle" class="toggle-switch dark-mode-desktop">
+        <i class="toggle-icon sun-icon fas fa-sun"></i>
+        <i class="toggle-icon moon-icon fas fa-moon"></i>
+      </button>
+      <!-- Wishlist (Desktop - Sembunyi di <1024px) -->
+      <button id="wishlist-btn" class="relative wishlist-desktop hidden lg:block" aria-label="Buka Wishlist">
+        <i class="fas fa-heart text-xl"></i>
+        <span class="absolute -top-2 -right-2 text-xs bg-pink-500 text-white rounded-full px-1.5" id="wishlist-count">0</span>
+      </button>
+      <!-- Cart (Desktop) -->
+      <button id="cart-btn" class="relative cart-desktop" aria-label="Buka Keranjang">
+        <i class="fas fa-shopping-cart text-xl"></i>
+        <span class="absolute -top-2 -right-2 text-xs bg-orange-500 text-white rounded-full px-1.5" id="cart-count">0</span>
+      </button>
+      <!-- Tombol Hamburger (Mobile - Muncul di <1024px) -->
+      <div id="hamburger" class="hamburger lg:hidden">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu Mobile Overlay -->
+  <div id="mobileMenu" class="mobile-menu">
+    <div id="mobile-nav-links">
+      <a href="#home-section" class="menu-item nav-link-mobile">
+        <i class="fas fa-home"></i> <span>Home</span>
+      </a>
+      <a href="#categories-section" class="menu-item nav-link-mobile">
+        <i class="fas fa-th-large"></i> <span>Kategori</span>
+      </a>
+      <a href="#menu-section" class="menu-item nav-link-mobile">
+        <i class="fas fa-book-open"></i> <span>Menu</span>
+      </a>
+      <a href="#contact-section" class="menu-item nav-link-mobile">
+        <i class="fas fa-address-book"></i> <span>Kontak</span>
+      </a>
+    </div>
+    <!-- Wishlist di Mobile Menu (Muncul di <1024px) -->
+    <div id="mobile-wishlist" class="menu-item">
+      <i class="fas fa-heart"></i> <span>Wishlist</span>
+      <span class="ml-auto bg-pink-500 text-white text-xs rounded-full px-2" id="wishlist-count-mobile">0</span>
+    </div>
+    <!-- Removed Search, Cart, and Dark Mode from mobile menu as per request -->
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="max-w-6xl mx-auto px-4 py-6 block">
+  <!-- Judul Kedai -->
+  <h1 class="text-4xl font-extrabold text-center text-orange-500 mb-6 select-none" style="max-width:600px; margin-left:auto; margin-right:auto;">
+    KEDAI MAS HARIS
+  </h1>
+  
+  <!-- Home Section -->
+  <section id="home-section" class="w-5/6 mx-auto rounded-2xl shadow-md mb-6">
+    <div class="swiper mySwiper">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide bg-lime-300">
+          <h2 class="text-2xl font-bold text-gray-800">COMING SOON</h2>
+          <p class="text-sm mt-2 bg-white inline-block px-4 py-1 rounded-full text-lime-600 font-semibold">STAY TUNED</p>
+        </div>
+        <div class="swiper-slide bg-teal-300">
+          <h2 class="text-2xl font-bold text-gray-800">COMING SOON</h2>
+          <p class="text-sm mt-2 bg-white inline-block px-4 py-1 rounded-full text-lime-600 font-semibold">EXCITING THINGS</p>
+        </div>
+        <div class="swiper-slide bg-orange-300">
+          <h2 class="text-2xl font-bold text-gray-800">COMING SOON</h2>
+          <p class="text-sm mt-2 bg-white inline-block px-4 py-1 rounded-full text-lime-600 font-semibold">NEW ARRIVALS</p>
+        </div>
+      </div>
+      
+      <!-- Navigation Arrows -->
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->  
+<section id="categories-section">
+    <h3 class="text-lg font-semibold mb-3">Kategori</h3>
+  <div class="grid  grid-cols-2 sm:grid-cols-3 gap-4 mb-6" id="kategori-container">
+    <div class="category-card bg-gray-400 active" data-kategori="all">Semua ></div>
+    <div class="category-card bg-green-500" data-kategori="Karbohidrat">Karbohidrat ></div>
+    <div class="category-card bg-yellow-500" data-kategori="Gorengan">Gorengan ></div>
+    <div class="category-card bg-pink-500" data-kategori="Manis">Manis ></div>
+  </div>
+
+  <!-- Menu Section -->
+<section id="menu-section">
+    <h3 class="text-lg font-semibold mb-3">Daftar Menu</h3>
+  <div class="menu-grid grid grid-cols-2 gap-4 md:grid-cols-4" id="menu-container"></div>
+</main>
+
+<!-- Contact Section (Footer) -->
+<section id="contact-section" class="max-w-6xl mx-auto px-4 py-8">
+  <h3 class="text-2xl font-bold text-center mb-8">Hubungi Kami</h3>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Kontak Umum -->
+    <div class="contact-card flex flex-col items-center text-center">
+      <i class="fas fa-headset text-4xl text-orange-500 mb-4"></i>
+      <h4 class="font-semibold text-xl mb-2">Kontak Cepat</h4>
+      <p class="text-gray-600 mb-4 footer-text">Punya pertanyaan atau ingin memesan?</p>
+      
+      <div class="contact-dropdown mb-3">
+        <button class="contact-button whatsapp" id="whatsapp-contact-btn">
+          <i class="fab fa-whatsapp"></i> WhatsApp
+        </button>
+        <div class="contact-dropdown-content" id="whatsapp-dropdown-content">
+          <a href="#" data-action="order-event-wa">Order untuk Acara</a>
+          <a href="#" data-action="report-bug-wa">Report Bug</a>
+        </div>
+      </div>
+
+      <div class="contact-dropdown">
+        <button class="contact-button email" id="email-contact-btn">
+          <i class="fas fa-envelope"></i> Email
+        </button>
+        <div class="contact-dropdown-content" id="email-dropdown-content">
+          <a href="#" data-action="order-event-email">Order untuk Acara</a>
+          <a href="#" data-action="report-bug-email">Report Bug</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lokasi & Jam Buka -->
+    <div class="contact-card flex flex-col items-center text-center">
+      <i class="fas fa-map-marker-alt text-4xl text-orange-500 mb-4"></i>
+      <h4 class="font-semibold text-xl mb-2">Lokasi Kami</h4>
+      <p class="text-gray-600 mb-2 footer-text">Perum Karaba Indah</p>
+      <p class="text-gray-600 mb-4 footer-text">Buka setiap hari</p>
+      <iframe
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3965.549679362615!2d107.27811017509626!3d-6.322723393666768!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e699d78506a9903%3A0x89f074eb4c00a83e!2sBlok%20AD%20Karaba%20Indah!5e0!3m2!1sid!2sid!4v1755508173604!5m2!1sid!2sid"
+    width="100%" height="200" style="border:0;" allowfullscreen="" loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade" class="rounded-lg shadow-md">
+</iframe>
+
+    </div>
+
+    <!-- Request Desain Website -->
+    <div class="contact-card flex flex-col items-center text-center">
+      <i class="fas fa-laptop-code text-4xl text-orange-500 mb-4"></i>
+      <h4 class="font-semibold text-xl mb-2">Butuh Website untuk Usaha Anda?</h4>
+      <p class="text-gray-600 mb-4 footer-text">Saya juga menyediakan jasa desain website profesional untuk membantu usaha Anda berkembang secara online.</p>
+      <a href="https://wa.me/6281389868594?text=Halo%20saya%20tertarik%20dengan%20jasa%20desain%20website%20Anda.%20Bisa%20berikan%20informasi%20lebih%20lanjut?" target="_blank" class="contact-button request-design">
+        <i class="fab fa-whatsapp"></i> Request Desain Website
+      </a>
+    </div>
+  </div>
+  <p class="text-center text-gray-500 text-sm mt-8 footer-text">&copy; 2025 KEDAI MAS HARIS. All rights reserved.</p>
+</section>
+
+<!-- Overlay -->
+<div id="overlay" aria-hidden="true"></div>
+
+<!-- Modal Keranjang -->
+<div id="cart-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+  <div class="flex justify-between items-center mb-4">
+    <h3 id="cart-title" class="mb-0">Keranjang</h3>
+    <button id="clear-cart-btn" class="clear-cart-btn">
+      <i class="fas fa-trash-alt"></i> Hapus Semua
+    </button>
+  </div>
+  <div id="cart-items" class="space-y-4 max-h-64 overflow-y-auto mb-4"></div>
+  <div class="flex justify-between items-center font-semibold text-sm mb-4">
+    <span>Total:</span>
+    <span id="cart-total">Rp 0</span>
+  </div>
+  <button id="checkout-btn">Checkout</button>
+</div>
+
+<!-- Modal Edit Cart Item -->
+<div id="edit-cart-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="edit-cart-title">
+  <h3 id="edit-cart-title" class="mb-3">Edit Jumlah</h3>
+  <div id="edit-cart-content" class="mb-4">
+    <div class="bg-gray-50 p-3 rounded-lg flex items-center gap-3 mb-4">
+      <img id="edit-item-image" src="" class="w-12 h-12 rounded-lg">
+      <div class="flex-1">
+        <p id="edit-item-name" class="font-medium text-sm"></p>
+        <p id="edit-item-price" class="text-xs text-gray-500"></p>
+      </div>
+    </div>
+    <div class="flex items-center justify-center gap-4">
+      <button id="edit-minus-btn" class="qty-btn minus-red">
+        <i class="fas fa-minus"></i>
+      </button>
+      <span id="edit-qty-display" class="text-xl font-bold min-w-[40px] text-center">1</span>
+      <button id="edit-plus-btn" class="qty-btn plus">
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+  </div>
+  <div class="flex gap-3">
+    <button id="save-edit-cart" class="flex-1 bg-green-500 text-white py-2 rounded-xl font-semibold hover:bg-green-600">
+      <i class="fas fa-check mr-2"></i>Simpan
+    </button>
+    <button id="cancel-edit-cart" class="bg-gray-200 text-gray-800 px-4 rounded-xl">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+</div>
+
+<!-- Modal Konfirmasi Hapus -->
+<div id="confirm-delete-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="confirm-delete-title">
+  <h3 id="confirm-delete-title" class="mb-3 text-center">Konfirmasi Hapus</h3>
+  <div class="text-center mb-4">
+    <div class="text-4xl mb-2">
+      <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+    </div>
+    <p id="confirm-delete-message" class="text-gray-600"></p>
+  </div>
+  <div class="flex gap-3">
+    <button id="confirm-delete-yes" class="flex-1 bg-red-500 text-white py-2 rounded-xl font-semibold hover:bg-red-600">
+      <i class="fas fa-trash-alt mr-2"></i>Ya, Hapus
+    </button>
+    <button id="confirm-delete-no" class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-xl">Batal</button>
+  </div>
+</div>
+
+<!-- Modal Wishlist -->
+<div id="wishlist-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="wishlist-title">
+  <h3 id="wishlist-title">Wishlist</h3>
+  <div id="wishlist-items" class="space-y-4 max-h-80 overflow-y-auto mb-4"></div>
+  <button id="close-wishlist" class="w-full bg-gray-200 text-gray-800 py-2 rounded-xl font-semibold hover:bg-gray-300">
+    <i class="fas fa-times mr-2"></i>Tutup
+  </button>
+</div>
+
+<!-- Modal Search -->
+<div id="search-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="search-title">
+  <h3 id="search-title" class="mb-3">Cari Produk</h3>
+  <div class="mb-3">
+    <input
+      id="search-input"
+      type="text"
+      placeholder="Cari..."
+      class="w-full border px-3 py-2 rounded-lg"
+      autocomplete="off"
+    />
+  </div>
+  <div class="flex gap-3">
+    <button id="do-search" class="flex-1 bg-orange-500 text-white py-2 rounded-xl font-semibold hover:bg-orange-600">
+      <i class="fas fa-search mr-2"></i>Cari
+    </button>
+    <button id="close-search" class="bg-gray-200 text-gray-800 px-4 rounded-xl">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+</div>
+
+<!-- Modal Pilihan Pembayaran - ENHANCED -->
+<div id="payment-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="payment-title" tabindex="-1">
+  <h3 id="payment-title" class="text-center mb-4">Pilih Metode Pembayaran</h3>
+  <button id="pay-cash" class="payment-btn cash">
+    <i class="fas fa-money-bill-wave text-xl"></i>
+    <span>Bayar Tunai</span>
+  </button>
+  <button id="pay-dana" class="payment-btn dana">
+    <i class="fas fa-mobile-alt text-xl"></i>
+    <span>DANA</span>
+  </button>
+  <button id="pay-transfer" class="payment-btn transfer">
+    <i class="fas fa-university text-xl"></i>
+    <span>Transfer Bank</span>
+  </button>
+</div>
+
+<!-- Modal Info Pembayaran -->
+<div id="info-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="info-title" tabindex="-1">
+  <h3 id="info-title" class="mb-3"></h3>
+  <div id="info-content" class="mb-4"></div>
+  <div class="flex gap-3">
+    <button id="send-wa" class="flex-1 bg-green-500 text-white py-2 rounded-xl font-semibold hover:bg-green-600">
+      <i class="fab fa-whatsapp mr-2"></i>Kirim WA
+    </button>
+    <button id="close-info" class="bg-gray-200 text-gray-800 px-4 rounded-xl">Tutup</button>
+  </div>
+</div>
+
+<!-- Modal Order untuk Acara (WhatsApp & Email) -->
+<div id="order-event-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="order-event-title">
+  <h3 id="order-event-title" class="mb-3">Order untuk Acara</h3>
+  <div class="space-y-3">
+    <div>
+      <label for="order-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Pemesan:</label>
+      <input type="text" id="order-name" class="w-full border px-3 py-2 rounded-lg mt-1" placeholder="Nama Anda" />
+    </div>
+    <div>
+      <label for="order-wa" class="block text-sm font-medium text-gray-700 dark:text-gray-300">No. WA:</label>
+      <input type="tel" id="order-wa" class="w-full border px-3 py-2 rounded-lg mt-1" placeholder="Contoh: 6281234567890" />
+    </div>
+    <div>
+      <label for="order-event-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Acara:</label>
+      <input type="text" id="order-event-name" class="w-full border px-3 py-2 rounded-lg mt-1" placeholder="Nama Acara (misal: Ulang Tahun, Rapat)" />
+    </div>
+    <div>
+      <label for="order-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Dipesan untuk Tanggal:</label>
+      <input type="date" id="order-date" class="w-full border px-3 py-2 rounded-lg mt-1" />
+    </div>
+    <div>
+      <label for="order-address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Alamat Dituju:</label>
+      <textarea id="order-address" rows="3" class="w-full border px-3 py-2 rounded-lg mt-1" placeholder="Alamat lengkap pengiriman"></textarea>
+    </div>
+  </div>
+  <div class="flex gap-3 mt-4">
+    <button id="submit-order-event" class="flex-1 bg-orange-500 text-white py-2 rounded-xl font-semibold hover:bg-orange-600">
+      Kirim Pesanan
+    </button>
+    <button id="close-order-event-modal" class="bg-gray-200 text-gray-800 px-4 rounded-xl">Batal</button>
+  </div>
+</div>
+
+<!-- Modal Report Bug -->
+<div id="report-bug-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="report-bug-title">
+  <h3 id="report-bug-title" class="mb-3">Report Bug</h3>
+  <div class="space-y-3">
+    <div>
+      <label for="bug-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Judul Bug:</label>
+      <input type="text" id="bug-title" class="w-full border px-3 py-2 rounded-lg mt-1" placeholder="Singkat dan jelas" />
+    </div>
+    <div>
+      <label for="bug-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Deskripsi Bug (maks 500 karakter):</label>
+      <textarea id="bug-description" rows="5" maxlength="500" class="w-full border px-3 py-2 rounded-lg mt-1" placeholder="Jelaskan bug yang Anda temukan"></textarea>
+      <p class="text-xs text-gray-500 text-right" id="bug-char-count">0/500</p>
+    </div>
+  </div>
+  <div class="flex gap-3 mt-4">
+    <button id="submit-report-bug" class="flex-1 bg-red-500 text-white py-2 rounded-xl font-semibold hover:bg-red-600">
+      Kirim Laporan
+    </button>
+    <button id="close-report-bug-modal" class="bg-gray-200 text-gray-800 px-4 rounded-xl">Batal</button>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="main.js"></script>
+
+</body>
+</html>

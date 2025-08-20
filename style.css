@@ -1,0 +1,1743 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+/* NAV underline custom */
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      height: 2px;
+      width: 0;
+      background: #f97316;
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+
+
+/* Pastikan semua section yang dituju navigasi transparan */
+#home-section,
+#categories-section,
+#menu-section,
+#contact-section {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Glassmorphism Header tanpa garis bawah */
+header {
+          position: sticky;
+          top: 0;
+          width: 100%;
+          z-index: 50;
+          transition: all 0.3s ease, border-color 0.3s ease; /* Tambahkan border-color ke transisi */
+          padding: 1rem 1.5rem;
+          border-bottom: 1px solid transparent; /* Border selalu ada, tapi transparan */
+          display: flex; /* Tambahkan flex untuk layout header */
+          align-items: center;
+          justify-content: space-between; /* Pisahkan elemen kiri, tengah, kanan */
+        }
+
+/* Saat di atas (no scroll) → transparan */
+header.top {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+/* Saat discroll → efek glass tanpa border */
+
+header.scrolled {
+          background: rgba(255, 255, 255, 0.35);
+          backdrop-filter: blur(18px) saturate(180%);
+          -webkit-backdrop-filter: blur(18px) saturate(180%);
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+          border-bottom-color: transparent; /* Pastikan border transparan di light mode saat discroll */
+        }
+
+/* Dark mode */
+body.dark header.top {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+
+body.dark header.scrolled {
+          background: rgba(26, 35, 50, 0.35);
+          backdrop-filter: blur(18px) saturate(180%);
+          -webkit-backdrop-filter: blur(18px) saturate(180%);
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+          border-bottom-color: rgba(255, 255, 255, 0.1); /* Atur warna border untuk dark mode saat discroll */
+        }
+
+/* Logo text color control */
+.logo-text {
+  color: rgb(var(--dark-body-color)); /* Light mode orange */
+}
+
+body.dark .logo-text {
+  color: #f97316; /* Ikut warna body dark mode */
+}
+
+
+
+/* Modern Toggle Switch Styles */
+.toggle-switch {
+  position: relative;
+  width: 60px;
+  height: 32px;
+  background: #374151;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 28px;
+  height: 28px;
+  background: white;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+.toggle-switch .toggle-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+.toggle-switch .sun-icon {
+  left: 8px;
+  color: #ffcc00 !important;
+  opacity: 0;
+  transform: translateY(-50%) scale(0.8);
+}
+
+.toggle-switch .moon-icon {
+  right: 8px;
+  color: white !important;
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+/* Active (Dark Mode) State */
+body.dark .toggle-switch {
+  background-color: transparent;
+  border: 1px solid white !important
+}
+
+body.dark .toggle-switch::before {
+  transform: translateX(28px);
+  background-color: white;
+}
+
+body.dark .toggle-switch .sun-icon {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+body.dark .toggle-switch .moon-icon {
+  opacity: 0;
+  transform: translateY(-50%) scale(0.8);
+}
+
+
+/* Kategori */
+.category-card {
+  border-radius: 1rem;
+  color: white;
+  padding: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.category-card.active {
+  border: 3px solid #1f2937;
+  transform: scale(1.05);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Enhanced Button Styles */
+.btn-pesan, 
+#checkout-btn,
+#send-wa,
+#do-search,
+.copy-btn,
+.payment-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-pesan::before,
+#checkout-btn::before,
+#send-wa::before,
+#do-search::before,
+.copy-btn::before,
+.payment-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-pesan:hover::before,
+#checkout-btn:hover::before,
+#send-wa:hover::before,
+#do-search:hover::before,
+.copy-btn:hover::before,
+.payment-btn:hover::before {
+  left: 100%;
+}
+
+/* Button Gradients and Effects */
+.btn-pesan {
+  background: linear-gradient(135deg, #f97316, #ea580c) !important;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+}
+
+.btn-pesan:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+}
+
+#checkout-btn {
+  background: linear-gradient(135deg, #f97316, #ea580c) !important;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+}
+
+#checkout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+}
+
+/* Search Input Contrast Fix */
+#search-input {
+  background: white;
+  color: #1f2937;
+  transition: all 0.3s ease;
+}
+
+/* Dark Mode Styles */
+body.dark {
+  --dark-body-color: 26, 35, 50; /* RGB dari warna body dark */
+  background: rgb(var(--dark-body-color));
+  color: #e2e8f0;
+}
+
+body.dark #search-input {
+  background: #1f2937;
+  color: #e2e8f0;
+  border-color: #4b5563;
+}
+
+body.dark #search-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Coming Soon Banner Dark Mode */
+body.dark .bg-lime-300 {
+  background: #064e3b;
+}
+
+body.dark .bg-lime-300 h2 {
+  color: #34d399;
+}
+
+body.dark .bg-lime-300 p {
+  background: #059669;
+  color: #ecfdf5;
+}
+
+/* Category Active State */
+body.dark .category-card.active {
+  border: 3px solid rgba(255,255,255,0.8);
+}
+
+/* Payment Modal Buttons */
+.payment-btn {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.payment-btn.cash {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.payment-btn.cash:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+}
+
+.payment-btn.dana {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.payment-btn.dana:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+}
+
+.payment-btn.transfer {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.payment-btn.transfer:hover {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
+
+    /* Kategori */
+    .category-card {
+  border-radius: 1rem;
+  padding: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+  background-position: center;
+  background-size: 200% auto;
+}
+
+/* Hover effect untuk semua kategori */
+.category-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Kategori "Semua" dengan gradient baru */
+.category-card[data-kategori="all"] {
+  background-image: linear-gradient(45deg, #3b82f6, #2563eb);
+  color: #fff;
+}
+
+.category-card[data-kategori="all"]:hover {
+  background-position: right center;
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
+}
+
+.category-card[data-kategori="all"].active {
+  border: 3px solid #1d4ed8;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+/* Karbohidrat kategori */
+.category-card[data-kategori="Karbohidrat"] {
+  background-image: linear-gradient(45deg, #22c55e, #16a34a);
+}
+
+.category-card[data-kategori="Karbohidrat"]:hover {
+  box-shadow: 0 10px 20px rgba(34, 197, 94, 0.2);
+}
+
+.category-card[data-kategori="Karbohidrat"].active {
+  border: 3px solid #15803d;
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+}
+
+/* Gorengan kategori */
+.category-card[data-kategori="Gorengan"] {
+  background-image: linear-gradient(45deg, #eab308, #ca8a04);
+}
+
+.category-card[data-kategori="Gorengan"]:hover {
+  box-shadow: 0 10px 20px rgba(234, 179, 8, 0.2);
+}
+
+.category-card[data-kategori="Gorengan"].active {
+  border: 3px solid #a16207;
+  box-shadow: 0 8px 25px rgba(234, 179, 8, 0.3);
+}
+
+/* Manis kategori */
+.category-card[data-kategori="Manis"] {
+  background-image: linear-gradient(45deg, #ec4899, #db2777);
+}
+
+.category-card[data-kategori="Manis"]:hover {
+  box-shadow: 0 10px 20px rgba(236, 72, 153, 0.2);
+}
+
+/* Active state untuk semua kategori */
+.category-card.active {
+  transform: scale(1.05);
+  background-position: right center;
+}
+
+    /* Notifikasi - FIX: Hidden by default */
+    .notif {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #4ade80;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 9999px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      z-index: 1200;
+      opacity: 0;
+      pointer-events: none;
+      display: none; /* FIX: Initially hidden */
+    }
+
+    .copied-badge, .sent-badge {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 8px 14px;
+      border-radius: 999px;
+      color: white;
+      font-size: 13px;
+      z-index: 1300;
+      opacity: 0;
+      pointer-events: none;
+      display: none; /* FIX: Initially hidden */
+    }
+
+    .copied-badge {
+      top: 88px;
+      background: rgba(17,24,39,0.92);
+    }
+
+    .sent-badge {
+      top: 130px;
+      background: rgba(59,130,246,0.95);
+    }
+
+    /* Overlay */
+    #overlay {
+      background: rgba(0,0,0,0.5);
+      position: fixed;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 999;
+      transition: opacity 0.25s ease;
+      display: none;
+    }
+
+    #overlay.show {
+      display: block;
+      pointer-events: auto;
+      opacity: 1;
+    }
+
+    /* Modal Base Styles */
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: white;
+      border-radius: 1.5rem;
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      width: 90vw;
+      max-width: 400px;
+      opacity: 0;
+      z-index: 1000;
+      display: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+    }
+
+    .modal.show {
+      display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .modal h3 {
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    /* Buttons style */
+    button {
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    /* Payment Modal Buttons - ENHANCED */
+    .payment-btn {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border-radius: 1rem;
+      border: none;
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .payment-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .payment-btn:hover::before {
+      left: 100%;
+    }
+
+    .payment-btn.cash {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+    }
+
+    .payment-btn.cash:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    }
+
+    .payment-btn.dana {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .payment-btn.dana:hover {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+    }
+
+    .payment-btn.transfer {
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      color: white;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    }
+
+    .payment-btn.transfer:hover {
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+    }
+
+    /* Icon colors for light/dark mode */
+    .fas {
+      transition: color 0.3s ease;
+    }
+
+    body:not(.dark) .fas {
+      color: #1f2937; /* gray-800 for light mode */
+    }
+
+body:not(.dark) .product-card {
+  background-color: transparent; /* Changed to transparent */
+  box-shadow: 0 1px 2px rgba(17,24,39,0.05);
+ }
+
+body.dark .product-card:hover {
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,0.06) inset,
+    0 0 12px rgba(255,255,255,0.35),
+    0 0 24px rgba(255,255,255,0.25);
+  transform: translateY(-2px);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+    body.dark .fas {
+      color: #e2e8f0; /* gray-200 for dark mode */
+    }
+
+    body.dark .nav-link {
+      color: #e2e8f0;
+    }
+
+    body.dark .nav-link:hover {
+      color: #f97316;
+    }
+
+    /* Wishlist icon specific colors */
+    body:not(.dark) #wishlist-btn .fas.fa-heart {
+      color: #ec4899; /* pink-500 for light mode */
+    }
+
+    body.dark #wishlist-btn .fas.fa-heart {
+      color: #fff; /* white for dark mode */
+    }
+
+    #checkout-btn {
+      width: 100%;
+      background: #f97316;
+      color: white;
+      border: none;
+      padding: 0.75rem;
+      font-weight: 600;
+      border-radius: 0.75rem;
+    }
+
+    #checkout-btn:hover {
+      background: #ea580c;
+    }
+
+    /* Cart edit buttons */
+    .qty-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qty-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .qty-btn.plus {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .qty-btn.plus:hover:not(:disabled) {
+      background: #2563eb;
+    }
+
+    .qty-btn.minus-red {
+      background: #ef4444;
+      color: white;
+    }
+
+    .qty-btn.minus-red:hover:not(:disabled) {
+      background: #dc2626;
+    }
+
+    .qty-btn.minus-gray {
+      background: #d1d5db;
+      color: #9ca3af;
+    }
+
+    /* Product card styles - Enhanced MacOS Glassmorphism */
+.product-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.06),
+    0 1px 4px rgba(0, 0, 0, 0.03);
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border-radius: 1.25rem;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+
+/* Dark mode product cards */
+body.dark .product-card {
+  background: rgba(51, 65, 85, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.25),
+    0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+body.dark .product-card::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+}
+
+/* Hover effects - consistent positioning */
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.12),
+    0 3px 8px rgba(0, 0, 0, 0.06);
+}
+
+body.dark .product-card:hover {
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.35),
+    0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+    /* Copy button styles */
+    .copy-btn {
+      background: #f3f4f6;
+      border: 1px solid #d1d5db;
+      color: #374151;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.875rem;
+    }
+
+    .copy-btn:hover {
+      background: #e5e7eb;
+    }
+
+    /* Dark Mode Styles */
+    body.dark {
+      background: #1a2332;
+      color: #e2e8f0;
+    }
+
+    body.dark header {
+  background: transparent; /* 0.35 = tingkat transparansi */
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+    body.dark .modal {
+      background: #334155;
+      color: #e2e8f0;
+    }
+
+    body.dark .product-card,
+    body.dark .bg-white {
+      background: #475569 !important;
+      color: #e2e8f0;
+    }
+
+    body.dark .category-card {
+  color: #fff;
+}
+
+body.dark .category-card[data-kategori="all"] {
+  background-image: linear-gradient(45deg, #2563eb, #1d4ed8);
+}
+
+body.dark .category-card[data-kategori="all"].active {
+  border: 3px solid #60a5fa;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+body.dark .category-card[data-kategori="Karbohidrat"] {
+  background-image: linear-gradient(45deg, #16a34a, #15803d);
+}
+
+body.dark .category-card[data-kategori="Karbohidrat"].active {
+  border: 3px solid #4ade80;
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+}
+
+body.dark .category-card[data-kategori="Gorengan"] {
+  background-image: linear-gradient(45deg, #ca8a04, #a16207);
+}
+
+body.dark .category-card[data-kategori="Gorengan"].active {
+  border: 3px solid #fbbf24;
+  box-shadow: 0 8px 25px rgba(234, 179, 8, 0.4);
+}
+
+body.dark .category-card[data-kategori="Manis"] {
+  background-image: linear-gradient(45deg, #db2777, #be185d);
+}
+
+body.dark .category-card[data-kategori="Manis"].active {
+  border: 3px solid #f472b6;
+  box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
+}
+
+/* Hover effects for dark mode */
+body.dark .category-card:hover {
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+/* Additional animation for smooth transitions */
+.category-card {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Soft transition for all effects */
+.category-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+    body.dark .bg-gray-50,
+    body.dark .bg-gray-100 {
+      background: #475569 !important;
+      color: #e2e8f0;
+    }
+
+    body.dark .text-gray-500,
+    body.dark .text-gray-600 {
+      color: #94a3b8 !important;
+    }
+
+    body.dark .text-gray-800,
+    body.dark .text-gray-900 {
+      color: #e2e8f0 !important;
+    }
+
+    body.dark .bg-gray-200 {
+      background: #64748b !important;
+      color: #e2e8f0 !important;
+    }
+
+    body.dark .border {
+      border-color: #64748b !important;
+    }
+
+    body.dark .info-left {
+      color: #e2e8f0 !important;
+    }
+
+    body.dark .copy-btn {
+      background: #64748b;
+      border-color: #475569;
+      color: #e2e8f0;
+    }
+
+    body.dark .copy-btn:hover {
+      background: #475569;
+    }
+
+    /* Contrast improvements */
+    body.dark .text-orange-500 {
+      color: #fb923c !important; /* orange-400 for better contrast in dark mode */
+    }
+
+    body.dark .bg-orange-500 {
+      background-color: #fb923c !important;
+    }
+
+    /* Wishlist button style */
+    .btn-wishlist {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-wishlist:not(.wishlist-active) {
+      background-color: transparent;
+      color: #ec4899;
+    }
+
+    .btn-wishlist.wishlist-active {
+      background-color: #ec4899;
+      color: white;
+    }
+
+    body.dark .btn-wishlist:not(.wishlist-active) {
+      color: #fff;
+    }
+
+    body.dark .btn-wishlist.wishlist-active {
+      background-color: #be185d;
+    }
+
+    /* Info content styles */
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      background: #f9fafb;
+      border-radius: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    body.dark .info-item {
+      background: #475569;
+    }
+
+    .info-left {
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .info-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: monospace;
+      font-weight: 600;
+    }
+
+    
+/* SOLUSI LENGKAP UNTUK SWIPER BANNER "COMING SOON" */
+
+/* Fix container swiper agar tidak bocor */
+.banner-section {
+  width: 100%;
+  max-width: 100%;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  overflow: hidden; /* Penting untuk mencegah bocor */
+  position: relative;
+}
+
+/* Swiper container fix */
+.swiper {
+  width: 100%;
+  height: 100%; /* Tinggi tetap agar konsisten */
+  border-radius: 1.5rem;
+  overflow: hidden; /* Mencegah slide bocor keluar */
+  position: relative;
+}
+    
+   .mySwiper {
+    margin: 0; /* Remove margins */
+    padding: 0; /* Remove padding */
+} 
+
+.swiper-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.swiper-slide {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 2rem;
+  border-radius: 1.5rem;
+  text-align: center;
+  height: 100%;
+  width: 100%; /* Pastikan slide mengambil lebar penuh */
+  flex-shrink: 0; /* Mencegah slide menyusut */
+  transition: background-color 0.3s ease;
+}
+
+.swiper-slide h2 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  transition: color 0.3s ease;
+}
+
+.swiper-slide p {
+  font-size: 1.1rem;
+  padding: 0.6rem 1.5rem;
+  border-radius: 2rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Navigation Arrows - Desain yang bagus */
+.swiper-button-next,
+.swiper-button-prev {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  margin-top: 0;
+  /* Mengubah background menjadi transparan */
+  background: rgba(255, 255, 255, 0.1); /* Lebih transparan */
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background: rgba(255, 255, 255, 0.2); /* Sedikit lebih solid saat hover */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.swiper-button-next {
+  right: 20px;
+}
+
+.swiper-button-prev {
+  left: 20px;
+}
+
+/* Custom Arrow Icons */
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: 18px;
+  color: #374151;
+  transition: color 0.3s ease;
+}
+
+.swiper-button-next::after {
+  content: '\f054'; /* fa-chevron-right */
+}
+
+.swiper-button-prev::after {
+  content: '\f053'; /* fa-chevron-left */
+}
+
+.swiper-button-next:hover::after,
+.swiper-button-prev:hover::after {
+  color: #f97316; /* Orange saat hover */
+}
+
+/* Dark mode untuk navigation */
+body.dark .swiper-button-next,
+body.dark .swiper-button-prev {
+  background: rgba(31, 41, 55, 0.1); /* Lebih transparan di dark mode */
+  border: 1px solid rgba(156, 163, 175, 0.2);
+}
+
+body.dark .swiper-button-next:hover,
+body.dark .swiper-button-prev:hover {
+  background: rgba(31, 41, 55, 0.2); /* Sedikit lebih solid saat hover di dark mode */
+}
+
+body.dark .swiper-button-next::after,
+body.dark .swiper-button-prev::after {
+  color: #f3f4f6;
+}
+
+body.dark .swiper-button-next:hover::after,
+body.dark .swiper-button-prev:hover::after {
+  color: #f97316;
+}
+
+/* Pagination bullets styling yang lebih bagus */
+.swiper-pagination {
+  bottom: 20px !important;
+  text-align: center;
+}
+
+.swiper-pagination-bullet {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 1;
+  margin: 0 6px;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.swiper-pagination-bullet-active {
+  background: #f97316;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  transform: scale(1.2);
+}
+
+/* Dark mode pagination */
+body.dark .swiper-pagination-bullet {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+body.dark .swiper-pagination-bullet-active {
+  background: #f97316;
+  border: 2px solid rgba(31, 41, 55, 0.8);
+}
+
+/* Light mode banner colors - Fix overflow */
+.swiper-slide.bg-lime-300 {
+  background-color: #a7f3d0;
+}
+.swiper-slide.bg-teal-300 {
+  background-color: #99f6e4;
+}
+.swiper-slide.bg-orange-300 {
+  background-color: #fed7aa;
+}
+
+.swiper-slide h2 {
+  color: #374151;
+}
+
+.swiper-slide p {
+  background-color: white;
+  color: #10b981;
+}
+
+/* Dark Mode Banner Colors */
+body.dark .bg-lime-300 {
+  background: #064e3b !important;
+}
+
+body.dark .bg-lime-300 h2 {
+  color: #34d399 !important;
+}
+
+body.dark .bg-lime-300 p {
+  background: #059669 !important;
+  color: #ecfdf5 !important;
+}
+
+body.dark .bg-teal-300 {
+  background: #0f766e !important;
+}
+
+body.dark .bg-teal-300 h2 {
+  color: #5eead4 !important;
+}
+
+body.dark .bg-teal-300 p {
+  background: #0d9488 !important;
+  color: #ecfdf5 !important;
+}
+
+body.dark .bg-orange-300 {
+  background: #9a3412 !important;
+}
+
+body.dark .bg-orange-300 h2 {
+  color: #fdba74 !important;
+}
+
+body.dark .bg-orange-300 p {
+  background: #c2410c !important;
+  color: #ecfdf5 !important;
+}
+
+/* Responsive untuk mobile */
+@media (max-width: 768px) {
+  .swiper {
+    height: 250px;
+  }
+  
+  .swiper-slide h2 {
+    font-size: 2rem;
+  }
+  
+  .swiper-button-next,
+  .swiper-button-prev {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .swiper-button-next::after,
+  .swiper-button-prev::after {
+    font-size: 14px;
+  }
+  
+  .swiper-button-next {
+    right: 10px;
+  }
+  
+  .swiper-button-prev {
+    left: 10px;
+  }
+}
+
+      .copy-btn-inline {
+      background: #f3f4f6;
+      border: 1px solid #d1d5db;
+      color: #374151;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .copy-btn-inline:hover {
+      background: #e5e7eb;
+    }
+    body.dark .copy-btn-inline {
+      background: #64748b;
+      border-color: #475569;
+      color: #e2e8f0;
+    }
+    body.dark .copy-btn-inline:hover {
+      background: #475569;
+    }
+    
+    /* Light mode: kontainer menu transparan */
+body:not(.dark) #menu-container {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+body:not(.dark) #menu-container .product-card {
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Mini Search Bar Trigger */
+.search-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #f1f5f9;
+  border: 1px solid #d1d5db; /* light mode background */
+  color: #6b7280;
+  padding: 0.4rem 0.8rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  /* FIX: Remove transform from here to prevent layout shift */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  min-width: 200px; /* Lebar pendek */
+  flex-grow: 1; /* Memungkinkan untuk tumbuh di tengah */
+  max-width: 400px; /* Batasi lebar maksimum */
+  justify-content: center; /* Pusatkan teks di dalamnya */
+}
+
+/* FIX: Add a wrapper for the scale animation to prevent layout shift */
+.search-trigger-wrapper {
+  display: inline-block; /* Or block, depending on parent flex/grid */
+  transition: transform 0.3s ease; /* Apply transform here */
+}
+
+.search-trigger-wrapper:hover {
+  transform: scale(1.01); /* Apply scale here */
+}
+
+
+.search-trigger i {
+  font-size: 0.9rem;
+}
+
+body.dark .search-trigger {
+  background-color: #374151; /* dark mode background */
+  color: #d1d5db;
+  border-color: #4b5563;
+}
+
+.search-trigger:hover {
+  background-color: #F1F0E4;
+  color: #2a313e;
+  border: 2px solid #2a313e;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  /* FIX: Remove transform from here */
+}
+
+body.dark .search-trigger:hover {
+  background-color: #0E2148;
+  color: #EEEEEE;
+  border: 2px solid #58A0C8;
+  box-shadow: 0 0 10px rgba(10,20,10,0.3);
+  /* FIX: Remove transform from here */
+}
+
+ /* Tombol hamburger hanya muncul di <768px */
+    .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 24px;
+    height: 18px;
+    cursor: pointer;
+    position: relative; /* Added for X animation */
+    z-index: 1100; /* Above mobile menu overlay */
+  }
+  .hamburger span {
+    display: block;
+    height: 3px;
+    background: #1f2937;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+  }
+  body.dark .hamburger span {
+    background: #f97316; /* Ikut warna body dark mode */
+  }
+
+  /* Hamburger X animation */
+  .hamburger.open span:nth-child(1) {
+    transform: translateY(7.5px) rotate(45deg);
+  }
+  .hamburger.open span:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.open span:nth-child(3) {
+    transform: translateY(-7.5px) rotate(-45deg);
+  }
+
+  /* Specific breakpoints for hamburger and header elements */
+  /* Default: Desktop (>= 1024px) */
+  .header-nav-desktop { display: flex; gap: 1.5rem; } /* Added gap for spacing */
+  .wishlist-desktop { display: block; }
+  .dark-mode-desktop { display: block; }
+  .cart-desktop { display: block; }
+  .hamburger { display: none; }
+  .logo-desktop { display: flex; }
+  .search-trigger span { display: inline; } /* Teks search trigger terlihat */
+  .search-trigger {
+    min-width: 200px;
+    max-width: 400px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  .search-trigger i { font-size: 0.9rem; }
+  .search-container {
+    flex-grow: 1;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Tablet/Laptop Kecil (max-width: 1023px) */
+  @media (max-width: 1023px) {
+    .header-nav-desktop { display: none; } /* Navigasi masuk hamburger */
+    .hamburger { display: flex; } /* Hamburger muncul */
+    /* Elemen lain di header tetap terlihat */
+    .logo-desktop { display: flex; }
+    .wishlist-desktop { display: none !important; } /* Wishlist masuk hamburger */
+    .dark-mode-desktop { display: block; }
+    .cart-desktop { display: block; }
+    .search-trigger span { display: inline; }
+    .search-trigger {
+      min-width: 200px;
+      max-width: 400px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+    }
+    .search-trigger i { font-size: 0.9rem; }
+    .search-container {
+      flex-grow: 1;
+      justify-content: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    /* Adjust header actions for smaller screens */
+    .header-actions-desktop {
+      gap: 0.75rem; /* Jarak antar item di kanan */
+      margin-left: auto; /* Dorong ke kanan */
+    }
+    .hamburger {
+      margin-left: 0.5rem; /* Sedikit jarak dari item sebelumnya */
+    }
+  }
+
+  /* Mobile Portrait (max-width: 519px) - Changed from 427px to 519px */
+  @media (max-width: 519px) { /* New breakpoint for 520px */
+    .logo-desktop { display: flex !important; } /* Logo tetap ada */
+    .wishlist-desktop { display: none !important; } /* Pastikan wishlist tersembunyi */
+    .dark-mode-desktop { display: block !important; }
+    .cart-desktop { display: block !important; }
+    
+    /* Search trigger menyesuaikan ukuran dan tanpa teks */
+    .search-trigger {
+      min-width: unset;
+      max-width: 150px; /* Lebih kecil */
+      padding: 0.3rem 0.6rem; /* Padding lebih kecil */
+      font-size: 0.75rem; /* Font lebih kecil */
+    }
+    .search-trigger i {
+      font-size: 0.8rem; /* Icon lebih kecil */
+    }
+    .search-trigger span {
+      display: none; /* Sembunyikan teks "Cari produk anda..." */
+    }
+    .search-container {
+      flex-grow: 1;
+      justify-content: flex-start; /* Rata kiri */
+      margin-left: 0;
+      margin-right: 0.5rem;
+    }
+    .header-actions-desktop {
+      gap: 0.5rem; /* Jarak antar item lebih kecil */
+    }
+  }
+
+
+  /* Mobile menu overlay */
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 60px; /* tinggi header */
+    left: 0;
+    width: 100%;
+    background: white;
+    z-index: 1000;
+    border-top: 1px solid #e5e7eb;
+    padding-bottom: 1rem; /* Tambahkan padding bawah */
+    transform: translateY(-100%); /* Start off-screen */
+    transition: transform 0.3s ease-out;
+  }
+  .mobile-menu.open {
+    transform: translateY(0); /* Slide in */
+  }
+  body.dark .mobile-menu {
+    background: #334155;
+    border-color: #475569;
+  }
+
+  /* Menu items */
+  .mobile-menu .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid #e5e7eb;
+    transition: background 0.3s ease;
+  }
+  .mobile-menu .menu-item:last-child { border-bottom: none; }
+    
+  /* Hover efek kebalikan */
+  body:not(.dark) .mobile-menu .menu-item:hover {
+  background: #1f2937; /* gelap untuk light mode */
+  color: white;
+}
+body:not(.dark) .mobile-menu .menu-item:hover i {
+  color: white;
+}
+
+body.dark .mobile-menu .menu-item:hover {
+  background: #f3f4f6; /* terang untuk dark mode */
+  color: #1f2937;
+}
+body.dark .mobile-menu .menu-item:hover i {
+  color: #1f2937;
+}
+    
+    @media (max-width: 767px) {
+  .header-actions {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    position: absolute;
+    pointer-events: none;
+  }
+}
+@media (min-width: 768px) {
+  .header-actions {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    position: static;
+    pointer-events: auto;
+  }
+}
+
+/* Grid Daftar Menu - Glassmorphism */
+.menu-grid {
+  border-radius: 1rem;
+  padding: 1rem;
+}
+    
+/* Contact */
+    #contact-section {
+  background: transparent !important; /* Gunakan !important jika ada konflik */
+  box-shadow: none !important; /* Jika ada shadow yang tidak diinginkan */
+  border: none !important; /* Jika ada border yang tidak diinginkan */
+}
+
+/* New styles for contact section */
+.contact-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.contact-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+body.dark .contact-card {
+  background: rgba(51, 65, 85, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+body.dark .contact-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+}
+
+.contact-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.contact-button.whatsapp {
+  background: linear-gradient(135deg, #25d366, #1da851);
+  color: white;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+}
+
+.contact-button.whatsapp:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+}
+
+.contact-button.email {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.contact-button.email:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+}
+
+.contact-button.request-design {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.contact-button.request-design:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
+
+.footer-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+body.dark .footer-text {
+  color: #9ca3af;
+}
+
+/* Dropdown for contact buttons */
+.contact-dropdown {
+  position: relative;
+  width: 100%; /* Ensure it takes full width of its parent */
+}
+
+.contact-dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9fafb; /* Light mode background */
+  min-width: 100%; /* Match button width */
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 10; /* Above other content */
+  border-radius: 0.75rem; /* Match button border-radius */
+  overflow: hidden; /* For rounded corners */
+  top: 100%; /* Position below the button */
+  left: 0;
+  margin-top: 0.5rem; /* Space between button and dropdown */
+}
+
+body.dark .contact-dropdown-content {
+  background-color: #334155; /* Dark mode background */
+}
+
+.contact-dropdown-content a {
+  color: #374151; /* Light mode text color */
+  padding: 0.75rem 1.25rem;
+  text-decoration: none;
+  display: block;
+  font-weight: 500;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+body.dark .contact-dropdown-content a {
+  color: #e2e8f0; /* Dark mode text color */
+}
+
+.contact-dropdown-content a:hover {
+  background-color: #e5e7eb; /* Light mode hover */
+  color: #1f2937;
+}
+
+body.dark .contact-dropdown-content a:hover {
+  background-color: #475569; /* Dark mode hover */
+  color: #e2e8f0;
+}
+
+/* Date picker styling */
+input[type="date"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: white;
+  border: 1px solid #d1d5db;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  color: #1f2937;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="date"]:focus {
+  outline: none;
+  border-color: #f97316;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+}
+
+body.dark input[type="date"]:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.3);
+}
+
+/* Placeholder color for date input */
+input[type="date"]::-webkit-input-placeholder { color: #9ca3af; }
+input[type="date"]::-moz-placeholder { color: #9ca3af; }
+input[type="date"]:-ms-input-placeholder { color: #9ca3af; }
+input[type="date"]::placeholder { color: #9ca3af; }
+
+/* Date picker icon styling (optional, depends on browser) */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5); /* Adjust for dark mode */
+}
+
+body.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1); /* Make icon white in dark mode */
+}
+
+/* Login success animation */
+.login-success-badge {
+  position: fixed;
+  top: 180px; /* Below other badges */
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: 999px;
+  background-color: #22c55e; /* Green for success */
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 1400;
+  opacity: 0;
+  pointer-events: none;
+  display: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+  
+
+/* === NAVBAR VISIBILITY RULES — canonical === */
+@media (min-width: 1024px) {
+  .header-nav-desktop { display: flex !important; }
+  .hamburger { display: none !important; }
+}
+@media (max-width: 1023px) {
+  .header-nav-desktop { display: none !important; }
+  .hamburger { display: flex !important; }
+}
+@media (max-width: 767px) {
+  .header-nav-desktop { display: none !important; }
+  .hamburger { display: flex !important; }
+}
+@media (max-width: 519px) {
+  .header-nav-desktop { display: none !important; }
+  .hamburger { display: flex !important; }
+}
+
+  .product-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: auto;
+    transition: all 0.3s ease;
+  }
+  @media (max-width: 519px) {
+    .product-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .product-actions button {
+      width: 100%;
+    }
+  }
