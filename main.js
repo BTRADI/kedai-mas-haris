@@ -69,6 +69,11 @@ const productList = [
   { name: "Pie Buah", price: 3000, kategori: "Manis" },
   { name: "Risol Mayonais", price: 3000, kategori: "Gorengan" },
   { name: "Pastel Bihun", price: 3000, kategori: "Gorengan" },
+  // --- MENU BARU DITAMBAHKAN DI SINI ---
+  { name: "Cente Manis / Hunkwe", price: 3000, kategori: "Manis" },
+  { name: "Nasi Uduk", price: 8000, kategori: "Karbohidrat" },
+  { name: "Nasi Kuning", price: 7000, kategori: "Karbohidrat" },
+  // --- AKHIR DARI MENU BARU ---
 ];
 
 // Cart & Wishlist state
@@ -1057,7 +1062,7 @@ setInterval(syncMobileCounts, 500);
         showBadge(loginSuccessBadge, "Berhasil Login!");
         setTimeout(() => {
           openModal(reportBugModal);
-          resetReportEventForm(); // Fixed: should be resetReportBugForm
+          resetReportBugForm(); // Fixed: should be resetReportBugForm
         }, 1000); // Delay to show login success badge
       }
     });
