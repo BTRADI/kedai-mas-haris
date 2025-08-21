@@ -81,6 +81,10 @@ const dispersionCanvas = document.getElementById("dispersion-canvas");
 const promoCodeInput = document.getElementById("promo-code-input");
 const applyPromoBtn = document.getElementById("apply-promo-btn");
 const promoMessage = document.getElementById("promo-message");
+const promoPriceDisplay = document.getElementById("promo-price-display"); // New: Promo Price Display
+const originalTotalSpan = document.getElementById("original-total"); // New: Original Total Span
+const discountedTotalSpan = document.getElementById("discounted-total"); // New: Discounted Total Span
+
 
 // ---------- Data ----------
 const productList = [
@@ -98,32 +102,34 @@ const productList = [
 // New: Update Log Data
 const updateLog = [
   {
-    version: "1.1.0",
-    date: "2024-07-25",
+    version: "1.0.1",
+    date: "2025-08-21",
     changes: [
-      "Menambahkan kategori 'Manis' untuk pilihan menu baru.",
-      "Peningkatan performa loading gambar produk.",
-      "Perbaikan minor pada tampilan keranjang belanja."
+      "Perbaikan tombol 'Pesan' pada setiap menu untuk pengguna handphone.",
+      "Penambahan tombol 'back to the top'.",
+      "Perbaikan animasi.",
+      "Penambahan kode promo terbatas."
     ]
   },
   {
-    version: "1.0.0", // Versi awal aplikasi
-    date: "2025-08-20", // Tanggal launching aplikasi
+    version: "1.0.0",
+    date: "2025-08-20",
     changes: [
       "Aplikasi eCatalog Kedai Mas Haris resmi diluncurkan!",
-      "Fitur keranjang belanja dan wishlist tersedia.",
-      "Mode terang dan gelap untuk kenyamanan pengguna."
+      "Fitur keranjang belanja, wishlist, search produk tersedia.",
+      "Mode terang dan gelap untuk kenyamanan pengguna.",
+      "6 Menu tersedia (Lemper, Sosis Solo, Sus, Pie Buah, Cente Manis / Hunkwe / Risol Mayonais / Pastel Bihun)."
     ]
   }
 ];
 
 const currentPromo = {
-  code: "NEWAPP",
-  type: "buyXGetY",
-  buy: 6,
-  get: 1,
-  endDate: new Date("2025-08-31"), // Akhir bulan ini (contoh: Agustus 2025)
-  text: "Beli 6 item, GRATIS 1 item termurah! Berlaku hingga akhir bulan ini dengan kode promo: NEWAPP."
+  code: "DISKON10", // Kode promo yang Anda inginkan
+  discountPercentage: 0.10, // 10% diskon
+  minPurchase: 20000, // Minimal pembelian Rp 20.000
+  startDate: new Date("2025-08-21T20:00:00"), // Kamis, 21 Agustus 2025 pukul 20.00
+  endDate: new Date("2025-08-26T15:00:00"), // Selasa, 26 Agustus 2025 pukul 15.00
+  text: "Dapatkan diskon 10% untuk pembelian minimal Rp 20.000! Berlaku hingga 26 Agustus 2025 pukul 15.00 dengan kode promo: DISKON10."
 };
 
 // Cart & Wishlist state
@@ -138,7 +144,7 @@ let currentOrderData = {};
 let currentContactActionType = ''; // 'whatsapp' or 'email'
 let currentContactAction = ''; // 'order-event' or 'report-bug'
 let promoApplied = false;
-let freeItem = null;
+let freeItem = null; // This was for buyXGetY, not needed for percentage discount, but keeping for now if logic changes.
 
 // ---------- Utility Functions ----------
 function showNotif(text) {
@@ -287,13 +293,21 @@ function updateCartCount() {
 
 function updateCartTotal() {
   let total = Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0);
-  
+  let originalTotal = total; // Store original total before discount
+
   // Apply promo if active
-  if (promoApplied && freeItem) {
-    total -= freeItem.price; // Kurangi harga item gratis
+  if (promoApplied) {
+    total = originalTotal * (1 - currentPromo.discountPercentage);
+    promoPriceDisplay.classList.remove('hidden');
+    originalTotalSpan.textContent = `Rp ${originalTotal.toLocaleString("id-ID")}`;
+    discountedTotalSpan.textContent = `Rp ${total.toLocaleString("id-ID")}`;
+    document.getElementById("cart-total").style.display = 'none'; // Hide regular total
+  } else {
+    promoPriceDisplay.classList.add('hidden');
+    document.getElementById("cart-total").style.display = 'block'; // Show regular total
   }
 
-  document.getElementById("cart-total").textContent = "Rp " + total.toLocaleString("id-ID");
+  document.getElementById("cart-total").textContent = "Rp " + originalTotal.toLocaleString("id-ID");
 }
 
 function renderCart() {
@@ -309,7 +323,6 @@ function renderCart() {
     promoMessage.classList.add('hidden'); // Hide promo message if cart is empty
     promoCodeInput.value = ''; // Clear promo input
     promoApplied = false; // Reset promo status
-    freeItem = null; // Reset free item
     updateCartTotal(); // Recalculate total
     return;
   }
@@ -385,28 +398,14 @@ function deleteCartItem(itemName) {
 
 // ---------- Promo Logic ----------
 function checkPromoEligibility() {
-  const totalItemsInCart = Object.values(cart).reduce((sum, item) => sum + item.qty, 0);
+  const totalPriceInCart = Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0);
   const today = new Date();
 
-  if (totalItemsInCart >= currentPromo.buy && today <= currentPromo.endDate) {
-    // Find the cheapest item in the cart
-    let cheapestItem = null;
-    let minPrice = Infinity;
-
-    for (const itemName in cart) {
-      const item = cart[itemName];
-      if (item.price < minPrice) {
-        minPrice = item.price;
-        cheapestItem = item;
-      }
-    }
-    freeItem = cheapestItem;
-    promoApplied = true;
-    promoMessage.textContent = `Promo "${currentPromo.code}" diterapkan! Anda mendapatkan 1 ${freeItem.name} GRATIS!`;
+  if (promoApplied && totalPriceInCart >= currentPromo.minPurchase && today >= currentPromo.startDate && today <= currentPromo.endDate) {
+    promoMessage.textContent = `Promo "${currentPromo.code}" diterapkan! Anda mendapatkan diskon 10%!`;
     promoMessage.classList.remove('hidden');
   } else {
-    promoApplied = false;
-    freeItem = null;
+    promoApplied = false; // Reset promoApplied if conditions are not met
     promoMessage.classList.add('hidden');
   }
   updateCartTotal();
@@ -414,25 +413,31 @@ function checkPromoEligibility() {
 
 function applyPromoCode() {
   const inputCode = promoCodeInput.value.trim().toUpperCase();
+  const totalPriceInCart = Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0);
+  const today = new Date();
+
   if (inputCode === currentPromo.code) {
-    const today = new Date();
-    if (today > currentPromo.endDate) {
+    if (today < currentPromo.startDate) {
+      promoMessage.textContent = "Kode promo belum aktif.";
+      promoMessage.classList.remove('hidden');
+      promoApplied = false;
+    } else if (today > currentPromo.endDate) {
       promoMessage.textContent = "Maaf, kode promo sudah kadaluarsa.";
       promoMessage.classList.remove('hidden');
       promoApplied = false;
-      freeItem = null;
+    } else if (totalPriceInCart < currentPromo.minPurchase) {
+      promoMessage.textContent = `Promo "${currentPromo.code}" belum memenuhi syarat (minimal pembelian Rp ${currentPromo.minPurchase.toLocaleString("id-ID")}).`;
+      promoMessage.classList.remove('hidden');
+      promoApplied = false;
     } else {
-      checkPromoEligibility();
-      if (!promoApplied) {
-        promoMessage.textContent = `Promo "${currentPromo.code}" belum memenuhi syarat (minimal ${currentPromo.buy} item).`;
-        promoMessage.classList.remove('hidden');
-      }
+      promoApplied = true;
+      promoMessage.textContent = `Kode promo berhasil diterapkan! Anda mendapatkan diskon 10%!`;
+      promoMessage.classList.remove('hidden');
     }
   } else {
     promoMessage.textContent = "Kode promo tidak valid.";
     promoMessage.classList.remove('hidden');
     promoApplied = false;
-    freeItem = null;
   }
   updateCartTotal();
 }
@@ -596,7 +601,8 @@ function renderMenu(kategori = "all") {
 function generateOrderMessage() {
   const items = Object.values(cart);
   let total = items.reduce((sum, item) => sum + item.qty * item.price, 0);
-  
+  let originalTotal = total;
+
   let message = `🛒 *PESANAN BARU*\n\n`;
   message += `📍 *KEDAI MAS HARIS*\n`;
   message += `⏰ ${new Date().toLocaleString('id-ID')}\n\n`;
@@ -607,10 +613,11 @@ function generateOrderMessage() {
     message += `   ${item.qty} x Rp ${item.price.toLocaleString('id-ID')} = Rp ${(item.qty * item.price).toLocaleString('id-ID')}\n\n`;
   });
 
-  if (promoApplied && freeItem) {
-    message += `🎁 *PROMO: Buy ${currentPromo.buy} Get ${currentPromo.get}*\n`;
-    message += `   Anda mendapatkan 1 ${freeItem.name} GRATIS!\n\n`;
-    total -= freeItem.price; // Adjust total for free item
+  if (promoApplied) {
+    total = originalTotal * (1 - currentPromo.discountPercentage);
+    message += `\n🎉 *PROMO DITERAPKAN!* 🎉\n`;
+    message += `   Harga Asli: Rp ${originalTotal.toLocaleString('id-ID')}\n`;
+    message += `   Diskon (${currentPromo.discountPercentage * 100}%): Rp ${(originalTotal - total).toLocaleString('id-ID')}\n`;
   }
   
   message += `💰 *Total: Rp ${total.toLocaleString('id-ID')}*\n\n`;
@@ -671,6 +678,12 @@ function renderUpdateModalContent() {
     title.textContent = `Versi ${log.version}`;
     updateItem.appendChild(title);
 
+    // Mengubah format tanggal menjadi "Diperbarui pada [tanggal]"
+    const dateElement = document.createElement('p');
+    dateElement.className = 'update-date'; // Menambahkan kelas untuk styling
+    dateElement.textContent = `Diperbarui pada ${new Date(log.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+    updateItem.appendChild(dateElement);
+
     const ul = document.createElement('ul');
     ul.className = 'list-disc list-inside text-sm';
     log.changes.forEach(change => {
@@ -679,11 +692,6 @@ function renderUpdateModalContent() {
       ul.appendChild(li);
     });
     updateItem.appendChild(ul);
-
-    const date = document.createElement('p');
-    date.className = 'update-date';
-    date.textContent = `Diperbarui: ${new Date(log.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}`;
-    updateItem.appendChild(date);
 
     updateContent.appendChild(updateItem);
   });
@@ -936,7 +944,7 @@ document.addEventListener('DOMContentLoaded', () => {
     promoCodeInput.value = '';
     promoMessage.classList.add('hidden');
     promoApplied = false;
-    freeItem = null;
+    updateCartTotal(); // Ensure total is updated correctly when opening cart
 
     if (Object.keys(cart).length === 0) {
       showNotif("Keranjang kosong");

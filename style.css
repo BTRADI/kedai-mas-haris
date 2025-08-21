@@ -275,7 +275,6 @@ body.dark .bg-lime-300 h2 {
 }
 
 body.dark .bg-lime-300 p {
-  background: #059669;
   color: #ecfdf5;
 }
 
@@ -1530,7 +1529,7 @@ body.dark .mobile-menu .menu-item:hover i {
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 1.25rem;
   padding: 1.5rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
 }
 
@@ -1542,7 +1541,7 @@ body.dark .mobile-menu .menu-item:hover i {
 body.dark .contact-card {
   background: rgba(51, 65, 85, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
 body.dark .contact-card:hover {
@@ -1822,22 +1821,18 @@ body.dark .back-to-top-btn:hover {
   padding: 2rem;
 }
 
-#update-modal h3 {
-  font-size: 1.75rem;
-  font-weight: bold;
-  color: #f97316; /* Orange color for title */
-}
-
 #update-modal .update-item {
   background-color: #f3f4f6;
   padding: 1rem;
   border-radius: 0.75rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem; /* Added gap between update items */
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid #e5e7eb; /* Light mode border */
 }
 
 body.dark #update-modal .update-item {
   background-color: #475569;
+  border: 1px solid #64748b; /* Dark mode border */
 }
 
 #update-modal .update-item h4 {
@@ -1850,24 +1845,20 @@ body.dark #update-modal .update-item h4 {
   color: #e2e8f0;
 }
 
-#update-modal .update-item p {
-  font-size: 0.9rem;
-  color: #4b5563;
-}
-
-body.dark #update-modal .update-item p {
-  color: #cbd5e1;
-}
-
 #update-modal .update-item .update-date {
   font-size: 0.8rem;
-  color: #9ca3af;
-  margin-top: 0.5rem;
-  text-align: right;
+  color: #6b7280; /* Adjusted for better contrast in light mode */
+  margin-top: 0.25rem; /* Reduced margin for tighter spacing */
+  margin-bottom: 0.5rem; /* Added margin below date */
+  text-align: left; /* Align date to left */
 }
 
 body.dark #update-modal .update-item .update-date {
-  color: #94a3b8;
+  color: #94a3b8; /* Adjusted for better contrast in dark mode */
+}
+
+#update-modal .update-item ul {
+  margin-top: 0.5rem; /* Gap between date and list */
 }
 
 #update-modal #promo-content {
@@ -1963,4 +1954,48 @@ body.dark .promo-applied-text {
 
 body.dark #update-modal label {
   color: #cbd5e1; /* Dark mode color */
+}
+
+/* Styling for promo price display */
+.promo-original-price {
+  text-decoration: line-through;
+  color: #ef4444; /* Red color for strikethrough price */
+  font-size: 0.875rem;
+  margin-right: 0.5rem;
+}
+
+.promo-discounted-price {
+  color: #22c55e; /* Green color for discounted price */
+  font-weight: bold;
+}
+
+/* Custom Scrollbar for update-content */
+#update-content {
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: transparent transparent; /* For Firefox: thumb track */
+}
+
+/* Webkit (Chrome, Safari) scrollbar styles */
+#update-content::-webkit-scrollbar {
+  width: 8px; /* Lebar scrollbar */
+  background-color: transparent; /* Latar belakang transparan */
+}
+
+#update-content::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5); /* Warna thumb default (light mode) */
+  border-radius: 10px;
+  border: 2px solid transparent; /* Border transparan agar terlihat melayang */
+}
+
+#update-content::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.7); /* Warna thumb saat hover */
+}
+
+/* Dark mode scrollbar */
+body.dark #update-content::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.5); /* Warna thumb dark mode */
+}
+
+body.dark #update-content::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.7); /* Warna thumb dark mode saat hover */
 }
