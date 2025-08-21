@@ -8,6 +8,10 @@ const MY_EMAIL = "mhdharisn21@gmail.com";
 const CC_EMAIL = "muhammad_nugroho@app.co.id"; // Email CC yang tidak diketahui user
 const DANA_QR_CODE_PATH = "QR-Dana.jpeg"; // Path ke gambar QR Code DANA Anda
 
+// New: Cooldown for update modal
+const UPDATE_MODAL_COOLDOWN_KEY = 'updateModalCooldown';
+const UPDATE_MODAL_COOLDOWN_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
+
 // DOM Elements
 const container = document.getElementById("menu-container");
 const cartCount = document.getElementById("cart-count");
@@ -28,6 +32,7 @@ const infoModal = document.getElementById("info-modal");
 const searchModal = document.getElementById("search-modal");
 const orderEventModal = document.getElementById("order-event-modal");
 const reportBugModal = document.getElementById("report-bug-modal");
+const updateModal = document.getElementById("update-modal"); // New: Update Modal
 
 // Badges
 const copiedBadge = document.getElementById("copied");
@@ -65,6 +70,18 @@ const danaQrCodeImg = document.getElementById("dana-qr-code");
 // Back to Top button
 const backToTopBtn = document.getElementById("back-to-top");
 
+// New: Update Modal Elements
+const updateContent = document.getElementById("update-content");
+const promoText = document.getElementById("promo-text");
+const closeUpdateModalBtn = document.getElementById("close-update-modal");
+const dontShowAgainCheckbox = document.getElementById("dont-show-again"); // New: Checkbox
+const dispersionCanvas = document.getElementById("dispersion-canvas");
+
+// Promo elements
+const promoCodeInput = document.getElementById("promo-code-input");
+const applyPromoBtn = document.getElementById("apply-promo-btn");
+const promoMessage = document.getElementById("promo-message");
+
 // ---------- Data ----------
 const productList = [
   { name: "Lemper", price: 3000, kategori: "Karbohidrat" },
@@ -78,6 +95,37 @@ const productList = [
   { name: "Nasi Kuning", price: 7000, kategori: "Karbohidrat" },
 ];
 
+// New: Update Log Data
+const updateLog = [
+  {
+    version: "1.1.0",
+    date: "2024-07-25",
+    changes: [
+      "Menambahkan kategori 'Manis' untuk pilihan menu baru.",
+      "Peningkatan performa loading gambar produk.",
+      "Perbaikan minor pada tampilan keranjang belanja."
+    ]
+  },
+  {
+    version: "1.0.0", // Versi awal aplikasi
+    date: "2025-08-20", // Tanggal launching aplikasi
+    changes: [
+      "Aplikasi eCatalog Kedai Mas Haris resmi diluncurkan!",
+      "Fitur keranjang belanja dan wishlist tersedia.",
+      "Mode terang dan gelap untuk kenyamanan pengguna."
+    ]
+  }
+];
+
+const currentPromo = {
+  code: "NEWAPP",
+  type: "buyXGetY",
+  buy: 6,
+  get: 1,
+  endDate: new Date("2025-08-31"), // Akhir bulan ini (contoh: Agustus 2025)
+  text: "Beli 6 item, GRATIS 1 item termurah! Berlaku hingga akhir bulan ini dengan kode promo: NEWAPP."
+};
+
 // Cart & Wishlist state
 const cart = {};
 const wishlist = {};
@@ -89,6 +137,8 @@ let currentPaymentMethod = '';
 let currentOrderData = {};
 let currentContactActionType = ''; // 'whatsapp' or 'email'
 let currentContactAction = ''; // 'order-event' or 'report-bug'
+let promoApplied = false;
+let freeItem = null;
 
 // ---------- Utility Functions ----------
 function showNotif(text) {
@@ -236,7 +286,13 @@ function updateCartCount() {
 }
 
 function updateCartTotal() {
-  const total = Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0);
+  let total = Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0);
+  
+  // Apply promo if active
+  if (promoApplied && freeItem) {
+    total -= freeItem.price; // Kurangi harga item gratis
+  }
+
   document.getElementById("cart-total").textContent = "Rp " + total.toLocaleString("id-ID");
 }
 
@@ -250,6 +306,11 @@ function renderCart() {
         Keranjang kosong 🛒<br>
         <small>Silakan tambahkan produk!</small>
       </div>`;
+    promoMessage.classList.add('hidden'); // Hide promo message if cart is empty
+    promoCodeInput.value = ''; // Clear promo input
+    promoApplied = false; // Reset promo status
+    freeItem = null; // Reset free item
+    updateCartTotal(); // Recalculate total
     return;
   }
 
@@ -278,6 +339,10 @@ function renderCart() {
     
     cartItemsContainer.appendChild(wrap);
   });
+
+  // Re-check promo status after rendering cart items
+  checkPromoEligibility();
+  updateCartTotal();
 }
 
 function openEditCartModal(itemName) {
@@ -316,6 +381,60 @@ function deleteCartItem(itemName) {
     cartModal.setAttribute("aria-hidden", "true");
     openModal(confirmDeleteModal);
   }});
+}
+
+// ---------- Promo Logic ----------
+function checkPromoEligibility() {
+  const totalItemsInCart = Object.values(cart).reduce((sum, item) => sum + item.qty, 0);
+  const today = new Date();
+
+  if (totalItemsInCart >= currentPromo.buy && today <= currentPromo.endDate) {
+    // Find the cheapest item in the cart
+    let cheapestItem = null;
+    let minPrice = Infinity;
+
+    for (const itemName in cart) {
+      const item = cart[itemName];
+      if (item.price < minPrice) {
+        minPrice = item.price;
+        cheapestItem = item;
+      }
+    }
+    freeItem = cheapestItem;
+    promoApplied = true;
+    promoMessage.textContent = `Promo "${currentPromo.code}" diterapkan! Anda mendapatkan 1 ${freeItem.name} GRATIS!`;
+    promoMessage.classList.remove('hidden');
+  } else {
+    promoApplied = false;
+    freeItem = null;
+    promoMessage.classList.add('hidden');
+  }
+  updateCartTotal();
+}
+
+function applyPromoCode() {
+  const inputCode = promoCodeInput.value.trim().toUpperCase();
+  if (inputCode === currentPromo.code) {
+    const today = new Date();
+    if (today > currentPromo.endDate) {
+      promoMessage.textContent = "Maaf, kode promo sudah kadaluarsa.";
+      promoMessage.classList.remove('hidden');
+      promoApplied = false;
+      freeItem = null;
+    } else {
+      checkPromoEligibility();
+      if (!promoApplied) {
+        promoMessage.textContent = `Promo "${currentPromo.code}" belum memenuhi syarat (minimal ${currentPromo.buy} item).`;
+        promoMessage.classList.remove('hidden');
+      }
+    }
+  } else {
+    promoMessage.textContent = "Kode promo tidak valid.";
+    promoMessage.classList.remove('hidden');
+    promoApplied = false;
+    freeItem = null;
+  }
+  updateCartTotal();
 }
 
 // ---------- Wishlist Functions ----------
@@ -476,7 +595,7 @@ function renderMenu(kategori = "all") {
 // ---------- Payment Functions ----------
 function generateOrderMessage() {
   const items = Object.values(cart);
-  const total = items.reduce((sum, item) => sum + item.qty * item.price, 0);
+  let total = items.reduce((sum, item) => sum + item.qty * item.price, 0);
   
   let message = `🛒 *PESANAN BARU*\n\n`;
   message += `📍 *KEDAI MAS HARIS*\n`;
@@ -487,6 +606,12 @@ function generateOrderMessage() {
     message += `${index + 1}. ${item.name}\n`;
     message += `   ${item.qty} x Rp ${item.price.toLocaleString('id-ID')} = Rp ${(item.qty * item.price).toLocaleString('id-ID')}\n\n`;
   });
+
+  if (promoApplied && freeItem) {
+    message += `🎁 *PROMO: Buy ${currentPromo.buy} Get ${currentPromo.get}*\n`;
+    message += `   Anda mendapatkan 1 ${freeItem.name} GRATIS!\n\n`;
+    total -= freeItem.price; // Adjust total for free item
+  }
   
   message += `💰 *Total: Rp ${total.toLocaleString('id-ID')}*\n\n`;
   message += `💳 *Metode Pembayaran: ${currentPaymentMethod}*\n\n`;
@@ -534,6 +659,207 @@ function sendToWhatsApp() {
   
   window.open(whatsappUrl, '_blank');
 }
+
+// ---------- New: Update Notification Modal Functions ----------
+function renderUpdateModalContent() {
+  updateContent.innerHTML = '';
+  updateLog.forEach(log => {
+    const updateItem = document.createElement('div');
+    updateItem.className = 'update-item';
+    
+    const title = document.createElement('h4');
+    title.textContent = `Versi ${log.version}`;
+    updateItem.appendChild(title);
+
+    const ul = document.createElement('ul');
+    ul.className = 'list-disc list-inside text-sm';
+    log.changes.forEach(change => {
+      const li = document.createElement('li');
+      li.textContent = change;
+      ul.appendChild(li);
+    });
+    updateItem.appendChild(ul);
+
+    const date = document.createElement('p');
+    date.className = 'update-date';
+    date.textContent = `Diperbarui: ${new Date(log.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+    updateItem.appendChild(date);
+
+    updateContent.appendChild(updateItem);
+  });
+
+  promoText.textContent = currentPromo.text;
+}
+
+function showUpdateModal() {
+  renderUpdateModalContent();
+  
+  // Check cooldown
+  const lastShownTime = localStorage.getItem(UPDATE_MODAL_COOLDOWN_KEY);
+  const currentTime = new Date().getTime();
+
+  if (lastShownTime && (currentTime - parseInt(lastShownTime, 10) < UPDATE_MODAL_COOLDOWN_DURATION)) {
+    // If within cooldown period, do not show modal
+    console.log('Update modal is in cooldown. Not showing.');
+    return;
+  }
+
+  openModal(updateModal);
+  
+  // Reset checkbox state
+  dontShowAgainCheckbox.checked = false;
+  // Store the last seen update version in localStorage
+  localStorage.setItem('lastSeenUpdateVersion', updateLog[0].version);
+}
+
+// ---------- New: Dispersion Effect with Three.js ----------
+let scene, camera, renderer, mesh, material, geometry;
+let uniforms;
+let animationFrameId;
+
+function initDispersionEffect(targetElement) {
+    // Get the bounding box of the modal
+    const rect = targetElement.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const x = rect.left;
+    const y = rect.top;
+
+    // Set canvas size and position
+    dispersionCanvas.width = window.innerWidth;
+    dispersionCanvas.height = window.innerHeight;
+    dispersionCanvas.style.display = 'block'; // Show canvas
+
+    // Scene
+    scene = new THREE.Scene();
+
+    // Camera
+    camera = new THREE.OrthographicCamera(
+        -window.innerWidth / 2, window.innerWidth / 2,
+        window.innerHeight / 2, -window.innerHeight / 2,
+        1, 1000
+    );
+    camera.position.z = 1;
+
+    // Renderer
+    renderer = new THREE.WebGLRenderer({ canvas: dispersionCanvas, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    // Create a texture from the modal content
+    // This is a simplified approach. For a real-world scenario,
+    // you might need to render the modal to a canvas first.
+    const modalTexture = new THREE.CanvasTexture(targetElement); // This won't work directly for HTML elements.
+                                                                 // You'd need to use html2canvas or similar.
+                                                                 // For now, let's use a placeholder.
+    
+    // Placeholder texture (replace with actual modal content capture)
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+    const ctx = tempCanvas.getContext('2d');
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, width, height);
+    ctx.font = '20px Arial';
+    ctx.fillStyle = 'black';
+    ctx.fillText('Modal Content', 20, 50);
+    const texture = new THREE.CanvasTexture(tempCanvas);
+
+
+    // Shader Uniforms
+    uniforms = {
+        u_texture: { value: texture },
+        u_progress: { value: 0.0 },
+        u_resolution: { value: new THREE.Vector2(width, height) },
+        u_mouse: { value: new THREE.Vector2(x + width / 2, window.innerHeight - (y + height / 2)) }, // Center of modal
+        u_time: { value: 0.0 }
+    };
+
+    // Shader Material
+    material = new THREE.ShaderMaterial({
+        uniforms: uniforms,
+        vertexShader: `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `,
+        fragmentShader: `
+            uniform sampler2D u_texture;
+            uniform float u_progress;
+            uniform vec2 u_resolution;
+            uniform vec2 u_mouse;
+            uniform float u_time;
+            varying vec2 vUv;
+
+            void main() {
+                vec2 uv = vUv;
+                vec2 mouse_uv = u_mouse / u_resolution; // Mouse position in UV space
+
+                // Simple dispersion based on distance from mouse/center
+                float dist = distance(uv, mouse_uv);
+                float strength = smoothstep(0.0, 0.5, dist) * u_progress; // Dispersion strength increases with progress
+
+                vec2 displaced_uv = uv + normalize(uv - mouse_uv) * strength * 0.1; // Displace UVs
+                
+                // Add some noise for a more organic look
+                float noise = fract(sin(dot(uv * 100.0, vec2(12.9898, 78.233))) * 43758.5453);
+                displaced_uv += noise * strength * 0.05;
+
+                vec4 color = texture2D(u_texture, displaced_uv);
+
+                // Fade out effect
+                color.a *= (1.0 - u_progress);
+
+                gl_FragColor = color;
+            }
+        `,
+        transparent: true
+    });
+
+    // Plane Geometry (covering the modal area)
+    geometry = new THREE.PlaneGeometry(width, height);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x + width / 2 - window.innerWidth / 2, window.innerHeight / 2 - (y + height / 2), 0); // Position in orthographic camera space
+    scene.add(mesh);
+
+    animateDispersion();
+}
+
+function animateDispersion() {
+    uniforms.u_time.value += 0.05;
+    uniforms.u_progress.value += 0.02; // Increase progress for dispersion
+    if (uniforms.u_progress.value < 1.0) {
+        renderer.render(scene, camera);
+        animationFrameId = requestAnimationFrame(animateDispersion);
+    } else {
+        cancelAnimationFrame(animationFrameId);
+        dispersionCanvas.style.display = 'none'; // Hide canvas after animation
+        // Clean up Three.js resources
+        if (mesh) scene.remove(mesh);
+        if (geometry) geometry.dispose();
+        if (material) material.dispose();
+        if (uniforms.u_texture.value) uniforms.u_texture.value.dispose();
+        scene = null;
+        camera = null;
+        renderer = null;
+        mesh = null;
+        material = null;
+        geometry = null;
+        uniforms = null;
+    }
+}
+
+function startDispersionEffect(modalElement) {
+    // Hide the modal immediately to reveal the canvas
+    modalElement.style.display = 'none';
+    modalElement.setAttribute("aria-hidden", "true");
+
+    // Initialize and run the Three.js effect
+    initDispersionEffect(modalElement);
+}
+
 
 // ---------- Event Listeners ----------
 document.addEventListener('DOMContentLoaded', () => {
@@ -606,6 +932,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Cart button
   document.getElementById("cart-btn").addEventListener("click", () => {
+    // Reset promo input and message when opening cart
+    promoCodeInput.value = '';
+    promoMessage.classList.add('hidden');
+    promoApplied = false;
+    freeItem = null;
+
     if (Object.keys(cart).length === 0) {
       showNotif("Keranjang kosong");
       return;
@@ -613,6 +945,14 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCart();
     updateCartTotal();
     openModal(cartModal);
+  });
+
+  // Promo code handlers
+  applyPromoBtn.addEventListener('click', applyPromoCode);
+  promoCodeInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      applyPromoCode();
+    }
   });
 
   // Wishlist button
@@ -863,7 +1203,18 @@ document.addEventListener('DOMContentLoaded', () => {
       hamburger.click();
     } else {
       if (modalStack.length > 0) {
-        closeModal(modalStack[modalStack.length - 1]);
+        // If the top modal is the update modal, trigger dispersion
+        if (modalStack[modalStack.length - 1] === updateModal) {
+          startDispersionEffect(updateModal);
+          modalStack.pop(); // Remove from stack after starting dispersion
+          gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
+            gsap.set(overlay, { display: "none" });
+            overlay.setAttribute("aria-hidden", "true");
+            overlay.style.pointerEvents = "none";
+          }});
+        } else {
+          closeModal(modalStack[modalStack.length - 1]);
+        }
       }
     }
   });
@@ -1257,6 +1608,46 @@ setInterval(syncMobileCounts, 500);
       ease: "power2.inOut" // Animasi smooth
     });
   });
+
+  // New: Update Notification Modal Logic
+  closeUpdateModalBtn.addEventListener('click', () => {
+    // Trigger dispersion effect when closing update modal
+    startDispersionEffect(updateModal);
+    modalStack = modalStack.filter(modal => modal !== updateModal); // Remove from stack
+    gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
+      gsap.set(overlay, { display: "none" });
+      overlay.setAttribute("aria-hidden", "true");
+      overlay.style.pointerEvents = "none";
+    }});
+  });
+
+  // Checkbox event listener
+  dontShowAgainCheckbox.addEventListener('change', () => {
+    if (dontShowAgainCheckbox.checked) {
+      // Set cooldown timestamp in localStorage
+      localStorage.setItem(UPDATE_MODAL_COOLDOWN_KEY, new Date().getTime().toString());
+    } else {
+      // Remove cooldown timestamp from localStorage
+      localStorage.removeItem(UPDATE_MODAL_COOLDOWN_KEY);
+    }
+  });
+
+  // Check if update modal should be shown on page load
+  const lastSeenVersion = localStorage.getItem('lastSeenUpdateVersion');
+  if (!lastSeenVersion || lastSeenVersion !== updateLog[0].version) {
+    // Show update modal after a short delay to ensure page is loaded
+    setTimeout(showUpdateModal, 1000); 
+  } else {
+    // If the latest version has been seen, check if it's still in cooldown
+    const lastShownTime = localStorage.getItem(UPDATE_MODAL_COOLDOWN_KEY);
+    const currentTime = new Date().getTime();
+    if (lastShownTime && (currentTime - parseInt(lastShownTime, 10) < UPDATE_MODAL_COOLDOWN_DURATION)) {
+      console.log('Update modal is in cooldown from previous session. Not showing.');
+    } else {
+      // If not in cooldown, show it again (e.g., if user didn't check the box last time)
+      setTimeout(showUpdateModal, 1000);
+    }
+  }
 });
 
 document.addEventListener("DOMContentLoaded", function() {
