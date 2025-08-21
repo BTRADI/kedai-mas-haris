@@ -17,7 +17,6 @@ const kategoriButtons = document.querySelectorAll(".category-card");
 const overlay = document.getElementById("overlay");
 const darkToggle = document.getElementById('darkToggle');
 const darkModeIcon = darkToggle.querySelector('.toggle-icon');
-// Removed darkToggleMobile creation here, will be handled dynamically if needed
 
 // Modals
 const cartModal = document.getElementById("cart-modal");
@@ -27,15 +26,13 @@ const wishlistModal = document.getElementById("wishlist-modal");
 const paymentModal = document.getElementById("payment-modal");
 const infoModal = document.getElementById("info-modal");
 const searchModal = document.getElementById("search-modal");
-const whatsappModal = document.getElementById("whatsapp-modal"); // New
-const emailModal = document.getElementById("email-modal"); // New
-const orderEventModal = document.getElementById("order-event-modal"); // New
-const reportBugModal = document.getElementById("report-bug-modal"); // New
+const orderEventModal = document.getElementById("order-event-modal");
+const reportBugModal = document.getElementById("report-bug-modal");
 
 // Badges
 const copiedBadge = document.getElementById("copied");
 const sentBadge = document.getElementById("sent");
-const loginSuccessBadge = document.getElementById("login-success-badge"); // New
+const loginSuccessBadge = document.getElementById("login-success-badge");
 
 // Search elements
 const searchInput = document.getElementById("search-input");
@@ -43,10 +40,10 @@ const doSearchBtn = document.getElementById("do-search");
 const closeSearchBtn = document.getElementById("close-search");
 
 // Contact elements
-const whatsappContactBtn = document.getElementById("whatsapp-contact-btn"); // New
-const emailContactBtn = document.getElementById("email-contact-btn"); // New
-const whatsappDropdownContent = document.getElementById("whatsapp-dropdown-content"); // New
-const emailDropdownContent = document.getElementById("email-dropdown-content"); // New
+const whatsappContactBtn = document.getElementById("whatsapp-contact-btn");
+const emailContactBtn = document.getElementById("email-contact-btn");
+const whatsappDropdownContent = document.getElementById("whatsapp-dropdown-content");
+const emailDropdownContent = document.getElementById("email-dropdown-content");
 
 // Order Event Form elements
 const orderNameInput = document.getElementById("order-name");
@@ -63,7 +60,10 @@ const bugCharCount = document.getElementById("bug-char-count");
 const submitReportBugBtn = document.getElementById("submit-report-bug");
 
 // QR Code element
-const danaQrCodeImg = document.getElementById("dana-qr-code"); // New: Get QR code image element
+const danaQrCodeImg = document.getElementById("dana-qr-code");
+
+// Back to Top button
+const backToTopBtn = document.getElementById("back-to-top");
 
 // ---------- Data ----------
 const productList = [
@@ -73,11 +73,9 @@ const productList = [
   { name: "Pie Buah", price: 3000, kategori: "Manis" },
   { name: "Risol Mayonais", price: 3000, kategori: "Gorengan" },
   { name: "Pastel Bihun", price: 3000, kategori: "Gorengan" },
-  // --- MENU BARU DITAMBAHKAN DI SINI ---
   { name: "Cente Manis / Hunkwe", price: 3000, kategori: "Manis" },
   { name: "Nasi Uduk", price: 8000, kategori: "Karbohidrat" },
   { name: "Nasi Kuning", price: 7000, kategori: "Karbohidrat" },
-  // --- AKHIR DARI MENU BARU ---
 ];
 
 // Cart & Wishlist state
@@ -95,8 +93,8 @@ let currentContactAction = ''; // 'order-event' or 'report-bug'
 // ---------- Utility Functions ----------
 function showNotif(text) {
   notif.textContent = text;
-  gsap.killTweensOf(notif);
-  gsap.set(notif, { opacity: 0, y: -10, display: "block" });
+  gsap.killTweensOf(notif); // Stop any ongoing animations
+  gsap.set(notif, { opacity: 0, y: -10, display: "block" }); // Ensure it's visible for animation
   gsap.to(notif, { duration: 0.28, opacity: 1, y: 0, ease: "power2.out" });
   gsap.to(notif, {
     delay: 1.6,
@@ -105,15 +103,15 @@ function showNotif(text) {
     y: -10,
     ease: "power2.in",
     onComplete: () => {
-      notif.style.display = "none";
+      gsap.set(notif, { display: "none" }); // Hide it completely after animation
     },
   });
 }
 
 function showBadge(badge, text) {
   badge.textContent = text;
-  gsap.killTweensOf(badge);
-  gsap.set(badge, { opacity: 0, scale: 0.8, display: "block" });
+  gsap.killTweensOf(badge); // Stop any ongoing animations
+  gsap.set(badge, { opacity: 0, scale: 0.8, display: "block" }); // Ensure it's visible for animation
   gsap.to(badge, { duration: 0.3, opacity: 1, scale: 1, ease: "back.out" });
   gsap.to(badge, {
     delay: 1.5,
@@ -122,7 +120,7 @@ function showBadge(badge, text) {
     scale: 0.8,
     ease: "back.in",
     onComplete: () => {
-      badge.style.display = "none";
+      gsap.set(badge, { display: "none" }); // Hide it completely after animation
     },
   });
 }
@@ -132,13 +130,17 @@ function openModal(modal) {
   if (!modalStack.includes(modal)) {
     modalStack.push(modal);
   }
-  overlay.classList.add("show");
-  overlay.setAttribute("aria-hidden", "false");
-  setTimeout(() => {
-    modal.classList.add("show");
+  gsap.set(overlay, { display: "block" }); // Ensure overlay is block before animating
+  gsap.to(overlay, { duration: 0.25, opacity: 1, ease: "power2.out", onComplete: () => {
+    overlay.setAttribute("aria-hidden", "false");
+    overlay.style.pointerEvents = "auto";
+  }});
+
+  gsap.set(modal, { display: "block", scale: 0.8, opacity: 0 }); // Ensure modal is block before animating
+  gsap.to(modal, { duration: 0.3, opacity: 1, scale: 1, ease: "power2.out", onComplete: () => {
     modal.setAttribute("aria-hidden", "false");
     modal.focus();
-  }, 10);
+  }});
 }
 
 function closeModal(modal) {
@@ -146,14 +148,25 @@ function closeModal(modal) {
   if (index > -1) {
     modalStack.splice(index, 1);
   }
-  modal.classList.remove("show");
-  modal.setAttribute("aria-hidden", "true");
-  if (modalStack.length === 0) {
-    setTimeout(() => {
-      overlay.classList.remove("show");
-      overlay.setAttribute("aria-hidden", "true");
-    }, 300);
-  }
+
+  gsap.to(modal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+    gsap.set(modal, { display: "none" });
+    modal.setAttribute("aria-hidden", "true");
+    if (modalStack.length === 0) {
+      gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
+        gsap.set(overlay, { display: "none" });
+        overlay.setAttribute("aria-hidden", "true");
+        overlay.style.pointerEvents = "none";
+      }});
+    } else {
+      // If there are other modals in stack, show the previous one
+      const previousModal = modalStack[modalStack.length - 1];
+      gsap.set(previousModal, { display: "block", opacity: 1, scale: 1 });
+      previousModal.setAttribute("aria-hidden", "false");
+      previousModal.focus();
+    }
+  }});
+  
   // New: Hide QR code when closing info modal
   if (modal.id === 'info-modal') {
     danaQrCodeImg.classList.add('hidden');
@@ -168,14 +181,19 @@ function goBackToPreviousModal() {
   }
   const currentModal = modalStack[modalStack.length - 1];
   const previousModal = modalStack[modalStack.length - 2];
-  currentModal.classList.remove("show");
-  currentModal.setAttribute("aria-hidden", "true");
-  modalStack.pop();
-  setTimeout(() => {
-    previousModal.classList.add("show");
-    previousModal.setAttribute("aria-hidden", "false");
-    previousModal.focus();
-  }, 350);
+  
+  gsap.to(currentModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+    gsap.set(currentModal, { display: "none" });
+    currentModal.setAttribute("aria-hidden", "true");
+    modalStack.pop(); // Remove current modal from stack
+    
+    gsap.set(previousModal, { display: "block", opacity: 0, scale: 0.8 });
+    gsap.to(previousModal, { duration: 0.3, opacity: 1, scale: 1, ease: "power2.out", onComplete: () => {
+      previousModal.setAttribute("aria-hidden", "false");
+      previousModal.focus();
+    }});
+  }});
+
   // New: Hide QR code if going back from info modal
   if (currentModal.id === 'info-modal') {
     danaQrCodeImg.classList.add('hidden');
@@ -185,14 +203,17 @@ function goBackToPreviousModal() {
 
 function closeAllModals() {
   modalStack.forEach((modal) => {
-    modal.classList.remove("show");
-    modal.setAttribute("aria-hidden", "true");
+    gsap.to(modal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+      gsap.set(modal, { display: "none" });
+      modal.setAttribute("aria-hidden", "true");
+    }});
   });
   modalStack = [];
-  setTimeout(() => {
-    overlay.classList.remove("show");
+  gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
+    gsap.set(overlay, { display: "none" });
     overlay.setAttribute("aria-hidden", "true");
-  }, 300);
+    overlay.style.pointerEvents = "none";
+  }});
   // New: Hide QR code when closing all modals
   danaQrCodeImg.classList.add('hidden');
   danaQrCodeImg.src = ''; // Clear src
@@ -270,9 +291,12 @@ function openEditCartModal(itemName) {
   
   updateEditButtons(item.qty);
   
-  cartModal.classList.remove("show");
-  cartModal.setAttribute("aria-hidden", "true");
-  setTimeout(() => openModal(editCartModal), 350);
+  // Close cart modal first, then open edit modal
+  gsap.to(cartModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+    gsap.set(cartModal, { display: "none" });
+    cartModal.setAttribute("aria-hidden", "true");
+    openModal(editCartModal);
+  }});
 }
 
 function updateEditButtons(qty) {
@@ -286,9 +310,12 @@ function deleteCartItem(itemName) {
   currentDeleteType = 'item';
   document.getElementById("confirm-delete-message").textContent = `Hapus "${itemName}" dari keranjang?`;
   
-  cartModal.classList.remove("show");
-  cartModal.setAttribute("aria-hidden", "true");
-  setTimeout(() => openModal(confirmDeleteModal), 350);
+  // Close cart modal first, then open confirm delete modal
+  gsap.to(cartModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+    gsap.set(cartModal, { display: "none" });
+    cartModal.setAttribute("aria-hidden", "true");
+    openModal(confirmDeleteModal);
+  }});
 }
 
 // ---------- Wishlist Functions ----------
@@ -469,9 +496,21 @@ function generateOrderMessage() {
 }
 
 function copyToClipboard(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    showBadge(copiedBadge, "Nomor disalin");
-  }).catch(() => {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showBadge(copiedBadge, "Nomor disalin");
+    }).catch(() => {
+      // Fallback if writeText fails (e.g., not in a secure context)
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      showBadge(copiedBadge, "Nomor disalin");
+    });
+  } else {
+    // Fallback for older browsers
     const textArea = document.createElement("textarea");
     textArea.value = text;
     document.body.appendChild(textArea);
@@ -479,7 +518,7 @@ function copyToClipboard(text) {
     document.execCommand('copy');
     document.body.removeChild(textArea);
     showBadge(copiedBadge, "Nomor disalin");
-  });
+  }
 }
 
 function sendToWhatsApp() {
@@ -498,6 +537,9 @@ function sendToWhatsApp() {
 
 // ---------- Event Listeners ----------
 document.addEventListener('DOMContentLoaded', () => {
+  // Register ScrollToPlugin
+  gsap.registerPlugin(ScrollToPlugin);
+
   // Dark mode initialization
   let currentTheme = 'light';
   try {
@@ -603,19 +645,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById("save-edit-cart").addEventListener("click", () => {
     updateCartCount();
     updateCartTotal();
-    editCartModal.classList.remove("show");
-    editCartModal.setAttribute("aria-hidden", "true");
-    const index = modalStack.indexOf(editCartModal);
-    if (index > -1) {
-      modalStack.splice(index, 1);
-    }
     
-    setTimeout(() => {
-      renderCart();
-      cartModal.classList.add("show");
-      cartModal.setAttribute("aria-hidden", "false");
-      cartModal.focus();
-    }, 350);
+    // Close edit modal and open cart modal
+    gsap.to(editCartModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+      gsap.set(editCartModal, { display: "none" });
+      editCartModal.setAttribute("aria-hidden", "true");
+      renderCart(); // Re-render cart to show updated quantities
+      openModal(cartModal); // Open cart modal again
+    }});
     showNotif("Perubahan disimpan");
   });
 
@@ -625,9 +662,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById("clear-cart-btn").addEventListener("click", () => {
     currentDeleteType = 'all';
     document.getElementById("confirm-delete-message").textContent = "Hapus semua item dari keranjang?";
-    cartModal.classList.remove("show");
-    cartModal.setAttribute("aria-hidden", "true");
-    setTimeout(() => openModal(confirmDeleteModal), 350);
+    
+    // Close cart modal first, then open confirm delete modal
+    gsap.to(cartModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+      gsap.set(cartModal, { display: "none" });
+      cartModal.setAttribute("aria-hidden", "true");
+      openModal(confirmDeleteModal);
+    }});
   });
 
   document.getElementById("confirm-delete-yes").addEventListener("click", () => {
@@ -642,19 +683,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     updateCartCount();
     updateCartTotal();
-    confirmDeleteModal.classList.remove("show");
-    confirmDeleteModal.setAttribute("aria-hidden", "true");
-    const index = modalStack.indexOf(confirmDeleteModal);
-    if (index > -1) {
-      modalStack.splice(index, 1);
-    }
     
-    setTimeout(() => {
-            renderCart();
-      cartModal.classList.add("show");
-      cartModal.setAttribute("aria-hidden", "false");
-      cartModal.focus();
-    }, 350);
+    // Close confirm delete modal and open cart modal
+    gsap.to(confirmDeleteModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+      gsap.set(confirmDeleteModal, { display: "none" });
+      confirmDeleteModal.setAttribute("aria-hidden", "true");
+      renderCart(); // Re-render cart to show updated state
+      openModal(cartModal); // Open cart modal again
+    }});
     
     currentDeleteType = null;
   });
@@ -673,11 +709,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     
-    cartModal.classList.remove("show");
-    cartModal.setAttribute("aria-hidden", "true");
-    setTimeout(() => {
+    // Close cart modal first, then open payment modal
+    gsap.to(cartModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+      gsap.set(cartModal, { display: "none" });
+      cartModal.setAttribute("aria-hidden", "true");
       openModal(paymentModal);
-    }, 350);
+    }});
   });
 
   // Payment method handlers
@@ -703,9 +740,12 @@ document.addEventListener('DOMContentLoaded', () => {
     danaQrCodeImg.classList.add('hidden');
     danaQrCodeImg.src = '';
 
-    paymentModal.classList.remove("show");
-    paymentModal.setAttribute("aria-hidden", "true");
-    setTimeout(() => openModal(infoModal), 350);
+    // Close payment modal first, then open info modal
+    gsap.to(paymentModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+      gsap.set(paymentModal, { display: "none" });
+      paymentModal.setAttribute("aria-hidden", "true");
+      openModal(infoModal);
+    }});
   });
 
   document.getElementById("pay-dana").addEventListener("click", () => {
@@ -743,9 +783,12 @@ document.addEventListener('DOMContentLoaded', () => {
     danaQrCodeImg.src = DANA_QR_CODE_PATH;
     danaQrCodeImg.classList.remove('hidden');
 
-    paymentModal.classList.remove("show");
-    paymentModal.setAttribute("aria-hidden", "true");
-    setTimeout(() => openModal(infoModal), 350);
+    // Close payment modal first, then open info modal
+    gsap.to(paymentModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+      gsap.set(paymentModal, { display: "none" });
+      paymentModal.setAttribute("aria-hidden", "true");
+      openModal(infoModal);
+    }});
   });
 
   document.getElementById("pay-transfer").addEventListener("click", () => {
@@ -783,9 +826,12 @@ document.addEventListener('DOMContentLoaded', () => {
     danaQrCodeImg.classList.add('hidden');
     danaQrCodeImg.src = '';
 
-    paymentModal.classList.remove("show");
-    paymentModal.setAttribute("aria-hidden", "true");
-    setTimeout(() => openModal(infoModal), 350);
+    // Close payment modal first, then open info modal
+    gsap.to(paymentModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+      gsap.set(paymentModal, { display: "none" });
+      paymentModal.setAttribute("aria-hidden", "true");
+      openModal(infoModal);
+    }});
   });
 
   // Info modal handlers
@@ -800,7 +846,8 @@ document.addEventListener('DOMContentLoaded', () => {
       darkModeIcon.classList.remove('fa-moon');
       darkModeIcon.classList.add('fa-sun');
     } else {
-      document.body.classList.remove('fa-sun');
+      document.body.classList.remove('dark');
+      darkModeIcon.classList.remove('fa-sun');
       darkModeIcon.classList.add('fa-moon');
     }
     try {
@@ -881,19 +928,15 @@ document.addEventListener('DOMContentLoaded', () => {
   hamburger.addEventListener('click', () => {
     mobileMenuOpen = !mobileMenuOpen;
     hamburger.classList.toggle('open', mobileMenuOpen);
-    mobileMenu.classList.toggle('open', mobileMenuOpen);
-
+    
     if (mobileMenuOpen) {
-      mobileMenu.style.display = 'block';
-      gsap.fromTo(mobileMenu,
-        { y: -20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.3, ease: 'power2.out' }
-      );
+      gsap.set(mobileMenu, { display: 'block', y: -20, opacity: 0 }); // Set initial state
+      gsap.to(mobileMenu, { y: 0, opacity: 1, duration: 0.3, ease: 'power2.out' });
     } else {
       gsap.to(mobileMenu, {
         y: -20, opacity: 0, duration: 0.25, ease: 'power2.in',
         onComplete: () => { 
-          mobileMenu.style.display = 'none'; 
+          gsap.set(mobileMenu, { display: 'none' }); // Hide completely after animation
         }
       });
     }
@@ -918,8 +961,7 @@ window.addEventListener('resize', () => {
   if (window.innerWidth >= 1024 && mobileMenuOpen) {
     mobileMenuOpen = false;
     hamburger.classList.remove('open');
-    mobileMenu.classList.remove('open');
-    mobileMenu.style.display = 'none';
+    gsap.set(mobileMenu, { display: 'none', y: -100, opacity: 0 }); // Ensure it's hidden
   }
   // Ensure mobile menu items are removed/added based on screen size
   updateMobileMenuItems();
@@ -928,13 +970,10 @@ window.addEventListener('resize', () => {
 setInterval(syncMobileCounts, 500);
 
   // Mobile menu navigation
-  // Removed dynamic creation of Search, Cart, and Dark Mode menu items
-  // as per request to remove them from hamburger menu
-
   document.getElementById('mobile-wishlist').addEventListener('click', () => {
     renderWishlist();
     openModal(wishlistModal);
-    hamburger.click();
+    hamburger.click(); // Close hamburger menu after opening modal
   });
   
   document.querySelectorAll('.mobile-menu a.nav-link-mobile').forEach(anchor => {
@@ -942,7 +981,7 @@ setInterval(syncMobileCounts, 500);
       e.preventDefault();
       const target = this.getAttribute('href');
       smoothScrollTo(target);
-      hamburger.click();
+      hamburger.click(); // Close hamburger menu after navigation
     });
   });
   
@@ -968,22 +1007,15 @@ setInterval(syncMobileCounts, 500);
     if (!targetElement) return;
 
     const headerHeight = document.querySelector('header').offsetHeight;
-    const targetRect = targetElement.getBoundingClientRect();
-    const offsetPosition = targetRect.top + window.pageYOffset - headerHeight;
-
-    const distance = Math.abs(window.pageYOffset - offsetPosition);
-    const duration = Math.min(1.2, Math.max(0.6, distance / 1500));
+    const offsetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - headerHeight;
 
     gsap.to(window, {
-      duration: duration,
+      duration: 1, // Durasi animasi scroll
       scrollTo: {
         y: offsetPosition,
         autoKill: true
       },
-      ease: "power2.inOut",
-      onComplete: () => {
-        window.scrollTo(0, offsetPosition);
-      }
+      ease: "power2.inOut", // Animasi smooth
     });
 
     gsap.fromTo(targetElement,
@@ -1003,13 +1035,12 @@ setInterval(syncMobileCounts, 500);
       const target = this.getAttribute('href');
 
       if(mobileMenuOpen) {
-        hamburger.click();
-        if(window.innerWidth < 1024) {
-          setTimeout(() => smoothScrollTo(target), 200);
-          return;
-        }
+        hamburger.click(); // Close mobile menu
+        // Add a small delay if needed for the menu to close before scrolling
+        setTimeout(() => smoothScrollTo(target), 300); 
+      } else {
+        smoothScrollTo(target);
       }
-      smoothScrollTo(target);
     });
   });
 
@@ -1199,102 +1230,33 @@ setInterval(syncMobileCounts, 500);
 
   // Function to update mobile menu items based on screen size
   function updateMobileMenuItems() {
-    const mobileSearchMenuItem = document.getElementById('mobile-search');
-    const mobileCartMenuItem = document.getElementById('mobile-cart');
-    const mobileDarkModeMenuItem = document.getElementById('mobile-dark-mode'); // New ID for dark mode item
-
-    // Remove existing dynamic items to prevent duplicates
-    if (mobileSearchMenuItem) mobileSearchMenuItem.remove();
-    if (mobileCartMenuItem) mobileCartMenuItem.remove();
-    if (mobileDarkModeMenuItem) mobileDarkModeMenuItem.remove();
-
-    // Add items back if screen size requires them
-    // Based on your request, these items should NOT be in the hamburger menu
-    // so this section will remain commented out or removed.
-    // If you change your mind and want them back in the hamburger menu for certain screen sizes,
-    // you can uncomment and adjust the logic here.
-    /*
-    if (window.innerWidth < 1024) { // Example condition if you want them back for <1024px
-      // Add Search
-      const newMobileSearchMenuItem = document.createElement('div');
-      newMobileSearchMenuItem.id = 'mobile-search';
-      newMobileSearchMenuItem.className = 'menu-item';
-      newMobileSearchMenuItem.innerHTML = `<i class="fas fa-search"></i> <span>Cari Produk</span>`;
-      mobileMenu.prepend(newMobileSearchMenuItem);
-      newMobileSearchMenuItem.addEventListener('click', () => {
-        openModal(searchModal);
-        searchInput.value = "";
-        setTimeout(() => searchInput.focus(), 100);
-        hamburger.click();
-      });
-
-      // Add Cart
-      const newMobileCartMenuItem = document.createElement('div');
-      newMobileCartMenuItem.id = 'mobile-cart';
-      newMobileCartMenuItem.className = 'menu-item';
-      newMobileCartMenuItem.innerHTML = `
-        <i class="fas fa-shopping-cart"></i> <span>Keranjang</span>
-        <span class="ml-auto bg-orange-500 text-white text-xs rounded-full px-2" id="cart-count-mobile">0</span>
-      `;
-      mobileMenu.insertBefore(newMobileCartMenuItem, document.getElementById('mobile-wishlist').nextSibling);
-      newMobileCartMenuItem.addEventListener('click', () => {
-        if (Object.keys(cart).length === 0) {
-          showNotif("Keranjang kosong");
-          hamburger.click();
-          return;
-        }
-        renderCart();
-        updateCartTotal();
-        openModal(cartModal);
-        hamburger.click();
-      });
-
-      // Add Dark Mode Toggle
-      const newMobileDarkModeMenuItem = document.createElement('div');
-      newMobileDarkModeMenuItem.id = 'mobile-dark-mode'; // Unique ID
-      newMobileDarkModeMenuItem.className = 'menu-item';
-      newMobileDarkModeMenuItem.innerHTML = `
-        <span class="flex-1">Mode Gelap</span>
-        <button id="darkToggleMobile" class="toggle-switch">
-          <i class="toggle-icon sun-icon fas fa-sun"></i><i class="toggle-icon moon-icon fas fa-moon"></i>
-        </button>
-      `;
-      mobileMenu.appendChild(newMobileDarkModeMenuItem);
-
-      const darkToggleMobileBtn = document.getElementById('darkToggleMobile');
-      const darkModeIconMobile = darkToggleMobileBtn.querySelector('.toggle-icon');
-      // Initialize mobile dark mode toggle state
-      if (document.body.classList.contains('dark')) {
-        darkModeIconMobile.classList.remove('fa-moon');
-        darkModeIconMobile.classList.add('fa-sun');
-      } else {
-        darkModeIconMobile.classList.remove('fa-sun');
-        darkModeIconMobile.classList.add('fa-moon');
-      }
-      darkToggleMobileBtn.addEventListener('click', () => {
-        document.body.classList.toggle('dark');
-        const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
-        if (theme === 'dark') {
-          darkModeIcon.classList.remove('fa-moon');
-          darkModeIcon.classList.add('fa-sun');
-          darkModeIconMobile.classList.remove('fa-moon');
-          darkModeIconMobile.classList.add('fa-sun');
-        } else {
-          darkModeIcon.classList.remove('fa-sun');
-          darkModeIcon.classList.add('fa-moon');
-          darkModeIconMobile.classList.remove('fa-sun');
-          darkModeIconMobile.classList.add('fa-moon');
-        }
-        try {
-          localStorage.setItem('theme', theme);
-        } catch (e) { }
-      });
-    }
-    */
+    // This function is intentionally left empty or minimal based on previous instructions
+    // to remove search, cart, and dark mode from the mobile menu.
+    // If you wish to re-add them conditionally, this is where the logic would go.
   }
 
   // Initial call to set up mobile menu items
   updateMobileMenuItems();
+
+  // Back to Top button logic
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 200) { // Show button after scrolling 200px
+      backToTopBtn.classList.add('show');
+    } else {
+      backToTopBtn.classList.remove('show');
+    }
+  });
+
+  backToTopBtn.addEventListener('click', () => {
+    gsap.to(window, {
+      duration: 1, // Durasi animasi scroll
+      scrollTo: {
+        y: 0, // Scroll ke paling atas
+        autoKill: true
+      },
+      ease: "power2.inOut" // Animasi smooth
+    });
+  });
 });
 
 document.addEventListener("DOMContentLoaded", function() {
