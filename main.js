@@ -114,91 +114,15 @@ let selectedToppings = {};
 
 // ---------- Data ----------
 const productList = [
-  {
-    name: "Lemper",
-    price: 3000,
-    kategori: "Karbohidrat",
-    description: "Lemper ketan isi ayam suwir gurih, dibungkus daun pisang.",
-    images: ["https://via.placeholder.com/120?text=Lemper+1", "https://via.placeholder.com/120?text=Lemper+2", "https://via.placeholder.com/120?text=Lemper+3"]
-  },
-  {
-    name: "Sosis Solo",
-    price: 3000,
-    kategori: "Karbohidrat",
-    description: "Sosis Solo dengan isian daging ayam cincang yang lezat, dibalut kulit tipis nan lembut.",
-    images: ["https://via.placeholder.com/120?text=Sosis+Solo+1", "https://via.placeholder.com/120?text=Sosis+Solo+2", "https://via.placeholder.com/120?text=Sosis+Solo+3"]
-  },
-  {
-    name: "Sus",
-    price: 3000,
-    kategori: "Manis",
-    description: "Kue sus lembut dengan isian vla manis dan creamy.",
-    images: ["https://via.placeholder.com/120?text=Sus+1", "https://via.placeholder.com/120?text=Sus+2", "https://via.placeholder.com/120?text=Sus+3"]
-  },
-  {
-    name: "Pie Buah",
-    price: 3000,
-    kategori: "Manis",
-    description: "Pie renyah dengan vla lembut dan topping buah-buahan segar.",
-    images: ["https://via.placeholder.com/120?text=Pie+Buah+1", "https://via.placeholder.com/120?text=Pie+Buah+2", "https://via.placeholder.com/120?text=Pie+Buah+3"]
-  },
-  {
-    name: "Risol Mayonais",
-    price: 3000,
-    kategori: "Gorengan",
-    description: "Risol renyah dengan isian sosis, telur, dan mayonais creamy.",
-    images: ["https://via.placeholder.com/120?text=Risol+Mayonais+1", "https://via.placeholder.com/120?text=Risol+Mayonais+2", "https://via.placeholder.com/120?text=Risol+Mayonais+3"]
-  },
-  {
-    name: "Pastel Bihun",
-    price: 3000,
-    kategori: "Gorengan",
-    description: "Pastel gurih dengan isian bihun dan sayuran.",
-    images: ["https://via.placeholder.com/120?text=Pastel+Bihun+1", "https://via.placeholder.com/120?text=Pastel+Bihun+2", "https://via.placeholder.com/120?text=Pastel+Bihun+3"]
-  },
-  {
-    name: "Cente Manis / Hunkwe",
-    price: 3000,
-    kategori: "Manis",
-    description: "Kue tradisional Cente Manis atau Hunkwe, kenyal dan manis.",
-    images: ["https://via.placeholder.com/120?text=Cente+Manis+1", "https://via.placeholder.com/120?text=Cente+Manis+2", "https://via.placeholder.com/120?text=Cente+Manis+3"]
-  },
-  {
-    name: "Nasi Uduk",
-    price: 8000,
-    kategori: "Karbohidrat",
-    description: "Nasi uduk gurih dengan aroma rempah khas, cocok untuk sarapan atau makan siang.",
-    images: ["https://via.placeholder.com/120?text=Nasi+Uduk+1", "https://via.placeholder.com/120?text=Nasi+Uduk+2", "https://via.placeholder.com/120?text=Nasi+Uduk+3"],
-    variants: [
-      { name: "Polos", price: 0, description: "Nasi, Orek, Bihun, Sambal" }
-    ],
-    toppings: [
-      { name: "Telor ½ Bulet Balado", price: 2000 },
-      { name: "Telor Bulet Balado", price: 4000 },
-      { name: "Telor Dadar", price: 4000 },
-      { name: "Telor Ceplok", price: 4000 },
-      { name: "Bakwan", price: 1000 },
-      { name: "Tempe Orek", price: 2000 },
-      { name: "Bihun Goreng", price: 2000 }
-    ]
-  },
-  {
-    name: "Nasi Kuning",
-    price: 7000,
-    kategori: "Karbohidrat",
-    description: "Nasi kuning harum dengan lauk pelengkap, hidangan istimewa untuk berbagai acara.",
-    images: ["https://via.placeholder.com/120?text=Nasi+Kuning+1", "https://via.placeholder.com/120?text=Nasi+Kuning+2", "https://via.placeholder.com/120?text=Nasi+Kuning+3"],
-    variants: [
-      { name: "Polos", price: 0, description: "Nasi, Orek, Bihun, Sambal" }
-    ],
-    toppings: [
-      { name: "Telor Bulet Balado", price: 4000 },
-      { name: "Telor Dadar Iris", price: 4000 },
-      { name: "Bakwan", price: 1000 },
-      { name: "Tempe Orek", price: 2000 },
-      { name: "Bihun Goreng", price: 2000 }
-    ]
-  },
+  { name: "Lemper", price: 3000, kategori: "Karbohidrat" },
+  { name: "Sosis Solo", price: 3000, kategori: "Karbohidrat" },
+  { name: "Sus", price: 3000, kategori: "Manis" },
+  { name: "Pie Buah", price: 3000, kategori: "Manis" },
+  { name: "Risol Mayonais", price: 3000, kategori: "Gorengan" },
+  { name: "Pastel Bihun", price: 3000, kategori: "Gorengan" },
+  { name: "Cente Manis / Hunkwe", price: 3000, kategori: "Manis" },
+  { name: "Nasi Uduk", price: 8000, kategori: "Karbohidrat" },
+  { name: "Nasi Kuning", price: 7000, kategori: "Karbohidrat" },
 ];
 
 // New: Update Log Data
@@ -239,8 +163,8 @@ const currentPromo = {
   discountPercentage: 0.10, // 10% diskon
   minPurchase: 20000, // Minimal pembelian Rp 20.000
   startDate: new Date("2025-08-21T20:00:00"), // Kamis, 21 Agustus 2025 pukul 20.00
-  endDate: new Date("2025-08-26T15:00:00"), // Selasa, 26 Agustus 2025 pukul 15.00
-  text: "Dapatkan diskon 10% untuk pembelian minimal Rp 20.000! Berlaku hingga 26 Agustus 2025 pukul 15.00 dengan kode promo: DISKON10."
+  endDate: new Date("2025-08-29T17:00:00"), // Selasa, 29 Agustus 2025 pukul 17.00
+  text: "Dapatkan diskon 10% untuk pembelian minimal Rp 20.000! Berlaku hingga 29 Agustus 2025 pukul 17.00 dengan kode promo: DISKON10."
 };
 
 // Cart & Wishlist state
