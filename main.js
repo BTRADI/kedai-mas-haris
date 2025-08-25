@@ -11,6 +11,7 @@ const DANA_QR_CODE_PATH = "QR-Dana.jpeg"; // Path ke gambar QR Code DANA Anda
 // New: Cooldown for update modal
 const UPDATE_MODAL_COOLDOWN_KEY = 'updateModalCooldown';
 const UPDATE_MODAL_COOLDOWN_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
+const LAST_SEEN_UPDATE_VERSION_KEY = 'lastSeenUpdateVersion'; // Key for storing last seen version
 
 // DOM Elements
 const container = document.getElementById("menu-container");
@@ -33,6 +34,7 @@ const searchModal = document.getElementById("search-modal");
 const orderEventModal = document.getElementById("order-event-modal");
 const reportBugModal = document.getElementById("report-bug-modal");
 const updateModal = document.getElementById("update-modal"); // New: Update Modal
+const productDetailModal = document.getElementById("product-detail-modal"); // New: Product Detail Modal
 
 // Badges
 const copiedBadge = document.getElementById("copied");
@@ -85,22 +87,131 @@ const promoPriceDisplay = document.getElementById("promo-price-display"); // New
 const originalTotalSpan = document.getElementById("original-total"); // New: Original Total Span
 const discountedTotalSpan = document.getElementById("discounted-total"); // New: Discounted Total Span
 
+// Product Detail Modal Elements
+const productDetailTitle = document.getElementById("product-detail-title");
+const productDetailImagesContainer = document.getElementById("product-detail-images");
+const productDetailDescription = document.getElementById("product-detail-description");
+const productDetailPrice = document.getElementById("product-detail-price");
+const detailMinusBtn = document.getElementById("detail-minus-btn");
+const detailPlusBtn = document.getElementById("detail-plus-btn");
+const detailQtyDisplay = document.getElementById("detail-qty-display");
+const addToCartDetailBtn = document.getElementById("add-to-cart-detail-btn");
+const addToWishlistDetailBtn = document.getElementById("add-to-wishlist-detail-btn");
+const productVariantsContainer = document.getElementById("product-variants-container");
+const productVariantsOptions = document.getElementById("product-variants-options");
+const productToppingsContainer = document.getElementById("product-toppings-container"); // New: Toppings Container
+const productToppingsOptions = document.getElementById("product-toppings-options"); // New: Toppings Options
+const relatedProductsModalList = document.getElementById("related-products-modal-list");
+const relatedProductsSection = document.getElementById("related-products-section");
+const relatedProductsContainer = document.getElementById("related-products-container");
+
+// Global variables for product detail modal
+let currentProductDetail = null;
+let currentProductDetailQty = 1;
+let selectedVariant = null;
+let selectedToppings = {};
+
 
 // ---------- Data ----------
 const productList = [
-  { name: "Lemper", price: 3000, kategori: "Karbohidrat" },
-  { name: "Sosis Solo", price: 3000, kategori: "Karbohidrat" },
-  { name: "Sus", price: 3000, kategori: "Manis" },
-  { name: "Pie Buah", price: 3000, kategori: "Manis" },
-  { name: "Risol Mayonais", price: 3000, kategori: "Gorengan" },
-  { name: "Pastel Bihun", price: 3000, kategori: "Gorengan" },
-  { name: "Cente Manis / Hunkwe", price: 3000, kategori: "Manis" },
-  { name: "Nasi Uduk", price: 8000, kategori: "Karbohidrat" },
-  { name: "Nasi Kuning", price: 7000, kategori: "Karbohidrat" },
+  {
+    name: "Lemper",
+    price: 3000,
+    kategori: "Karbohidrat",
+    description: "Lemper ketan isi ayam suwir gurih, dibungkus daun pisang.",
+    images: ["https://via.placeholder.com/120?text=Lemper+1", "https://via.placeholder.com/120?text=Lemper+2", "https://via.placeholder.com/120?text=Lemper+3"]
+  },
+  {
+    name: "Sosis Solo",
+    price: 3000,
+    kategori: "Karbohidrat",
+    description: "Sosis Solo dengan isian daging ayam cincang yang lezat, dibalut kulit tipis nan lembut.",
+    images: ["https://via.placeholder.com/120?text=Sosis+Solo+1", "https://via.placeholder.com/120?text=Sosis+Solo+2", "https://via.placeholder.com/120?text=Sosis+Solo+3"]
+  },
+  {
+    name: "Sus",
+    price: 3000,
+    kategori: "Manis",
+    description: "Kue sus lembut dengan isian vla manis dan creamy.",
+    images: ["https://via.placeholder.com/120?text=Sus+1", "https://via.placeholder.com/120?text=Sus+2", "https://via.placeholder.com/120?text=Sus+3"]
+  },
+  {
+    name: "Pie Buah",
+    price: 3000,
+    kategori: "Manis",
+    description: "Pie renyah dengan vla lembut dan topping buah-buahan segar.",
+    images: ["https://via.placeholder.com/120?text=Pie+Buah+1", "https://via.placeholder.com/120?text=Pie+Buah+2", "https://via.placeholder.com/120?text=Pie+Buah+3"]
+  },
+  {
+    name: "Risol Mayonais",
+    price: 3000,
+    kategori: "Gorengan",
+    description: "Risol renyah dengan isian sosis, telur, dan mayonais creamy.",
+    images: ["https://via.placeholder.com/120?text=Risol+Mayonais+1", "https://via.placeholder.com/120?text=Risol+Mayonais+2", "https://via.placeholder.com/120?text=Risol+Mayonais+3"]
+  },
+  {
+    name: "Pastel Bihun",
+    price: 3000,
+    kategori: "Gorengan",
+    description: "Pastel gurih dengan isian bihun dan sayuran.",
+    images: ["https://via.placeholder.com/120?text=Pastel+Bihun+1", "https://via.placeholder.com/120?text=Pastel+Bihun+2", "https://via.placeholder.com/120?text=Pastel+Bihun+3"]
+  },
+  {
+    name: "Cente Manis / Hunkwe",
+    price: 3000,
+    kategori: "Manis",
+    description: "Kue tradisional Cente Manis atau Hunkwe, kenyal dan manis.",
+    images: ["https://via.placeholder.com/120?text=Cente+Manis+1", "https://via.placeholder.com/120?text=Cente+Manis+2", "https://via.placeholder.com/120?text=Cente+Manis+3"]
+  },
+  {
+    name: "Nasi Uduk",
+    price: 8000,
+    kategori: "Karbohidrat",
+    description: "Nasi uduk gurih dengan aroma rempah khas, cocok untuk sarapan atau makan siang.",
+    images: ["https://via.placeholder.com/120?text=Nasi+Uduk+1", "https://via.placeholder.com/120?text=Nasi+Uduk+2", "https://via.placeholder.com/120?text=Nasi+Uduk+3"],
+    variants: [
+      { name: "Polos", price: 0, description: "Nasi, Orek, Bihun, Sambal" }
+    ],
+    toppings: [
+      { name: "Telor ½ Bulet Balado", price: 2000 },
+      { name: "Telor Bulet Balado", price: 4000 },
+      { name: "Telor Dadar", price: 4000 },
+      { name: "Telor Ceplok", price: 4000 },
+      { name: "Bakwan", price: 1000 },
+      { name: "Tempe Orek", price: 2000 },
+      { name: "Bihun Goreng", price: 2000 }
+    ]
+  },
+  {
+    name: "Nasi Kuning",
+    price: 7000,
+    kategori: "Karbohidrat",
+    description: "Nasi kuning harum dengan lauk pelengkap, hidangan istimewa untuk berbagai acara.",
+    images: ["https://via.placeholder.com/120?text=Nasi+Kuning+1", "https://via.placeholder.com/120?text=Nasi+Kuning+2", "https://via.placeholder.com/120?text=Nasi+Kuning+3"],
+    variants: [
+      { name: "Polos", price: 0, description: "Nasi, Orek, Bihun, Sambal" }
+    ],
+    toppings: [
+      { name: "Telor Bulet Balado", price: 4000 },
+      { name: "Telor Dadar Iris", price: 4000 },
+      { name: "Bakwan", price: 1000 },
+      { name: "Tempe Orek", price: 2000 },
+      { name: "Bihun Goreng", price: 2000 }
+    ]
+  },
 ];
 
 // New: Update Log Data
 const updateLog = [
+  {
+    version: "1.0.2",
+    date: "2025-08-24",
+    changes: [
+      "Penambahan Menu Nasi Uduk/Kuning dengan disediakan all topping",
+      "Fix bug kode promo",
+      "Perbaikan animasi di semua layout."
+    ]
+  },
   {
     version: "1.0.1",
     date: "2025-08-21",
@@ -133,8 +244,9 @@ const currentPromo = {
 };
 
 // Cart & Wishlist state
-const cart = {};
-const wishlist = {};
+let cart = {}; // Changed to let for re-assignment from localStorage
+let wishlist = {}; // Changed to let for re-assignment from localStorage
+let usedPromoCodes = new Set(); // New: To store used promo codes
 let currentEditItem = null;
 let currentDeleteItem = null;
 let currentDeleteType = null;
@@ -143,8 +255,16 @@ let currentPaymentMethod = '';
 let currentOrderData = {};
 let currentContactActionType = ''; // 'whatsapp' or 'email'
 let currentContactAction = ''; // 'order-event' or 'report-bug'
-let promoApplied = false;
-let freeItem = null; // This was for buyXGetY, not needed for percentage discount, but keeping for now if logic changes.
+let promoApplied = false; // Status apakah promo sedang diterapkan pada keranjang saat ini
+let finalDiscountedPrice = 0; // New: To store the final price after discount
+
+// New: Promo usage tracking per user (stored in localStorage)
+const PROMO_USAGE_KEY = 'promoUsage';
+const MAX_PROMO_USAGE = 3; // Max 3 times per user
+let promoUsage = {}; // { 'DISKON10': { count: 0, currentTransactionId: null } }
+
+// New: Unique ID for current transaction (to track promo usage within a single transaction)
+let currentTransactionId = null;
 
 // ---------- Utility Functions ----------
 function showNotif(text) {
@@ -222,11 +342,23 @@ function closeModal(modal) {
       previousModal.focus();
     }
   }});
-  
+
   // New: Hide QR code when closing info modal
   if (modal.id === 'info-modal') {
     danaQrCodeImg.classList.add('hidden');
     danaQrCodeImg.src = ''; // Clear src
+  }
+  // Reset product detail modal state
+  if (modal.id === 'product-detail-modal') {
+    currentProductDetail = null;
+    currentProductDetailQty = 1;
+    selectedVariant = null;
+    selectedToppings = {}; // Reset selected toppings
+    // Destroy Swiper instance if it exists
+    if (productDetailModal.swiper) {
+      productDetailModal.swiper.destroy(true, true);
+      productDetailModal.swiper = null;
+    }
   }
 }
 
@@ -237,12 +369,12 @@ function goBackToPreviousModal() {
   }
   const currentModal = modalStack[modalStack.length - 1];
   const previousModal = modalStack[modalStack.length - 2];
-  
+
   gsap.to(currentModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
     gsap.set(currentModal, { display: "none" });
     currentModal.setAttribute("aria-hidden", "true");
     modalStack.pop(); // Remove current modal from stack
-    
+
     gsap.set(previousModal, { display: "block", opacity: 0, scale: 0.8 });
     gsap.to(previousModal, { duration: 0.3, opacity: 1, scale: 1, ease: "power2.out", onComplete: () => {
       previousModal.setAttribute("aria-hidden", "false");
@@ -254,6 +386,17 @@ function goBackToPreviousModal() {
   if (currentModal.id === 'info-modal') {
     danaQrCodeImg.classList.add('hidden');
     danaQrCodeImg.src = ''; // Clear src
+  }
+  // Reset product detail modal state if going back from it
+  if (currentModal.id === 'product-detail-modal') {
+    currentProductDetail = null;
+    currentProductDetailQty = 1;
+    selectedVariant = null;
+    selectedToppings = {}; // Reset selected toppings
+    if (productDetailModal.swiper) {
+      productDetailModal.swiper.destroy(true, true);
+      productDetailModal.swiper = null;
+    }
   }
 }
 
@@ -273,6 +416,71 @@ function closeAllModals() {
   // New: Hide QR code when closing all modals
   danaQrCodeImg.classList.add('hidden');
   danaQrCodeImg.src = ''; // Clear src
+
+  // Reset product detail modal state
+  currentProductDetail = null;
+  currentProductDetailQty = 1;
+  selectedVariant = null;
+  selectedToppings = {}; // Reset selected toppings
+  if (productDetailModal.swiper) {
+    productDetailModal.swiper.destroy(true, true);
+    productDetailModal.swiper = null;
+  }
+
+  // Reset promo state when all modals are closed (e.g., after a successful transaction)
+  // IMPORTANT: Only reset promoApplied and input value here.
+  // The usedPromoCodes set should NOT be cleared here, as it tracks used codes across transactions.
+  promoApplied = false;
+  promoCodeInput.value = '';
+  promoMessage.classList.add('hidden');
+  updateCartTotal(); // Ensure total is reset
+}
+
+// ---------- Persistensi Data (New) ----------
+function saveCartToLocalStorage() {
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+function loadCartFromLocalStorage() {
+  const storedCart = localStorage.getItem('cart');
+  if (storedCart) {
+    cart = JSON.parse(storedCart);
+  }
+}
+
+function saveWishlistToLocalStorage() {
+  localStorage.setItem('wishlist', JSON.stringify(wishlist));
+}
+
+function loadWishlistFromLocalStorage() {
+  const storedWishlist = localStorage.getItem('wishlist');
+  if (storedWishlist) {
+    wishlist = JSON.parse(storedWishlist);
+  }
+}
+
+// New: Save/Load used promo codes (this is for the global `usedPromoCodes` set, not the `promoUsage` object)
+function saveUsedPromoCodes() {
+  localStorage.setItem('usedPromoCodes', JSON.stringify(Array.from(usedPromoCodes)));
+}
+
+function loadUsedPromoCodes() {
+  const storedUsedPromoCodes = localStorage.getItem('usedPromoCodes');
+  if (storedUsedPromoCodes) {
+    usedPromoCodes = new Set(JSON.parse(storedUsedPromoCodes));
+  }
+}
+
+// New: Save/Load promo usage data
+function savePromoUsage() {
+    localStorage.setItem(PROMO_USAGE_KEY, JSON.stringify(promoUsage));
+}
+
+function loadPromoUsage() {
+    const storedPromoUsage = localStorage.getItem(PROMO_USAGE_KEY);
+    if (storedPromoUsage) {
+        promoUsage = JSON.parse(storedPromoUsage);
+    }
 }
 
 // ---------- Cart Functions ----------
@@ -289,6 +497,7 @@ function updateCartCount() {
   if (count > 0) {
     gsap.from(cartCount, { scale: 1.5, duration: 0.3, ease: "back.out" });
   }
+  saveCartToLocalStorage(); // Save to localStorage on update
 }
 
 function updateCartTotal() {
@@ -297,12 +506,13 @@ function updateCartTotal() {
 
   // Apply promo if active
   if (promoApplied) {
-    total = originalTotal * (1 - currentPromo.discountPercentage);
+    finalDiscountedPrice = originalTotal * (1 - currentPromo.discountPercentage);
     promoPriceDisplay.classList.remove('hidden');
     originalTotalSpan.textContent = `Rp ${originalTotal.toLocaleString("id-ID")}`;
-    discountedTotalSpan.textContent = `Rp ${total.toLocaleString("id-ID")}`;
+    discountedTotalSpan.textContent = `Rp ${finalDiscountedPrice.toLocaleString("id-ID")}`;
     document.getElementById("cart-total").style.display = 'none'; // Hide regular total
   } else {
+    finalDiscountedPrice = originalTotal; // If no promo, final price is original total
     promoPriceDisplay.classList.add('hidden');
     document.getElementById("cart-total").style.display = 'block'; // Show regular total
   }
@@ -313,7 +523,7 @@ function updateCartTotal() {
 function renderCart() {
   const cartItemsContainer = document.getElementById("cart-items");
   cartItemsContainer.innerHTML = "";
-  
+
   if (Object.keys(cart).length === 0) {
     cartItemsContainer.innerHTML = `
       <div class="text-center text-gray-500 py-8">
@@ -330,45 +540,63 @@ function renderCart() {
   Object.entries(cart).forEach(([key, item]) => {
     const wrap = document.createElement("div");
     wrap.className = "flex justify-between items-center bg-gray-50 p-3 rounded-lg";
-    
+
+    let itemDetails = item.name;
+    if (item.variant) {
+      itemDetails += ` (${item.variant})`;
+    }
+    if (item.toppings && item.toppings.length > 0) {
+      // Display toppings with their quantities
+      const toppingStrings = item.toppings.map(t => `${t.name} (${t.qty})`);
+      itemDetails += ` + ${toppingStrings.join(', ')}`;
+    }
+
     wrap.innerHTML = `
       <div class="flex items-center gap-3">
-        <img src="https://via.placeholder.com/50?text=${encodeURIComponent(item.name)}" 
-             class="w-10 h-10 rounded-lg">
+        <img src="${item.images ? item.images[0] : `https://via.placeholder.com/50?text=${encodeURIComponent(item.name)}`}"
+             class="w-10 h-10 object-cover rounded-lg">
         <div>
-          <p class="font-medium text-sm">${item.name}</p>
+          <p class="font-medium text-sm">${itemDetails}</p>
           <p class="text-xs text-gray-500">Rp ${item.price.toLocaleString("id-ID")} x ${item.qty}</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <button class="edit-cart-btn" onclick="openEditCartModal('${item.name}')">
+        <button class="edit-cart-btn" onclick="openEditCartModal('${key}')">
           <i class="fas fa-edit"></i>
         </button>
-        <button class="delete-item-btn" onclick="deleteCartItem('${item.name}')">
+        <button class="delete-item-btn" onclick="deleteCartItem('${key}')">
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>
     `;
-    
+
     cartItemsContainer.appendChild(wrap);
   });
 
-  // Re-check promo status after rendering cart items
-  checkPromoEligibility();
+  // Update cart total after rendering items
   updateCartTotal();
 }
 
-function openEditCartModal(itemName) {
-  currentEditItem = itemName;
-  const item = cart[itemName];
-  
-  document.getElementById("edit-item-name").textContent = item.name;
+function openEditCartModal(itemKey) { // itemKey now includes variant if applicable
+  currentEditItem = itemKey;
+  const item = cart[itemKey];
+
+  let itemDetails = item.name;
+  if (item.variant) {
+    itemDetails += ` (${item.variant})`;
+  }
+  if (item.toppings && item.toppings.length > 0) {
+    const toppingStrings = item.toppings.map(t => `${t.name} (${t.qty})`);
+    itemDetails += ` + ${toppingStrings.join(', ')}`;
+  }
+
+  document.getElementById("edit-item-name").textContent = itemDetails;
   document.getElementById("edit-item-price").textContent = `Rp ${item.price.toLocaleString("id-ID")}`;
-  document.getElementById("edit-item-image").src = "https://via.placeholder.com/50?text=" + encodeURIComponent(item.name);
+  document.getElementById("edit-item-image").src = item.images ? item.images[0] : "https://via.placeholder.com/50?text=" + encodeURIComponent(item.name);
   document.getElementById("edit-qty-display").textContent = item.qty;
-  
+
   updateEditButtons(item.qty);
-  
+
   // Close cart modal first, then open edit modal
   gsap.to(cartModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
     gsap.set(cartModal, { display: "none" });
@@ -383,11 +611,22 @@ function updateEditButtons(qty) {
   minusBtn.className = qty <= 1 ? "qty-btn minus-gray" : "qty-btn minus-red";
 }
 
-function deleteCartItem(itemName) {
-  currentDeleteItem = itemName;
+function deleteCartItem(itemKey) { // itemKey now includes variant if applicable
+  currentDeleteItem = itemKey;
   currentDeleteType = 'item';
-  document.getElementById("confirm-delete-message").textContent = `Hapus "${itemName}" dari keranjang?`;
-  
+  const item = cart[itemKey];
+
+  let itemDetails = item.name;
+  if (item.variant) {
+    itemDetails += ` (${item.variant})`;
+  }
+  if (item.toppings && item.toppings.length > 0) {
+    const toppingStrings = item.toppings.map(t => `${t.name} (${t.qty})`);
+    itemDetails += ` + ${toppingStrings.join(', ')}`;
+  }
+
+  document.getElementById("confirm-delete-message").textContent = `Hapus "${itemDetails}" dari keranjang?`;
+
   // Close cart modal first, then open confirm delete modal
   gsap.to(cartModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
     gsap.set(cartModal, { display: "none" });
@@ -396,48 +635,78 @@ function deleteCartItem(itemName) {
   }});
 }
 
-// ---------- Promo Logic ----------
-function checkPromoEligibility() {
-  const totalPriceInCart = Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0);
-  const today = new Date();
-
-  if (promoApplied && totalPriceInCart >= currentPromo.minPurchase && today >= currentPromo.startDate && today <= currentPromo.endDate) {
-    promoMessage.textContent = `Promo "${currentPromo.code}" diterapkan! Anda mendapatkan diskon 10%!`;
-    promoMessage.classList.remove('hidden');
-  } else {
-    promoApplied = false; // Reset promoApplied if conditions are not met
-    promoMessage.classList.add('hidden');
-  }
-  updateCartTotal();
-}
-
+// ---------- Fixed Promo Logic ----------
 function applyPromoCode() {
   const inputCode = promoCodeInput.value.trim().toUpperCase();
+  
+  // Check if input is empty
+  if (!inputCode) {
+    showNotif("Masukkan kode promo terlebih dahulu");
+    return;
+  }
+
   const totalPriceInCart = Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0);
   const today = new Date();
 
+  // Ensure a transaction ID exists for the current session
+  if (!currentTransactionId) {
+      currentTransactionId = Date.now().toString(); // Simple unique ID for the current session
+  }
+
+  // Get promo usage for the current promo code
+  let promoData = promoUsage[inputCode] || { count: 0, currentTransactionId: null };
+  const remainingUses = MAX_PROMO_USAGE - promoData.count;
+
   if (inputCode === currentPromo.code) {
-    if (today < currentPromo.startDate) {
-      promoMessage.textContent = "Kode promo belum aktif.";
-      promoMessage.classList.remove('hidden');
-      promoApplied = false;
-    } else if (today > currentPromo.endDate) {
-      promoMessage.textContent = "Maaf, kode promo sudah kadaluarsa.";
-      promoMessage.classList.remove('hidden');
-      promoApplied = false;
-    } else if (totalPriceInCart < currentPromo.minPurchase) {
-      promoMessage.textContent = `Promo "${currentPromo.code}" belum memenuhi syarat (minimal pembelian Rp ${currentPromo.minPurchase.toLocaleString("id-ID")}).`;
-      promoMessage.classList.remove('hidden');
-      promoApplied = false;
-    } else {
-      promoApplied = true;
-      promoMessage.textContent = `Kode promo berhasil diterapkan! Anda mendapatkan diskon 10%!`;
-      promoMessage.classList.remove('hidden');
-    }
+      // Scenario 1: Promo already applied for this transaction
+      if (promoApplied && promoData.currentTransactionId === currentTransactionId) {
+          showNotif(`Maaf kode promo (${inputCode} - tersisa ${remainingUses}/${MAX_PROMO_USAGE}) sudah dipakai untuk transaksi ini, silahkan selesaikan terlebih dahulu baru bisa menggunakan kembali.`);
+          return;
+      }
+
+      // Scenario 2: Promo usage limit reached
+      if (remainingUses <= 0) {
+          promoApplied = false;
+          promoMessage.textContent = `Maaf kode promo yang anda masukkan sudah mencapai limit. Terima kasih 🙏`;
+          promoMessage.classList.remove('hidden');
+          updateCartTotal();
+          return;
+      }
+
+      // Scenario 3: Promo not yet active
+      if (today < currentPromo.startDate) {
+          promoMessage.textContent = "Kode promo belum aktif.";
+          promoMessage.classList.remove('hidden');
+          promoApplied = false;
+      }
+      // Scenario 4: Promo expired
+      else if (today > currentPromo.endDate) {
+          promoMessage.textContent = "Maaf, kode promo sudah kadaluarsa.";
+          promoMessage.classList.remove('hidden');
+          promoApplied = false;
+      }
+      // Scenario 5: Minimum purchase not met
+      else if (totalPriceInCart < currentPromo.minPurchase) {
+          promoMessage.textContent = `Promo "${inputCode}" belum memenuhi syarat (minimal pembelian Rp ${currentPromo.minPurchase.toLocaleString("id-ID")}).`;
+          promoMessage.classList.remove('hidden');
+          promoApplied = false;
+      }
+      // Scenario 6: Promo successfully applied
+      else {
+          promoApplied = true;
+          promoMessage.textContent = `Kode promo berhasil diterapkan! Anda mendapatkan diskon 10%! 🎉 (Sisa penggunaan: ${remainingUses})`;
+          promoMessage.classList.remove('hidden');
+
+          // Mark promo as used for this transaction
+          promoData.currentTransactionId = currentTransactionId;
+          promoUsage[inputCode] = promoData;
+          savePromoUsage(); // Save updated usage to localStorage
+      }
   } else {
-    promoMessage.textContent = "Kode promo tidak valid.";
-    promoMessage.classList.remove('hidden');
-    promoApplied = false;
+      // Scenario 7: Invalid promo code
+      promoMessage.textContent = "Kode promo tidak valid.";
+      promoMessage.classList.remove('hidden');
+      promoApplied = false;
   }
   updateCartTotal();
 }
@@ -456,6 +725,7 @@ function updateWishlistCount() {
   if (count > 0) {
     gsap.from(wishlistCount, { scale: 1.5, duration: 0.3, ease: "back.out" });
   }
+  saveWishlistToLocalStorage(); // Save to localStorage on update
 }
 
 function updateWishlistButtonsState() {
@@ -467,12 +737,20 @@ function updateWishlistButtonsState() {
       button.classList.remove("wishlist-active");
     }
   });
+  // Also update the detail modal wishlist button
+  if (currentProductDetail) {
+    if (wishlist[currentProductDetail.name]) {
+      addToWishlistDetailBtn.classList.add("wishlist-active");
+    } else {
+      addToWishlistDetailBtn.classList.remove("wishlist-active");
+    }
+  }
 }
 
 function renderWishlist() {
   const wishlistItemsContainer = document.getElementById("wishlist-items");
   wishlistItemsContainer.innerHTML = "";
-  
+
   if (Object.keys(wishlist).length === 0) {
     wishlistItemsContainer.innerHTML = `
       <div class="text-center text-gray-500 py-8">
@@ -485,17 +763,17 @@ function renderWishlist() {
   Object.entries(wishlist).forEach(([key, item]) => {
     const card = document.createElement("div");
     card.className = "bg-gray-50 p-3 rounded-lg flex items-center gap-3";
-    
+
     card.innerHTML = `
-      <img src="https://via.placeholder.com/60?text=${encodeURIComponent(item.name)}" 
-           class="w-12 h-12 rounded-lg">
+      <img src="${item.images ? item.images[0] : `https://via.placeholder.com/60?text=${encodeURIComponent(item.name)}`}"
+           class="w-12 h-12 object-cover rounded-lg">
       <div class="flex-1">
         <p class="font-medium text-sm">${item.name}</p>
         <p class="text-xs text-gray-500">Rp ${item.price.toLocaleString("id-ID")}</p>
         <p class="text-xs text-blue-600">${item.kategori}</p>
       </div>
       <div class="flex flex-col gap-1">
-        <button onclick="addToCartFromWishlist('${item.name}')" 
+        <button onclick="addToCartFromWishlist('${item.name}')"
                 class="bg-orange-500 text-white text-xs px-3 py-1 rounded-full hover:bg-orange-600">
           <i class="fas fa-shopping-cart mr-1"></i>Pesan
         </button>
@@ -505,17 +783,25 @@ function renderWishlist() {
         </button>
       </div>
     `;
-    
+
     wishlistItemsContainer.appendChild(card);
   });
 }
 
 function addToCartFromWishlist(itemName) {
-  const item = wishlist[itemName];
-  if (cart[itemName]) {
-    cart[itemName].qty++;
+  const item = productList.find(p => p.name === itemName); // Get full product data
+  if (!item) return;
+
+  const itemKey = item.name; // For simple products, key is just name
+  if (cart[itemKey]) {
+    cart[itemKey].qty++;
   } else {
-    cart[itemName] = { name: itemName, price: item.price, qty: 1 };
+    cart[itemKey] = {
+      name: item.name,
+      price: item.price,
+      qty: 1,
+      images: item.images ? item.images : []
+    };
   }
   updateCartCount();
   showNotif(`${item.name} ditambahkan ke keranjang`);
@@ -530,13 +816,13 @@ function removeFromWishlist(itemName) {
 }
 
 // ---------- Display Functions ----------
-function displayProducts(list) {
-  container.innerHTML = "";
+function displayProducts(list, targetContainer = container) {
+  targetContainer.innerHTML = "";
   if (!list || !list.length) {
     const msg = document.createElement("div");
     msg.className = "col-span-full text-center py-8 text-gray-500";
     msg.innerHTML = `Maaf yang anda cari tidak/belum tersedia. 😔`;
-    container.appendChild(msg);
+    targetContainer.appendChild(msg);
     gsap.fromTo(msg, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.36, ease: "power2.out" });
     return;
   }
@@ -544,22 +830,23 @@ function displayProducts(list) {
   list.forEach((item) => {
     const card = document.createElement("div");
     card.className = "product-card";
-    
+    card.setAttribute("data-name", item.name); // Add data-name for click listener
+
     const image = document.createElement("img");
-    image.src = "https://via.placeholder.com/120?text=" + encodeURIComponent(item.name);
+    image.src = item.images && item.images.length > 0 ? item.images[0] : "https://via.placeholder.com/120?text=" + encodeURIComponent(item.name);
     image.className = "w-full h-32 object-cover rounded-lg mb-3";
-    
+
     const title = document.createElement("h4");
     title.className = "font-semibold text-base mb-1";
     title.textContent = item.name;
-    
+
     const price = document.createElement("p");
     price.className = "text-sm text-green-600 mb-2";
     price.textContent = "Rp " + item.price.toLocaleString("id-ID");
-    
+
     const buttonContainer = document.createElement("div");
     buttonContainer.className = "product-actions"; /* Menggunakan class product-actions */
-    
+
     const wishlistButton = document.createElement("button");
     wishlistButton.className = "btn-wishlist";
     wishlistButton.innerHTML = `
@@ -567,63 +854,312 @@ function displayProducts(list) {
       <span>Wishlist</span>
     `;
     wishlistButton.setAttribute("data-name", item.name);
-    wishlistButton.setAttribute("data-price", item.price);
-    wishlistButton.setAttribute("data-kategori", item.kategori);
-    
+
     if (wishlist[item.name]) {
       wishlistButton.classList.add("wishlist-active");
     }
-    
+
     const orderButton = document.createElement("button");
     orderButton.className = "btn-pesan bg-orange-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-orange-600 transition-all flex-1";
     orderButton.textContent = "Pesan";
     orderButton.setAttribute("data-name", item.name);
-    orderButton.setAttribute("data-price", item.price);
-    
+
     buttonContainer.append(wishlistButton, orderButton);
     card.append(image, title, price, buttonContainer);
-    container.appendChild(card);
+    targetContainer.appendChild(card);
   });
-  
+
   gsap.fromTo(
-    container.children,
+    targetContainer.children,
     { opacity: 0, y: 8 },
     { opacity: 1, y: 0, duration: 0.36, stagger: 0.06, ease: "power2.out" }
   );
+  updateWishlistButtonsState(); // Ensure wishlist state is updated after rendering products
 }
 
 function renderMenu(kategori = "all") {
   const filtered = kategori === "all" ? productList : productList.filter((item) => item.kategori === kategori);
   displayProducts(filtered);
+  renderRelatedProducts(filtered); // Render related products on menu page
 }
+
+// ---------- Product Detail Modal Functions (New) ----------
+function openProductDetailModal(itemName) {
+  const product = productList.find(p => p.name === itemName);
+  if (!product) return;
+
+  currentProductDetail = product;
+  currentProductDetailQty = 1;
+  selectedVariant = null; // Reset selected variant
+  selectedToppings = {}; // Reset selected toppings (object for quantities)
+
+  productDetailTitle.textContent = product.name;
+  productDetailDescription.textContent = product.description;
+  detailQtyDisplay.textContent = currentProductDetailQty;
+  updateDetailButtons(currentProductDetailQty);
+
+  // Render images for Swiper
+  productDetailImagesContainer.innerHTML = '';
+  product.images.forEach((imgSrc, index) => {
+    const slide = document.createElement('div');
+    slide.className = 'swiper-slide';
+    // Placeholder text for images
+    // Changed background to white for light mode, and #1F2937 for dark mode
+    slide.innerHTML = `<div class="flex items-center justify-center w-full h-48 bg-white dark:bg-gray-900 rounded-lg text-gray-600 dark:text-gray-300 text-lg font-semibold">Gambar ${index + 1}</div>`;
+    productDetailImagesContainer.appendChild(slide);
+  });
+
+  // Initialize Swiper for product detail images
+  // Destroy existing Swiper instance if it exists
+  if (productDetailModal.swiper) {
+    productDetailModal.swiper.destroy(true, true);
+  }
+  productDetailModal.swiper = new Swiper(".product-detail-swiper", {
+    loop: true,
+    autoplay: {
+      delay: 2500, // Auto-scroll every 2.5 seconds
+      disableOnInteraction: false, // Keep auto-scrolling even after user interaction
+    },
+    pagination: {
+      el: ".product-detail-pagination",
+      clickable: true,
+      renderBullet: function (index, className) {
+        // Use text "Gambar X" as bullets
+        return `<span class="${className} flex items-center justify-center"><span class="text-sm">Gambar ${index + 1}</span></span>`;
+      },
+    },
+  });
+
+  // Handle variants
+  if (product.variants && product.variants.length > 0) {
+    productVariantsContainer.classList.remove('hidden');
+    productVariantsOptions.innerHTML = '';
+    product.variants.forEach((variant, index) => {
+      const variantId = `variant-${product.name.replace(/\s/g, '-')}-${index}`;
+      const div = document.createElement('div');
+      div.className = 'variant-option p-2 rounded-md flex items-center justify-between'; // Added class for styling
+      div.innerHTML = `
+        <label for="${variantId}" class="flex items-center gap-2 cursor-pointer flex-1">
+          <input type="radio" id="${variantId}" name="product-variant" value="${variant.name}" data-price-offset="${variant.price}" class="form-radio text-orange-500">
+          <span class="text-sm">${variant.name} (${variant.description})</span>
+        </label>
+        <span class="text-sm font-medium">${variant.price > 0 ? `+ Rp ${variant.price.toLocaleString("id-ID")}` : ''}</span>
+      `;
+      productVariantsOptions.appendChild(div);
+    });
+
+    // Add event listener for variant selection
+    productVariantsOptions.querySelectorAll('input[name="product-variant"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        selectedVariant = {
+          name: e.target.value,
+          priceOffset: Number(e.target.dataset.priceOffset)
+        };
+        updateProductDetailPrice();
+      });
+    });
+    // Select the first variant ("Polos") by default and update price
+    const defaultVariantRadio = productVariantsOptions.querySelector('input[name="product-variant"][value="Polos"]');
+    if (defaultVariantRadio) {
+      defaultVariantRadio.checked = true;
+      selectedVariant = {
+        name: defaultVariantRadio.value,
+        priceOffset: Number(defaultVariantRadio.dataset.priceOffset)
+      };
+    } else { // Fallback if "Polos" not found, select first
+      productVariantsOptions.querySelector('input[name="product-variant"]').checked = true;
+      selectedVariant = {
+        name: product.variants[0].name,
+        priceOffset: product.variants[0].price
+      };
+    }
+    updateProductDetailPrice(); // Call to update price based on initial selection
+
+  } else {
+    productVariantsContainer.classList.add('hidden');
+    productVariantsOptions.innerHTML = '';
+    updateProductDetailPrice(); // Call to update price for products without variants
+  }
+
+  // Handle toppings (New)
+  if (product.toppings && product.toppings.length > 0) {
+    productToppingsContainer.classList.remove('hidden');
+    productToppingsOptions.innerHTML = '';
+    product.toppings.forEach((topping, index) => {
+      const toppingId = `topping-${topping.name.replace(/\s/g, '-')}-${index}`;
+      const div = document.createElement('div');
+      div.className = 'topping-item p-2 rounded-md flex items-center justify-between'; // Added class for styling
+      div.innerHTML = `
+        <div class="flex items-center gap-2 flex-1">
+          <span class="text-sm">${topping.name}</span>
+          <span class="text-sm font-medium">${topping.price > 0 ? `(+ Rp ${topping.price.toLocaleString("id-ID")})` : ''}</span>
+        </div>
+        <div class="topping-controls flex items-center gap-2">
+          <button type="button" class="qty-btn minus-red" data-topping-name="${topping.name}" data-action="minus-topping">
+            <i class="fas fa-minus"></i>
+          </button>
+          <span class="topping-qty text-sm font-bold" id="topping-qty-${topping.name.replace(/\s/g, '-')}" data-topping-name="${topping.name}">0</span>
+          <button type="button" class="qty-btn plus" data-topping-name="${topping.name}" data-action="plus-topping">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+      `;
+      productToppingsOptions.appendChild(div);
+
+      // Initialize topping quantity to 0
+      selectedToppings[topping.name] = { qty: 0, price: topping.price };
+    });
+
+    // Add event listeners for topping quantity buttons
+    productToppingsOptions.querySelectorAll('.qty-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const toppingName = e.currentTarget.dataset.toppingName;
+        const action = e.currentTarget.dataset.action;
+        const toppingQtySpan = document.getElementById(`topping-qty-${toppingName.replace(/\s/g, '-')}`);
+
+        if (action === 'plus-topping') {
+          selectedToppings[toppingName].qty++;
+        } else if (action === 'minus-topping' && selectedToppings[toppingName].qty > 0) {
+          selectedToppings[toppingName].qty--;
+        }
+        toppingQtySpan.textContent = selectedToppings[toppingName].qty;
+        updateProductDetailPrice();
+        updateToppingButtonsState(toppingName);
+      });
+    });
+    // Initial state for topping buttons
+    product.toppings.forEach(topping => updateToppingButtonsState(topping.name));
+
+  } else {
+    productToppingsContainer.classList.add('hidden');
+    productToppingsOptions.innerHTML = '';
+  }
+
+  // Update wishlist button state
+  updateWishlistButtonsState(); // Call this to update the button in the modal
+
+  renderRelatedProductsInModal(product); // Render related products in modal
+
+  openModal(productDetailModal);
+}
+
+function updateToppingButtonsState(toppingName) {
+  const qty = selectedToppings[toppingName].qty;
+  const minusBtn = productToppingsOptions.querySelector(`button[data-topping-name="${toppingName}"][data-action="minus-topping"]`);
+  if (minusBtn) {
+    minusBtn.disabled = qty <= 0;
+    minusBtn.className = qty <= 0 ? "qty-btn minus-gray" : "qty-btn minus-red";
+  }
+}
+
+function updateProductDetailPrice() {
+  let basePrice = currentProductDetail.price;
+  if (currentProductDetail.variants && selectedVariant) {
+    basePrice += selectedVariant.priceOffset;
+  }
+  // Add price of selected toppings based on their quantities
+  for (const toppingName in selectedToppings) {
+    basePrice += selectedToppings[toppingName].price * selectedToppings[toppingName].qty;
+  }
+  productDetailPrice.textContent = `Rp ${basePrice.toLocaleString("id-ID")}`;
+}
+
+function updateDetailButtons(qty) {
+  detailMinusBtn.disabled = qty <= 1;
+  detailMinusBtn.className = qty <= 1 ? "qty-btn minus-gray" : "qty-btn minus-red";
+}
+
+// ---------- Related Products Functions (New) ----------
+function renderRelatedProducts(excludeProduct = null, targetContainer = relatedProductsContainer) {
+  const allProducts = [...productList];
+  let filteredProducts = allProducts;
+
+  if (excludeProduct) {
+    filteredProducts = allProducts.filter(p => p.name !== excludeProduct.name);
+  }
+
+  // Shuffle products and take a few (e.g., 4)
+  const shuffled = filteredProducts.sort(() => 0.5 - Math.random());
+  const recommended = shuffled.slice(0, 4);
+
+  if (recommended.length > 0) {
+    relatedProductsSection.classList.remove('hidden');
+    displayProducts(recommended, targetContainer); // Use displayProducts to render with full product-card style
+  } else {
+    relatedProductsSection.classList.add('hidden');
+    targetContainer.innerHTML = '';
+  }
+}
+
+function renderRelatedProductsInModal(currentProduct) {
+  const allProducts = [...productList];
+  const filteredProducts = allProducts.filter(p => p.name !== currentProduct.name);
+
+  // Shuffle products and take a few (e.g., 2 for modal)
+  const shuffled = filteredProducts.sort(() => 0.5 - Math.random());
+  const recommended = shuffled.slice(0, 2);
+
+  relatedProductsModalList.innerHTML = '';
+  if (recommended.length > 0) {
+    recommended.forEach(item => {
+      const card = document.createElement("div");
+      // Use the same product-card class for consistency
+      card.className = "product-card cursor-pointer"; // Added cursor-pointer for clickability
+      card.setAttribute("data-name", item.name);
+      card.innerHTML = `
+        <img src="${item.images && item.images.length > 0 ? item.images[0] : `https://via.placeholder.com/120?text=${encodeURIComponent(item.name)}`}"
+             class="w-full h-32 object-cover rounded-lg mb-3">
+        <h4 class="font-semibold text-base mb-1">${item.name}</h4>
+        <p class="text-sm text-green-600 mb-2">Rp ${item.price.toLocaleString("id-ID")}</p>
+      `;
+      card.addEventListener('click', () => {
+        closeModal(productDetailModal); // Close current modal
+        openProductDetailModal(item.name); // Open new modal for related product
+      });
+      relatedProductsModalList.appendChild(card);
+    });
+  } else {
+    relatedProductsModalList.innerHTML = '<p class="text-center text-gray-500 text-sm col-span-2">Tidak ada rekomendasi.</p>';
+  }
+}
+
 
 // ---------- Payment Functions ----------
 function generateOrderMessage() {
   const items = Object.values(cart);
-  let total = items.reduce((sum, item) => sum + item.qty * item.price, 0);
-  let originalTotal = total;
+  let totalOriginal = items.reduce((sum, item) => sum + item.qty * item.price, 0);
+  let totalAfterDiscount = finalDiscountedPrice; // Use the globally stored final discounted price
 
   let message = `🛒 *PESANAN BARU*\n\n`;
   message += `📍 *KEDAI MAS HARIS*\n`;
   message += `⏰ ${new Date().toLocaleString('id-ID')}\n\n`;
   message += `📋 *Detail Pesanan:*\n`;
-  
+
   items.forEach((item, index) => {
-    message += `${index + 1}. ${item.name}\n`;
+    message += `${index + 1}. ${item.name}`;
+    if (item.variant) {
+      message += ` (${item.variant})`;
+    }
+    if (item.toppings && item.toppings.length > 0) {
+      const toppingStrings = item.toppings.map(t => `${t.name} (${t.qty})`);
+      message += ` + ${toppingStrings.join(', ')}`;
+    }
+    message += `\n`;
     message += `   ${item.qty} x Rp ${item.price.toLocaleString('id-ID')} = Rp ${(item.qty * item.price).toLocaleString('id-ID')}\n\n`;
   });
 
   if (promoApplied) {
-    total = originalTotal * (1 - currentPromo.discountPercentage);
     message += `\n🎉 *PROMO DITERAPKAN!* 🎉\n`;
-    message += `   Harga Asli: Rp ${originalTotal.toLocaleString('id-ID')}\n`;
-    message += `   Diskon (${currentPromo.discountPercentage * 100}%): Rp ${(originalTotal - total).toLocaleString('id-ID')}\n`;
+    message += `Menggunakan Kode Promo: *${currentPromo.code}*\n`;
+    message += `Mendapatkan potongan ${currentPromo.discountPercentage * 100}% 💰\n`; // Emote diskon
+    message += `Harga Asli: Rp ${totalOriginal.toLocaleString('id-ID')}\n`;
+    message += `Diskon: Rp ${(totalOriginal - totalAfterDiscount).toLocaleString('id-ID')}\n`;
   }
-  
-  message += `💰 *Total: Rp ${total.toLocaleString('id-ID')}*\n\n`;
+
+  message += `💰 *Total Bayar: Rp ${totalAfterDiscount.toLocaleString('id-ID')}*\n\n`;
   message += `💳 *Metode Pembayaran: ${currentPaymentMethod}*\n\n`;
   message += `Terima kasih! 🙏`;
-  
+
   return message;
 }
 
@@ -657,13 +1193,24 @@ function sendToWhatsApp() {
   const message = generateOrderMessage();
   const encodedMessage = encodeURIComponent(message);
   const whatsappUrl = `https://wa.me/${WA_PHONE}?text=${encodedMessage}`;
-  
+
+  // Update promo usage count if promo was applied for this transaction
+  if (promoApplied && promoUsage[currentPromo.code] && promoUsage[currentPromo.code].currentTransactionId === currentTransactionId) {
+      promoUsage[currentPromo.code].count++;
+      promoUsage[currentPromo.code].currentTransactionId = null; // Reset transaction ID
+      savePromoUsage(); // Save updated usage to localStorage
+  }
+
+  // Clear cart after sending order
   Object.keys(cart).forEach(key => delete cart[key]);
   updateCartCount();
-  
+
   showBadge(sentBadge, "Pesanan terkirim");
-  closeAllModals();
-  
+  closeAllModals(); // This will also reset promoApplied and promoCodeInput.value
+
+  // Generate a new transaction ID for the next potential transaction
+  currentTransactionId = Date.now().toString();
+
   window.open(whatsappUrl, '_blank');
 }
 
@@ -673,7 +1220,7 @@ function renderUpdateModalContent() {
   updateLog.forEach(log => {
     const updateItem = document.createElement('div');
     updateItem.className = 'update-item';
-    
+
     const title = document.createElement('h4');
     title.textContent = `Versi ${log.version}`;
     updateItem.appendChild(title);
@@ -701,23 +1248,28 @@ function renderUpdateModalContent() {
 
 function showUpdateModal() {
   renderUpdateModalContent();
-  
+
+  // Get the latest version from your updateLog data
+  const latestVersion = updateLog[0].version;
+
+  // Check if the latest version has been seen
+  const lastSeenVersion = localStorage.getItem(LAST_SEEN_UPDATE_VERSION_KEY);
+
   // Check cooldown
   const lastShownTime = localStorage.getItem(UPDATE_MODAL_COOLDOWN_KEY);
   const currentTime = new Date().getTime();
+  const isInCooldown = lastShownTime && (currentTime - parseInt(lastShownTime, 10) < UPDATE_MODAL_COOLDOWN_DURATION);
 
-  if (lastShownTime && (currentTime - parseInt(lastShownTime, 10) < UPDATE_MODAL_COOLDOWN_DURATION)) {
-    // If within cooldown period, do not show modal
-    console.log('Update modal is in cooldown. Not showing.');
-    return;
+  // Only show if it's a new version OR if it's not in cooldown
+  if (lastSeenVersion !== latestVersion || !isInCooldown) {
+    openModal(updateModal);
+    // Store the latest version as seen
+    localStorage.setItem(LAST_SEEN_UPDATE_VERSION_KEY, latestVersion);
+    // Reset checkbox state
+    dontShowAgainCheckbox.checked = false;
+  } else {
+    console.log('Update modal is in cooldown or already seen. Not showing.');
   }
-
-  openModal(updateModal);
-  
-  // Reset checkbox state
-  dontShowAgainCheckbox.checked = false;
-  // Store the last seen update version in localStorage
-  localStorage.setItem('lastSeenUpdateVersion', updateLog[0].version);
 }
 
 // ---------- New: Dispersion Effect with Three.js ----------
@@ -725,14 +1277,7 @@ let scene, camera, renderer, mesh, material, geometry;
 let uniforms;
 let animationFrameId;
 
-function initDispersionEffect(targetElement) {
-    // Get the bounding box of the modal
-    const rect = targetElement.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const x = rect.left;
-    const y = rect.top;
-
+function initDispersionEffectWithTexture(canvasTextureSource, width, height, x, y) {
     // Set canvas size and position
     dispersionCanvas.width = window.innerWidth;
     dispersionCanvas.height = window.innerHeight;
@@ -754,25 +1299,7 @@ function initDispersionEffect(targetElement) {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
 
-    // Create a texture from the modal content
-    // This is a simplified approach. For a real-world scenario,
-    // you might need to render the modal to a canvas first.
-    const modalTexture = new THREE.CanvasTexture(targetElement); // This won't work directly for HTML elements.
-                                                                 // You'd need to use html2canvas or similar.
-                                                                 // For now, let's use a placeholder.
-    
-    // Placeholder texture (replace with actual modal content capture)
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = width;
-    tempCanvas.height = height;
-    const ctx = tempCanvas.getContext('2d');
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, width, height);
-    ctx.font = '20px Arial';
-    ctx.fillStyle = 'black';
-    ctx.fillText('Modal Content', 20, 50);
-    const texture = new THREE.CanvasTexture(tempCanvas);
-
+    const texture = new THREE.CanvasTexture(canvasTextureSource);
 
     // Shader Uniforms
     uniforms = {
@@ -810,7 +1337,7 @@ function initDispersionEffect(targetElement) {
                 float strength = smoothstep(0.0, 0.5, dist) * u_progress; // Dispersion strength increases with progress
 
                 vec2 displaced_uv = uv + normalize(uv - mouse_uv) * strength * 0.1; // Displace UVs
-                
+
                 // Add some noise for a more organic look
                 float noise = fract(sin(dot(uv * 100.0, vec2(12.9898, 78.233))) * 43758.5453);
                 displaced_uv += noise * strength * 0.05;
@@ -860,17 +1387,68 @@ function animateDispersion() {
 }
 
 function startDispersionEffect(modalElement) {
-    // Hide the modal immediately to reveal the canvas
-    modalElement.style.display = 'none';
-    modalElement.setAttribute("aria-hidden", "true");
+    // Temporarily show the modal to capture its content
+    // Ensure modal is visible for html2canvas to capture it correctly
+    modalElement.style.display = 'block';
+    modalElement.setAttribute("aria-hidden", "false");
+    modalElement.style.opacity = '1'; // Ensure it's fully opaque for capture
+    modalElement.style.transform = 'translate(-50%, -50%) scale(1)'; // Ensure it's at its final size for capture
 
-    // Initialize and run the Three.js effect
-    initDispersionEffect(modalElement);
+    html2canvas(modalElement, {
+        backgroundColor: null, // Important for transparency
+        useCORS: true // If there are images from other domains
+    }).then(canvas => {
+        // Hide the original HTML modal after capturing the image
+        modalElement.style.display = 'none';
+        modalElement.setAttribute("aria-hidden", "true");
+        modalElement.style.opacity = '0'; // Reset opacity
+        modalElement.style.transform = 'translate(-50%, -50%) scale(0.8)'; // Reset transform
+
+        // Get the bounding box of the modal from the original element for screen positioning
+        const rect = modalElement.getBoundingClientRect();
+        const width = canvas.width; // Use canvas dimensions for texture
+        const height = canvas.height;
+        const x = rect.left;
+        const y = rect.top;
+
+        // Initialize Three.js with the captured canvas as a texture
+        initDispersionEffectWithTexture(canvas, width, height, x, y);
+
+        // Ensure overlay is also closed after dispersion starts
+        gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
+            gsap.set(overlay, { display: "none" });
+            overlay.setAttribute("aria-hidden", "true");
+            overlay.style.pointerEvents = "none";
+        }});
+
+    }).catch(error => {
+        console.error("Error capturing modal with html2canvas:", error);
+        // Fallback: Directly hide the modal if capture fails
+        modalElement.style.display = 'none';
+        modalElement.setAttribute("aria-hidden", "true");
+        // Ensure overlay is also closed
+        gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
+            gsap.set(overlay, { display: "none" });
+            overlay.setAttribute("aria-hidden", "true");
+            overlay.style.pointerEvents = "none";
+        }});
+    });
 }
 
 
 // ---------- Event Listeners ----------
 document.addEventListener('DOMContentLoaded', () => {
+  // Load data from localStorage
+  loadCartFromLocalStorage();
+  loadWishlistFromLocalStorage();
+  loadUsedPromoCodes(); // New: Load used promo codes (this is for the global `usedPromoCodes` set, not the `promoUsage` object)
+  loadPromoUsage(); // New: Load promo usage data
+  updateCartCount();
+  updateWishlistCount();
+
+  // Generate a new transaction ID on page load
+  currentTransactionId = Date.now().toString();
+
   // Register ScrollToPlugin
   gsap.registerPlugin(ScrollToPlugin);
 
@@ -938,20 +1516,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Cart button
+  // Cart button - FIXED: Reset promo state properly when opening cart
   document.getElementById("cart-btn").addEventListener("click", () => {
     // Reset promo input and message when opening cart
     promoCodeInput.value = '';
     promoMessage.classList.add('hidden');
-    promoApplied = false;
-    updateCartTotal(); // Ensure total is updated correctly when opening cart
+    promoApplied = false; // Reset promo status completely when opening cart
+    updateCartTotal(); // Ensure total is recalculated without any promo
 
     if (Object.keys(cart).length === 0) {
       showNotif("Keranjang kosong");
       return;
     }
     renderCart();
-    updateCartTotal();
     openModal(cartModal);
   });
 
@@ -977,7 +1554,8 @@ document.addEventListener('DOMContentLoaded', () => {
       cart[currentEditItem].qty--;
       document.getElementById("edit-qty-display").textContent = cart[currentEditItem].qty;
       updateEditButtons(cart[currentEditItem].qty);
-      showNotif(`Jumlah ${currentEditItem} berkurang`);
+      showNotif(`Jumlah ${cart[currentEditItem].name} berkurang`);
+      updateCartTotal(); // Update total after quantity change
     }
   });
 
@@ -986,14 +1564,15 @@ document.addEventListener('DOMContentLoaded', () => {
       cart[currentEditItem].qty++;
       document.getElementById("edit-qty-display").textContent = cart[currentEditItem].qty;
       updateEditButtons(cart[currentEditItem].qty);
-      showNotif(`Jumlah ${currentEditItem} bertambah`);
+      showNotif(`Jumlah ${cart[currentEditItem].name} bertambah`);
+      updateCartTotal(); // Update total after quantity change
     }
   });
 
   document.getElementById("save-edit-cart").addEventListener("click", () => {
     updateCartCount();
     updateCartTotal();
-    
+
     // Close edit modal and open cart modal
     gsap.to(editCartModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
       gsap.set(editCartModal, { display: "none" });
@@ -1010,7 +1589,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById("clear-cart-btn").addEventListener("click", () => {
     currentDeleteType = 'all';
     document.getElementById("confirm-delete-message").textContent = "Hapus semua item dari keranjang?";
-    
+
     // Close cart modal first, then open confirm delete modal
     gsap.to(cartModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
       gsap.set(cartModal, { display: "none" });
@@ -1028,10 +1607,10 @@ document.addEventListener('DOMContentLoaded', () => {
       Object.keys(cart).forEach(key => delete cart[key]);
       showNotif("Semua item berhasil dihapus");
     }
-    
+
     updateCartCount();
     updateCartTotal();
-    
+
     // Close confirm delete modal and open cart modal
     gsap.to(confirmDeleteModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
       gsap.set(confirmDeleteModal, { display: "none" });
@@ -1039,7 +1618,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renderCart(); // Re-render cart to show updated state
       openModal(cartModal); // Open cart modal again
     }});
-    
+
     currentDeleteType = null;
   });
 
@@ -1056,7 +1635,7 @@ document.addEventListener('DOMContentLoaded', () => {
       closeModal(cartModal);
       return;
     }
-    
+
     // Close cart modal first, then open payment modal
     gsap.to(cartModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
       gsap.set(cartModal, { display: "none" });
@@ -1072,16 +1651,16 @@ document.addEventListener('DOMContentLoaded', () => {
       method: "cash",
       info: "Pembayaran tunai saat pengambilan pesanan"
     };
-    
+
     document.getElementById("info-title").textContent = "Pembayaran Tunai";
     document.getElementById("info-content").innerHTML = `
-      
+
       <div class="text-center py-4">
         <div class="text-6xl mb-3">
           <i class="fas fa-money-bill-wave text-green-500"></i>
         </div>
         <p class="text-gray-600 mb-2">Siapkan uang tunai saat pengambilan pesanan</p>
-        <p class="font-semibold text-lg">Total: Rp ${Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0).toLocaleString('id-ID')}</p>
+        <p class="font-semibold text-lg">Total: Rp ${finalDiscountedPrice.toLocaleString('id-ID')}</p>
       </div>
     `;
     // Hide QR code for cash payment
@@ -1103,7 +1682,7 @@ document.addEventListener('DOMContentLoaded', () => {
       number: DANA_NUMBER,
       name: DANA_NAME
     };
-    
+
     document.getElementById("info-title").textContent = "Pembayaran DANA";
     document.getElementById("info-content").innerHTML = `
       <div class="space-y-3">
@@ -1122,7 +1701,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div class="info-item">
           <span class="info-left">Total Bayar:</span>
-          <span class="info-right">Rp ${Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0).toLocaleString('id-ID')}</span>
+          <span class="info-right">Rp ${finalDiscountedPrice.toLocaleString('id-ID')}</span>
         </div>
         <p class="text-sm text-center text-gray-500 dark:text-gray-300">Silakan scan QR Code atau transfer ke nomor DANA di atas, lalu klik "Kirim WA" untuk konfirmasi pesanan</p>
       </div>
@@ -1146,8 +1725,8 @@ document.addEventListener('DOMContentLoaded', () => {
       number: BANK_NUMBER,
       name: BANK_NAME
     };
-    
-    document.getElementById("info-title").textContent = "Transfer Bank";
+
+    document.getElementById("info-title").textContent = "Pembayaran Transfer Bank";
     document.getElementById("info-content").innerHTML = `
       <div class="space-y-3">
         <div class="info-item">
@@ -1165,7 +1744,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div class="info-item">
           <span class="info-left">Total Bayar:</span>
-          <span class="info-right">Rp ${Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0).toLocaleString('id-ID')}</span>
+          <span class="info-right">Rp ${finalDiscountedPrice.toLocaleString('id-ID')}</span>
         </div>
         <p class="text-sm text-center text-gray-500 dark:text-gray-300">Silakan transfer ke rekening di atas, lalu klik "Kirim WA" untuk konfirmasi pesanan</p>
       </div>
@@ -1203,64 +1782,179 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {
       // If localStorage is not available, continue without saving
     }
+    updateWishlistButtonsState(); // Update wishlist button colors on theme change
   });
 
   // Overlay click handler
   overlay.addEventListener("click", () => {
+    const currentTopModal = modalStack[modalStack.length - 1];
     if (mobileMenuOpen) {
       hamburger.click();
-    } else {
-      if (modalStack.length > 0) {
-        // If the top modal is the update modal, trigger dispersion
-        if (modalStack[modalStack.length - 1] === updateModal) {
-          startDispersionEffect(updateModal);
-          modalStack.pop(); // Remove from stack after starting dispersion
-          gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
-            gsap.set(overlay, { display: "none" });
-            overlay.setAttribute("aria-hidden", "true");
-            overlay.style.pointerEvents = "none";
-          }});
-        } else {
-          closeModal(modalStack[modalStack.length - 1]);
-        }
+    } else if (currentTopModal) {
+      // If the top modal is the update modal, trigger dispersion
+      if (currentTopModal === updateModal) {
+        startDispersionEffect(updateModal);
+        modalStack.pop(); // Remove from stack after starting dispersion
+        // Overlay will be closed by startDispersionEffect
+      } else {
+        closeModal(currentTopModal);
       }
     }
   });
 
-  // Dynamic product buttons
+  // Dynamic product buttons (for quick add to cart from menu grid)
   container.addEventListener("click", (e) => {
     const target = e.target;
     const orderButton = target.closest('.btn-pesan');
     const wishlistButton = target.closest('.btn-wishlist');
+    const productCard = target.closest('.product-card'); // For opening detail modal
 
     if (orderButton) {
       const name = orderButton.dataset.name;
-      const price = Number(orderButton.dataset.price);
-      if (cart[name]) {
-        cart[name].qty++;
+      const product = productList.find(p => p.name === name);
+      if (!product) return;
+
+      // If product has variants or toppings, open detail modal instead of direct add to cart
+      if ((product.variants && product.variants.length > 0) || (product.toppings && product.toppings.length > 0)) {
+        openProductDetailModal(name);
+        return;
+      }
+
+      const itemKey = product.name;
+      if (cart[itemKey]) {
+        cart[itemKey].qty++;
       } else {
-        cart[name] = { name, price, qty: 1 };
+        cart[itemKey] = {
+          name: product.name,
+          price: product.price,
+          qty: 1,
+          images: product.images ? product.images : []
+        };
       }
       updateCartCount();
       showNotif(`${name} ditambahkan ke keranjang`);
     }
-    
+
     if (wishlistButton) {
       const name = wishlistButton.dataset.name;
-      const price = Number(wishlistButton.dataset.price);
-      const kategori = wishlistButton.dataset.kategori;
-      
+      const product = productList.find(p => p.name === name);
+      if (!product) return;
+
       if (wishlist[name]) {
         delete wishlist[name];
         showNotif(`${name} dihapus dari wishlist`);
       } else {
-        wishlist[name] = { name, price, kategori };
+        wishlist[name] = {
+          name: product.name,
+          price: product.price,
+          kategori: product.kategori,
+          images: product.images ? product.images : []
+        };
         showNotif(`${name} ditambahkan ke wishlist`);
       }
       updateWishlistCount();
       updateWishlistButtonsState();
     }
+
+    // Open product detail modal when clicking on the card itself (excluding buttons)
+    if (productCard && !orderButton && !wishlistButton) {
+      const name = productCard.dataset.name;
+      openProductDetailModal(name);
+    }
   });
+
+  // Product Detail Modal Event Listeners (New)
+  detailMinusBtn.addEventListener("click", () => {
+    if (currentProductDetailQty > 1) {
+      currentProductDetailQty--;
+      detailQtyDisplay.textContent = currentProductDetailQty;
+      updateDetailButtons(currentProductDetailQty);
+    }
+  });
+
+  detailPlusBtn.addEventListener("click", () => {
+    currentProductDetailQty++;
+    detailQtyDisplay.textContent = currentProductDetailQty;
+    updateDetailButtons(currentProductDetailQty);
+  });
+
+  addToCartDetailBtn.addEventListener("click", () => {
+    if (!currentProductDetail) return;
+
+    let itemPrice = currentProductDetail.price;
+    let itemName = currentProductDetail.name;
+    let itemVariant = null;
+    let itemToppings = []; // Array to store selected topping objects {name, qty, price}
+    let itemToppingsPrice = 0;
+
+    if (currentProductDetail.variants && selectedVariant) {
+      itemPrice += selectedVariant.priceOffset;
+      itemVariant = selectedVariant.name;
+    }
+
+    // Calculate topping price and prepare topping array for cart
+    for (const toppingName in selectedToppings) {
+      const toppingData = selectedToppings[toppingName];
+      if (toppingData.qty > 0) {
+        itemToppings.push({ name: toppingName, qty: toppingData.qty, price: toppingData.price });
+        itemToppingsPrice += toppingData.price * toppingData.qty;
+      }
+    }
+    itemPrice += itemToppingsPrice;
+
+    // Construct a unique key for the cart item, including variant and toppings
+    let itemKey = currentProductDetail.name;
+    if (itemVariant) itemKey += `-${itemVariant}`;
+    if (itemToppings.length > 0) {
+      // Sort toppings by name for consistent key generation
+      const sortedToppings = [...itemToppings].sort((a, b) => a.name.localeCompare(b.name));
+      itemKey += `-${sortedToppings.map(t => `${t.name}_${t.qty}`).join('-')}`;
+    }
+
+    if (cart[itemKey]) {
+      cart[itemKey].qty += currentProductDetailQty;
+    } else {
+      cart[itemKey] = {
+        name: currentProductDetail.name,
+        price: itemPrice, // This price now includes variant and topping prices
+        qty: currentProductDetailQty,
+        images: currentProductDetail.images ? currentProductDetail.images : [],
+        variant: itemVariant,
+        toppings: itemToppings // Store selected topping objects
+      };
+    }
+    updateCartCount();
+    let notifText = `${currentProductDetail.name}`;
+    if (itemVariant) notifText += ` (${itemVariant})`;
+    if (itemToppings.length > 0) {
+      const toppingStrings = itemToppings.map(t => `${t.name} (${t.qty})`);
+      notifText += ` + ${toppingStrings.join(', ')}`;
+    }
+    notifText += ` ditambahkan ke keranjang`;
+    showNotif(notifText);
+    closeModal(productDetailModal);
+  });
+
+  addToWishlistDetailBtn.addEventListener("click", () => {
+    if (!currentProductDetail) return;
+
+    const name = currentProductDetail.name;
+    if (wishlist[name]) {
+      delete wishlist[name];
+      showNotif(`${name} dihapus dari wishlist`);
+    } else {
+      wishlist[name] = {
+        name: currentProductDetail.name,
+        price: currentProductDetail.price,
+        kategori: currentProductDetail.kategori,
+        images: currentProductDetail.images ? currentProductDetail.images : []
+      };
+      showNotif(`${name} ditambahkan ke wishlist`);
+    }
+    updateWishlistCount();
+    updateWishlistButtonsState();
+  });
+
 
   // Initialize Swiper
   const swiper = new Swiper(".mySwiper", {
@@ -1278,7 +1972,7 @@ document.addEventListener('DOMContentLoaded', () => {
       prevEl: '.swiper-button-prev',
     },
   });
-  
+
   // Fungsi Hamburger
   const hamburger = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobileMenu');
@@ -1287,14 +1981,14 @@ document.addEventListener('DOMContentLoaded', () => {
   hamburger.addEventListener('click', () => {
     mobileMenuOpen = !mobileMenuOpen;
     hamburger.classList.toggle('open', mobileMenuOpen);
-    
+
     if (mobileMenuOpen) {
       gsap.set(mobileMenu, { display: 'block', y: -20, opacity: 0 }); // Set initial state
       gsap.to(mobileMenu, { y: 0, opacity: 1, duration: 0.3, ease: 'power2.out' });
     } else {
       gsap.to(mobileMenu, {
         y: -20, opacity: 0, duration: 0.25, ease: 'power2.in',
-        onComplete: () => { 
+        onComplete: () => {
           gsap.set(mobileMenu, { display: 'none' }); // Hide completely after animation
         }
       });
@@ -1313,7 +2007,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   syncMobileCounts();
-  
+
 
 // Auto-close mobile menu when resizing to desktop
 window.addEventListener('resize', () => {
@@ -1334,7 +2028,7 @@ setInterval(syncMobileCounts, 500);
     openModal(wishlistModal);
     hamburger.click(); // Close hamburger menu after opening modal
   });
-  
+
   document.querySelectorAll('.mobile-menu a.nav-link-mobile').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
       e.preventDefault();
@@ -1343,7 +2037,7 @@ setInterval(syncMobileCounts, 500);
       hamburger.click(); // Close hamburger menu after navigation
     });
   });
-  
+
   const headerEl = document.querySelector("header");
 
   function updateHeaderOnScroll() {
@@ -1359,7 +2053,7 @@ setInterval(syncMobileCounts, 500);
   window.addEventListener("scroll", updateHeaderOnScroll);
   window.addEventListener("load", updateHeaderOnScroll);
 
-  renderMenu();
+  renderMenu(); // Initial render of menu and related products
 
   function smoothScrollTo(target) {
     const targetElement = document.querySelector(target);
@@ -1396,7 +2090,7 @@ setInterval(syncMobileCounts, 500);
       if(mobileMenuOpen) {
         hamburger.click(); // Close mobile menu
         // Add a small delay if needed for the menu to close before scrolling
-        setTimeout(() => smoothScrollTo(target), 300); 
+        setTimeout(() => smoothScrollTo(target), 300);
       } else {
         smoothScrollTo(target);
       }
@@ -1447,7 +2141,7 @@ setInterval(syncMobileCounts, 500);
     link.addEventListener('click', function(e) {
       e.preventDefault();
       const action = this.dataset.action;
-      
+
       // Close all dropdowns
       whatsappDropdownContent.style.display = 'none';
       emailDropdownContent.style.display = 'none';
@@ -1520,8 +2214,8 @@ setInterval(syncMobileCounts, 500);
                    `Dipesan untuk Tanggal: ${formattedDate}\n` +
                    `Alamat Dituju: ${address}\n\n` +
                    `Mohon konfirmasi pesanan ini. Terima kasih.\n\n` +
-                   `Hormat saya,\n${name}`;
-      
+                   `Hormat saya,\n[Nama Anda (opsional)]`;
+
       // Simulate sending email via mailto with CC
       const mailtoLink = `mailto:${MY_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}&cc=${encodeURIComponent(CC_EMAIL)}`;
       window.location.href = mailtoLink; // This will open the user's default email client
@@ -1571,7 +2265,7 @@ setInterval(syncMobileCounts, 500);
                    `Deskripsi Bug:\n${description}\n\n` +
                    `Mohon segera ditindaklanjuti. Terima kasih.\n\n` +
                    `Hormat saya,\n[Nama Anda (opsional)]`;
-      
+
       const mailtoLink = `mailto:${MY_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}&cc=${encodeURIComponent(CC_EMAIL)}`;
       window.location.href = mailtoLink;
       showBadge(sentBadge, "Email laporan bug terkirim!");
@@ -1622,11 +2316,7 @@ setInterval(syncMobileCounts, 500);
     // Trigger dispersion effect when closing update modal
     startDispersionEffect(updateModal);
     modalStack = modalStack.filter(modal => modal !== updateModal); // Remove from stack
-    gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
-      gsap.set(overlay, { display: "none" });
-      overlay.setAttribute("aria-hidden", "true");
-      overlay.style.pointerEvents = "none";
-    }});
+    // Overlay will be closed by startDispersionEffect
   });
 
   // Checkbox event listener
@@ -1640,22 +2330,9 @@ setInterval(syncMobileCounts, 500);
     }
   });
 
-  // Check if update modal should be shown on page load
-  const lastSeenVersion = localStorage.getItem('lastSeenUpdateVersion');
-  if (!lastSeenVersion || lastSeenVersion !== updateLog[0].version) {
-    // Show update modal after a short delay to ensure page is loaded
-    setTimeout(showUpdateModal, 1000); 
-  } else {
-    // If the latest version has been seen, check if it's still in cooldown
-    const lastShownTime = localStorage.getItem(UPDATE_MODAL_COOLDOWN_KEY);
-    const currentTime = new Date().getTime();
-    if (lastShownTime && (currentTime - parseInt(lastShownTime, 10) < UPDATE_MODAL_COOLDOWN_DURATION)) {
-      console.log('Update modal is in cooldown from previous session. Not showing.');
-    } else {
-      // If not in cooldown, show it again (e.g., if user didn't check the box last time)
-      setTimeout(showUpdateModal, 1000);
-    }
-  }
+  // Initial call to show update modal on page load
+  // Added a small delay to ensure all DOM elements are rendered and GSAP is ready
+  setTimeout(showUpdateModal, 1000);
 });
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -1681,5 +2358,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       });
     }
-  });
+  }
+  );
 });
