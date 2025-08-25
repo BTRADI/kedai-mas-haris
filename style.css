@@ -9,18 +9,18 @@ body, body.dark {
 }
 
 /* NAV underline custom */
-    .nav-link { position: relative; }
-    .nav-link::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: -4px;
-      height: 2px;
-      width: 0;
-      background: #f97316;
-      transition: width 0.3s ease;
-    }
-    .nav-link:hover::after { width: 100%; }
+.nav-link { position: relative; }
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  height: 2px;
+  width: 0;
+  background: #f97316;
+  transition: width 0.3s ease;
+}
+.nav-link:hover::after { width: 100%; }
 
 
 /* Pastikan semua section yang dituju navigasi transparan */
@@ -35,17 +35,17 @@ body, body.dark {
 
 /* Glassmorphism Header tanpa garis bawah */
 header {
-          position: sticky;
-          top: 0;
-          width: 100%;
-          z-index: 50;
-          transition: all 0.3s ease, border-color 0.3s ease; /* Tambahkan border-color ke transisi */
-          padding: 1rem 1.5rem;
-          border-bottom: 1px solid transparent; /* Border selalu ada, tapi transparan */
-          display: flex; /* Tambahkan flex untuk layout header */
-          align-items: center;
-          justify-content: space-between; /* Pisahkan elemen kiri, tengah, kanan */
-        }
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 50;
+  transition: all 0.3s ease, border-color 0.3s ease; /* Tambahkan border-color ke transisi */
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid transparent; /* Border selalu ada, tapi transparan */
+  display: flex; /* Tambahkan flex untuk layout header */
+  align-items: center;
+  justify-content: space-between; /* Pisahkan elemen kiri, tengah, kanan */
+}
 
 /* Saat di atas (no scroll) → transparan */
 header.top {
@@ -56,14 +56,13 @@ header.top {
 }
 
 /* Saat discroll → efek glass tanpa border */
-
 header.scrolled {
-          background: rgba(255, 255, 255, 0.35);
-          backdrop-filter: blur(18px) saturate(180%);
-          -webkit-backdrop-filter: blur(18px) saturate(180%);
-          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-          border-bottom-color: transparent; /* Pastikan border transparan di light mode saat discroll */
-        }
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-bottom-color: transparent; /* Pastikan border transparan di light mode saat discroll */
+}
 
 /* Dark mode */
 body.dark header.top {
@@ -73,14 +72,13 @@ body.dark header.top {
   box-shadow: none;
 }
 
-
 body.dark header.scrolled {
-          background: rgba(26, 35, 50, 0.35);
-          backdrop-filter: blur(18px) saturate(180%);
-          -webkit-backdrop-filter: blur(18px) saturate(180%);
-          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-          border-bottom-color: rgba(255, 255, 255, 0.1); /* Atur warna border untuk dark mode saat discroll */
-        }
+  background: rgba(26, 35, 50, 0.35);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-bottom-color: rgba(255, 255, 255, 0.1); /* Atur warna border untuk dark mode saat discroll */
+}
 
 /* Logo text color control */
 .logo-text {
@@ -90,8 +88,6 @@ body.dark header.scrolled {
 body.dark .logo-text {
   color: #f97316; /* Ikut warna body dark mode */
 }
-
-
 
 /* Modern Toggle Switch Styles */
 .toggle-switch {
@@ -165,7 +161,6 @@ body.dark .toggle-switch .moon-icon {
   transform: translateY(-50%) scale(0.8);
 }
 
-
 /* Kategori */
 .category-card {
   border-radius: 1rem;
@@ -184,7 +179,7 @@ body.dark .toggle-switch .moon-icon {
 }
 
 /* Enhanced Button Styles */
-.btn-pesan, 
+.btn-pesan,
 #checkout-btn,
 #send-wa,
 #do-search,
@@ -275,6 +270,7 @@ body.dark .bg-lime-300 h2 {
 }
 
 body.dark .bg-lime-300 p {
+  background: #059669;
   color: #ecfdf5;
 }
 
@@ -335,8 +331,8 @@ body.dark .category-card.active {
   box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
 }
 
-    /* Kategori */
-    .category-card {
+/* Kategori */
+.category-card {
   border-radius: 1rem;
   padding: 1.2rem;
   font-weight: 600;
@@ -415,183 +411,189 @@ body.dark .category-card.active {
   background-position: right center;
 }
 
-    /* Notifikasi - FIX: Hidden by default */
-    .notif {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #4ade80;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 9999px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      z-index: 1200;
-      opacity: 0;
-      pointer-events: none;
-      display: none; /* FIX: Initially hidden */
-    }
+/* Notifikasi - FIX: Hidden by default */
+.notif {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4ade80;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 1200;
+  opacity: 0;
+  pointer-events: none;
+  display: none; /* FIX: Initially hidden */
+}
 
-    .copied-badge, .sent-badge {
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 8px 14px;
-      border-radius: 999px;
-      color: white;
-      font-size: 13px;
-      z-index: 1300;
-      opacity: 0;
-      pointer-events: none;
-      display: none; /* FIX: Initially hidden */
-    }
+.copied-badge, .sent-badge {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border-radius: 999px;
+  color: white;
+  font-size: 13px;
+  z-index: 1300;
+  opacity: 0;
+  pointer-events: none;
+  display: none; /* FIX: Initially hidden */
+}
 
-    .copied-badge {
-      top: 88px;
-      background: rgba(17,24,39,0.92);
-    }
+.copied-badge {
+  top: 88px;
+  background: rgba(17,24,39,0.92);
+}
 
-    .sent-badge {
-      top: 130px;
-      background: rgba(59,130,246,0.95);
-    }
+.sent-badge {
+  top: 130px;
+  background: rgba(59,130,246,0.95);
+}
 
-    /* Overlay */
-    #overlay {
-      background: rgba(0,0,0,0.5);
-      position: fixed;
-      inset: 0;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 999;
-      transition: opacity 0.25s ease;
-      display: none;
-    }
+/* Overlay */
+#overlay {
+  background: rgba(0,0,0,0.5);
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 999;
+  transition: opacity 0.25s ease;
+  display: none;
+}
 
-    #overlay.show {
-      display: block;
-      pointer-events: auto;
-      opacity: 1;
-    }
+#overlay.show {
+  display: block;
+  pointer-events: auto;
+  opacity: 1;
+}
 
-    /* Modal Base Styles */
-    .modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.8);
-      background: white;
-      border-radius: 1.5rem;
-      padding: 1.25rem 1.5rem;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-      width: 90vw;
-      max-width: 400px;
-      opacity: 0;
-      z-index: 1000;
-      display: none;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      outline: none;
-    }
+/* Modal Base Styles */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: white;
+  border-radius: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+  width: 90vw;
+  max-width: 400px;
+  opacity: 0;
+  z-index: 1000;
+  display: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  /* Perbaikan untuk centering dan scroll */
+  max-height: 90vh; /* Batasi tinggi modal hingga 90% dari viewport height */
+  overflow-y: auto; /* Aktifkan scroll vertikal jika konten melebihi max-height */
+  /* Tambahan: Memberikan sedikit ruang di atas dan bawah jika modal terlalu tinggi */
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
 
-    .modal.show {
-      display: block;
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
+.modal.show {
+  display: block;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
 
-    .modal h3 {
-      font-weight: 600;
-      margin-bottom: 1rem;
-    }
+.modal h3 {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
 
-    /* Buttons style */
-    button {
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
+/* Buttons style */
+button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
 
-    /* Payment Modal Buttons - ENHANCED */
-    .payment-btn {
-      width: 100%;
-      padding: 1rem 1.25rem;
-      border-radius: 1rem;
-      border: none;
-      font-weight: 600;
-      font-size: 1rem;
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
+/* Payment Modal Buttons - ENHANCED */
+.payment-btn {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
 
-    .payment-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: left 0.5s;
-    }
+.payment-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
 
-    .payment-btn:hover::before {
-      left: 100%;
-    }
+.payment-btn:hover::before {
+  left: 100%;
+}
 
-    .payment-btn.cash {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: white;
-      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-    }
+.payment-btn.cash {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
 
-    .payment-btn.cash:hover {
-      background: linear-gradient(135deg, #059669, #047857);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
-    }
+.payment-btn.cash:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+}
 
-    .payment-btn.dana {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      color: white;
-      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-    }
+.payment-btn.dana {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
 
-    .payment-btn.dana:hover {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
-    }
+.payment-btn.dana:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+}
 
-    .payment-btn.transfer {
-      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-      color: white;
-      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
-    }
+.payment-btn.transfer {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
 
-    .payment-btn.transfer:hover {
-      background: linear-gradient(135deg, #7c3aed, #6d28d9);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
-    }
+.payment-btn.transfer:hover {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
 
-    /* Icon colors for light/dark mode */
-    .fas {
-      transition: color 0.3s ease;
-    }
+/* Icon colors for light/dark mode */
+.fas {
+  transition: color 0.3s ease;
+}
 
-    body:not(.dark) .fas {
-      color: #1f2937; /* gray-800 for light mode */
-    }
+body:not(.dark) .fas {
+  color: #1f2937; /* gray-800 for light mode */
+}
 
 body:not(.dark) .product-card {
   background-color: transparent; /* Changed to transparent */
   box-shadow: 0 1px 2px rgba(17,24,39,0.05);
- }
+}
 
 body.dark .product-card:hover {
   box-shadow:
@@ -601,85 +603,85 @@ body.dark .product-card:hover {
   transform: translateY(-2px);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
-    body.dark .fas {
-      color: #e2e8f0; /* gray-200 for dark mode */
-    }
+body.dark .fas {
+  color: #e2e8f0; /* gray-200 for dark mode */
+}
 
-    body.dark .nav-link {
-      color: #e2e8f0;
-    }
+body.dark .nav-link {
+  color: #e2e8f0;
+}
 
-    body.dark .nav-link:hover {
-      color: #f97316;
-    }
+body.dark .nav-link:hover {
+  color: #f97316;
+}
 
-    /* Wishlist icon specific colors */
-    body:not(.dark) #wishlist-btn .fas.fa-heart {
-      color: #ec4899; /* pink-500 for light mode */
-    }
+/* Wishlist icon specific colors */
+body:not(.dark) #wishlist-btn .fas.fa-heart {
+  color: #ec4899; /* pink-500 for light mode */
+}
 
-    body.dark #wishlist-btn .fas.fa-heart {
-      color: #fff; /* white for dark mode */
-    }
+body.dark #wishlist-btn .fas.fa-heart {
+  color: #fff; /* white for dark mode */
+}
 
-    #checkout-btn {
-      width: 100%;
-      background: #f97316;
-      color: white;
-      border: none;
-      padding: 0.75rem;
-      font-weight: 600;
-      border-radius: 0.75rem;
-    }
+#checkout-btn {
+  width: 100%;
+  background: #f97316;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+}
 
-    #checkout-btn:hover {
-      background: #ea580c;
-    }
+#checkout-btn:hover {
+  background: #ea580c;
+}
 
-    /* Cart edit buttons */
-    .qty-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: none;
-      font-weight: bold;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+/* Cart edit buttons */
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    .qty-btn:disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
+.qty-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
 
-    .qty-btn.plus {
-      background: #3b82f6;
-      color: white;
-    }
+.qty-btn.plus {
+  background: #3b82f6;
+  color: white;
+}
 
-    .qty-btn.plus:hover:not(:disabled) {
-      background: #2563eb;
-    }
+.qty-btn.plus:hover:not(:disabled) {
+  background: #2563eb;
+}
 
-    .qty-btn.minus-red {
-      background: #ef4444;
-      color: white;
-    }
+.qty-btn.minus-red {
+  background: #ef4444;
+  color: white;
+}
 
-    .qty-btn.minus-red:hover:not(:disabled) {
-      background: #dc2626;
-    }
+.qty-btn.minus-red:hover:not(:disabled) {
+  background: #dc2626;
+}
 
-    .qty-btn.minus-gray {
-      background: #d1d5db;
-      color: #9ca3af;
-    }
+.qty-btn.minus-gray {
+  background: #d1d5db;
+  color: #9ca3af;
+}
 
-    /* Product card styles - Enhanced MacOS Glassmorphism */
+/* Product card styles - Enhanced MacOS Glassmorphism */
 .product-card {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px) saturate(150%);
@@ -687,7 +689,7 @@ body.dark .product-card:hover {
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 1.25rem;
   padding: 1.25rem;
-  box-shadow: 
+  box-shadow:
     0 4px 16px rgba(0, 0, 0, 0.06),
     0 1px 4px rgba(0, 0, 0, 0.03);
   transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -720,7 +722,7 @@ body.dark .product-card:hover {
 body.dark .product-card {
   background: rgba(51, 65, 85, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
+  box-shadow:
     0 4px 16px rgba(0, 0, 0, 0.25),
     0 1px 4px rgba(0, 0, 0, 0.15);
 }
@@ -736,58 +738,58 @@ body.dark .product-card::before {
 /* Hover effects - consistent positioning */
 .product-card:hover {
   transform: translateY(-2px);
-  box-shadow: 
+  box-shadow:
     0 8px 25px rgba(0, 0, 0, 0.12),
     0 3px 8px rgba(0, 0, 0, 0.06);
 }
 
 body.dark .product-card:hover {
-  box-shadow: 
+  box-shadow:
     0 8px 25px rgba(0, 0, 0, 0.35),
     0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
-    /* Copy button styles */
-    .copy-btn {
-      background: #f3f4f6;
-      border: 1px solid #d1d5db;
-      color: #374151;
-      padding: 0.5rem;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 0.875rem;
-    }
+/* Copy button styles */
+.copy-btn {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+}
 
-    .copy-btn:hover {
-      background: #e5e7eb;
-    }
+.copy-btn:hover {
+  background: #e5e7eb;
+}
 
-    /* Dark Mode Styles */
-    body.dark {
-      background: #1a2332;
-      color: #e2e8f0;
-    }
+/* Dark Mode Styles */
+body.dark {
+  background: #1a2332;
+  color: #e2e8f0;
+}
 
-    body.dark header {
+body.dark header {
   background: transparent; /* 0.35 = tingkat transparansi */
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-    body.dark .modal {
-      background: #334155;
-      color: #e2e8f0;
-    }
+body.dark .modal {
+  background: #334155;
+  color: #e2e8f0;
+}
 
-    body.dark .product-card,
-    body.dark .bg-white {
-      background: #475569 !important;
-      color: #e2e8f0;
-    }
+body.dark .product-card,
+body.dark .bg-white {
+  background: #475569 !important;
+  color: #e2e8f0;
+}
 
-    body.dark .category-card {
+body.dark .category-card {
   color: #fff;
 }
 
@@ -853,113 +855,113 @@ body.dark .category-card:hover {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-    body.dark .bg-gray-50,
-    body.dark .bg-gray-100 {
-      background: #475569 !important;
-      color: #e2e8f0;
-    }
+body.dark .bg-gray-50,
+body.dark .bg-gray-100 {
+  background: #475569 !important;
+  color: #e2e8f0;
+}
 
-    body.dark .text-gray-500,
-    body.dark .text-gray-600 {
-      color: #94a3b8 !important;
-    }
+body.dark .text-gray-500,
+body.dark .text-gray-600 {
+  color: #94a3b8 !important;
+}
 
-    body.dark .text-gray-800,
-    body.dark .text-gray-900 {
-      color: #e2e8f0 !important;
-    }
+body.dark .text-gray-800,
+body.dark .text-gray-900 {
+  color: #e2e8f0 !important;
+}
 
-    body.dark .bg-gray-200 {
-      background: #64748b !important;
-      color: #e2e8f0 !important;
-    }
+body.dark .bg-gray-200 {
+  background: #64748b !important;
+  color: #e2e8f0 !important;
+}
 
-    body.dark .border {
-      border-color: #64748b !important;
-    }
+body.dark .border {
+  border-color: #64748b !important;
+}
 
-    body.dark .info-left {
-      color: #e2e8f0 !important;
-    }
+body.dark .info-left {
+  color: #e2e8f0 !important;
+}
 
-    body.dark .copy-btn {
-      background: #64748b;
-      border-color: #475569;
-      color: #e2e8f0;
-    }
+body.dark .copy-btn {
+  background: #64748b;
+  border-color: #475569;
+  color: #e2e8f0;
+}
 
-    body.dark .copy-btn:hover {
-      background: #475569;
-    }
+body.dark .copy-btn:hover {
+  background: #475569;
+}
 
-    /* Contrast improvements */
-    body.dark .text-orange-500 {
-      color: #fb923c !important; /* orange-400 for better contrast in dark mode */
-    }
+/* Contrast improvements */
+body.dark .text-orange-500 {
+  color: #fb923c !important; /* orange-400 for better contrast in dark mode */
+}
 
-    body.dark .bg-orange-500 {
-      background-color: #fb923c !important;
-    }
+body.dark .bg-orange-500 {
+  background-color: #fb923c !important;
+}
 
-    /* Wishlist button style */
-    .btn-wishlist {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      justify-content: center;
-      padding: 0.5rem 1rem;
-      border-radius: 9999px;
-      font-size: 0.875rem;
-      transition: all 0.3s ease;
-    }
+/* Wishlist button style */
+.btn-wishlist {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
 
-    .btn-wishlist:not(.wishlist-active) {
-      background-color: transparent;
-      color: #ec4899;
-    }
+.btn-wishlist:not(.wishlist-active) {
+  background-color: transparent;
+  color: #ec4899;
+}
 
-    .btn-wishlist.wishlist-active {
-      background-color: #ec4899;
-      color: white;
-    }
+.btn-wishlist.wishlist-active {
+  background-color: #ec4899;
+  color: white;
+}
 
-    body.dark .btn-wishlist:not(.wishlist-active) {
-      color: #fff;
-    }
+body.dark .btn-wishlist:not(.wishlist-active) {
+  color: #fff;
+}
 
-    body.dark .btn-wishlist.wishlist-active {
-      background-color: #be185d;
-    }
+body.dark .btn-wishlist.wishlist-active {
+  background-color: #be185d;
+}
 
-    /* Info content styles */
-    .info-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem;
-      background: #f9fafb;
-      border-radius: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
+/* Info content styles */
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+}
 
-    body.dark .info-item {
-      background: #475569;
-    }
+body.dark .info-item {
+  background: #475569;
+}
 
-    .info-left {
-      font-weight: 500;
-      color: #374151;
-    }
+.info-left {
+  font-weight: 500;
+  color: #374151;
+}
 
-    .info-right {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: monospace;
-      font-weight: 600;
-    }
+.info-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: monospace;
+  font-weight: 600;
+}
 
-    
+
 /* SOLUSI LENGKAP UNTUK SWIPER BANNER "COMING SOON" */
 
 /* Fix container swiper agar tidak bocor */
@@ -980,11 +982,11 @@ body.dark .category-card:hover {
   overflow: hidden; /* Mencegah slide bocor keluar */
   position: relative;
 }
-    
-   .mySwiper {
-    margin: 0; /* Remove margins */
-    padding: 0; /* Remove padding */
-} 
+
+.mySwiper {
+  margin: 0; /* Remove margins */
+  padding: 0; /* Remove padding */
+}
 
 .swiper-wrapper {
   display: flex;
@@ -1198,54 +1200,54 @@ body.dark .bg-orange-300 p {
   .swiper {
     height: 250px;
   }
-  
+
   .swiper-slide h2 {
     font-size: 2rem;
   }
-  
+
   .swiper-button-next,
   .swiper-button-prev {
     width: 40px;
     height: 40px;
   }
-  
+
   .swiper-button-next::after,
   .swiper-button-prev::after {
     font-size: 14px;
   }
-  
+
   .swiper-button-next {
     right: 10px;
   }
-  
+
   .swiper-button-prev {
     left: 10px;
   }
 }
 
-      .copy-btn-inline {
-      background: #f3f4f6;
-      border: 1px solid #d1d5db;
-      color: #374151;
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.375rem;
-      font-size: 0.75rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .copy-btn-inline:hover {
-      background: #e5e7eb;
-    }
-    body.dark .copy-btn-inline {
-      background: #64748b;
-      border-color: #475569;
-      color: #e2e8f0;
-    }
-    body.dark .copy-btn-inline:hover {
-      background: #475569;
-    }
-    
-    /* Light mode: kontainer menu transparan */
+.copy-btn-inline {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.copy-btn-inline:hover {
+  background: #e5e7eb;
+}
+body.dark .copy-btn-inline {
+  background: #64748b;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+body.dark .copy-btn-inline:hover {
+  background: #475569;
+}
+
+/* Light mode: kontainer menu transparan */
 body:not(.dark) #menu-container {
   background-color: transparent;
   padding: 0;
@@ -1315,48 +1317,72 @@ body.dark .search-trigger:hover {
   /* FIX: Remove transform from here */
 }
 
- /* Tombol hamburger hanya muncul di <768px */
-    .hamburger {
-    display: none;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 24px;
-    height: 18px;
-    cursor: pointer;
-    position: relative; /* Added for X animation */
-    z-index: 1100; /* Above mobile menu overlay */
-  }
-  .hamburger span {
-    display: block;
-    height: 3px;
-    background: #1f2937;
-    border-radius: 2px;
-    transition: all 0.3s ease;
-  }
-  body.dark .hamburger span {
-    background: #f97316; /* Ikut warna body dark mode */
-  }
+/* Tombol hamburger hanya muncul di <768px */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 18px;
+  cursor: pointer;
+  position: relative; /* Added for X animation */
+  z-index: 1100; /* Above mobile menu overlay */
+}
+.hamburger span {
+  display: block;
+  height: 3px;
+  background: #1f2937;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+body.dark .hamburger span {
+  background: #f97316; /* Ikut warna body dark mode */
+}
 
-  /* Hamburger X animation */
-  .hamburger.open span:nth-child(1) {
-    transform: translateY(7.5px) rotate(45deg);
-  }
-  .hamburger.open span:nth-child(2) {
-    opacity: 0;
-  }
-  .hamburger.open span:nth-child(3) {
-    transform: translateY(-7.5px) rotate(-45deg);
-  }
+/* Hamburger X animation */
+.hamburger.open span:nth-child(1) {
+  transform: translateY(7.5px) rotate(45deg);
+}
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-7.5px) rotate(-45deg);
+}
 
-  /* Specific breakpoints for hamburger and header elements */
-  /* Default: Desktop (>= 1024px) */
-  .header-nav-desktop { display: flex; gap: 1.5rem; } /* Added gap for spacing */
-  .wishlist-desktop { display: block; }
+/* Specific breakpoints for hamburger and header elements */
+/* Default: Desktop (>= 1024px) */
+.header-nav-desktop { display: flex; gap: 1.5rem; } /* Added gap for spacing */
+.wishlist-desktop { display: block; }
+.dark-mode-desktop { display: block; }
+.cart-desktop { display: block; }
+.hamburger { display: none; }
+.logo-desktop { display: flex; }
+.search-trigger span { display: inline; } /* Teks search trigger terlihat */
+.search-trigger {
+  min-width: 200px;
+  max-width: 400px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+}
+.search-trigger i { font-size: 0.9rem; }
+.search-container {
+  flex-grow: 1;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Tablet/Laptop Kecil (max-width: 1023px) */
+@media (max-width: 1023px) {
+  .header-nav-desktop { display: none; } /* Navigasi masuk hamburger */
+  .hamburger { display: flex; } /* Hamburger muncul */
+  /* Elemen lain di header tetap terlihat */
+  .logo-desktop { display: flex; }
+  .wishlist-desktop { display: none !important; } /* Wishlist masuk hamburger */
   .dark-mode-desktop { display: block; }
   .cart-desktop { display: block; }
-  .hamburger { display: none; }
-  .logo-desktop { display: flex; }
-  .search-trigger span { display: inline; } /* Teks search trigger terlihat */
+  .search-trigger span { display: inline; }
   .search-trigger {
     min-width: 200px;
     max-width: 400px;
@@ -1370,108 +1396,84 @@ body.dark .search-trigger:hover {
     margin-left: auto;
     margin-right: auto;
   }
-
-  /* Tablet/Laptop Kecil (max-width: 1023px) */
-  @media (max-width: 1023px) {
-    .header-nav-desktop { display: none; } /* Navigasi masuk hamburger */
-    .hamburger { display: flex; } /* Hamburger muncul */
-    /* Elemen lain di header tetap terlihat */
-    .logo-desktop { display: flex; }
-    .wishlist-desktop { display: none !important; } /* Wishlist masuk hamburger */
-    .dark-mode-desktop { display: block; }
-    .cart-desktop { display: block; }
-    .search-trigger span { display: inline; }
-    .search-trigger {
-      min-width: 200px;
-      max-width: 400px;
-      padding: 0.4rem 0.8rem;
-      font-size: 0.85rem;
-    }
-    .search-trigger i { font-size: 0.9rem; }
-    .search-container {
-      flex-grow: 1;
-      justify-content: center;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    /* Adjust header actions for smaller screens */
-    .header-actions-desktop {
-      gap: 0.75rem; /* Jarak antar item di kanan */
-      margin-left: auto; /* Dorong ke kanan */
-    }
-    .hamburger {
-      margin-left: 0.5rem; /* Sedikit jarak dari item sebelumnya */
-    }
+  /* Adjust header actions for smaller screens */
+  .header-actions-desktop {
+    gap: 0.75rem; /* Jarak antar item di kanan */
+    margin-left: auto; /* Dorong ke kanan */
   }
-
-  /* Mobile Portrait (max-width: 519px) - Changed from 427px to 519px */
-  @media (max-width: 519px) { /* New breakpoint for 520px */
-    .logo-desktop { display: flex !important; } /* Logo tetap ada */
-    .wishlist-desktop { display: none !important; } /* Pastikan wishlist tersembunyi */
-    .dark-mode-desktop { display: block !important; }
-    .cart-desktop { display: block !important; }
-    
-    /* Search trigger menyesuaikan ukuran dan tanpa teks */
-    .search-trigger {
-      min-width: unset;
-      max-width: 150px; /* Lebih kecil */
-      padding: 0.3rem 0.6rem; /* Padding lebih kecil */
-      font-size: 0.75rem; /* Font lebih kecil */
-    }
-    .search-trigger i {
-      font-size: 0.8rem; /* Icon lebih kecil */
-    }
-    .search-trigger span {
-      display: none; /* Sembunyikan teks "Cari produk anda..." */
-    }
-    .search-container {
-      flex-grow: 1;
-      justify-content: flex-start; /* Rata kiri */
-      margin-left: 0;
-      margin-right: 0.5rem;
-    }
-    .header-actions-desktop {
-      gap: 0.5rem; /* Jarak antar item lebih kecil */
-    }
+  .hamburger {
+    margin-left: 0.5rem; /* Sedikit jarak dari item sebelumnya */
   }
+}
+
+/* Mobile Portrait (max-width: 519px) - Changed from 427px to 519px */
+@media (max-width: 519px) { /* New breakpoint for 520px */
+  .logo-desktop { display: flex !important; } /* Logo tetap ada */
+  .wishlist-desktop { display: none !important; } /* Pastikan wishlist tersembunyi */
+  .dark-mode-desktop { display: block !important; }
+  .cart-desktop { display: block !important; }
+
+  /* Search trigger menyesuaikan ukuran dan tanpa teks */
+  .search-trigger {
+    min-width: unset;
+    max-width: 150px; /* Lebih kecil */
+    padding: 0.3rem 0.6rem; /* Padding lebih kecil */
+    font-size: 0.75rem; /* Font lebih kecil */
+  }
+  .search-trigger i {
+    font-size: 0.8rem; /* Icon lebih kecil */
+  }
+  .search-trigger span {
+    display: none; /* Sembunyikan teks "Cari produk anda..." */
+  }
+  .search-container {
+    flex-grow: 1;
+    justify-content: flex-start; /* Rata kiri */
+    margin-left: 0;
+    margin-right: 0.5rem;
+  }
+  .header-actions-desktop {
+    gap: 0.5rem; /* Jarak antar item lebih kecil */
+  }
+}
 
 
-  /* Mobile menu overlay */
-  .mobile-menu {
-    display: none;
-    position: fixed;
-    top: 60px; /* tinggi header */
-    left: 0;
-    width: 100%;
-    background: white;
-    z-index: 1000;
-    border-top: 1px solid #e5e7eb;
-    padding-bottom: 1rem; /* Tambahkan padding bawah */
-    transform: translateY(-100%); /* Start off-screen */
-    transition: transform 0.3s ease-out;
-  }
-  .mobile-menu.open {
-    transform: translateY(0); /* Slide in */
-  }
-  body.dark .mobile-menu {
-    background: #334155;
-    border-color: #475569;
-  }
+/* Mobile menu overlay */
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 60px; /* tinggi header */
+  left: 0;
+  width: 100%;
+  background: white;
+  z-index: 1000;
+  border-top: 1px solid #e5e7eb;
+  padding-bottom: 1rem; /* Tambahkan padding bawah */
+  transform: translateY(-100%); /* Start off-screen */
+  transition: transform 0.3s ease-out;
+}
+.mobile-menu.open {
+  transform: translateY(0); /* Slide in */
+}
+body.dark .mobile-menu {
+  background: #334155;
+  border-color: #475569;
+}
 
-  /* Menu items */
-  .mobile-menu .menu-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    cursor: pointer;
-    border-bottom: 1px solid #e5e7eb;
-    transition: background 0.3s ease;
-  }
-  .mobile-menu .menu-item:last-child { border-bottom: none; }
-    
-  /* Hover efek kebalikan */
-  body:not(.dark) .mobile-menu .menu-item:hover {
+/* Menu items */
+.mobile-menu .menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background 0.3s ease;
+}
+.mobile-menu .menu-item:last-child { border-bottom: none; }
+
+/* Hover efek kebalikan */
+body:not(.dark) .mobile-menu .menu-item:hover {
   background: #1f2937; /* gelap untuk light mode */
   color: white;
 }
@@ -1486,8 +1488,8 @@ body.dark .mobile-menu .menu-item:hover {
 body.dark .mobile-menu .menu-item:hover i {
   color: #1f2937;
 }
-    
-    @media (max-width: 767px) {
+
+@media (max-width: 767px) {
   .header-actions {
     opacity: 0;
     visibility: hidden;
@@ -1513,9 +1515,9 @@ body.dark .mobile-menu .menu-item:hover i {
   border-radius: 1rem;
   padding: 1rem;
 }
-    
+
 /* Contact */
-    #contact-section {
+#contact-section {
   background: transparent !important; /* Gunakan !important jika ada konflik */
   box-shadow: none !important; /* Jika ada shadow yang tidak diinginkan */
   border: none !important; /* Jika ada border yang tidak diinginkan */
@@ -1529,7 +1531,7 @@ body.dark .mobile-menu .menu-item:hover i {
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 1.25rem;
   padding: 1.5rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
 }
 
@@ -1541,7 +1543,7 @@ body.dark .mobile-menu .menu-item:hover i {
 body.dark .contact-card {
   background: rgba(51, 65, 85, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 body.dark .contact-card:hover {
@@ -1711,7 +1713,7 @@ body.dark input[type="date"]::-webkit-calendar-picker-indicator {
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-  
+
 
 /* === NAVBAR VISIBILITY RULES — canonical === */
 @media (min-width: 1024px) {
@@ -1731,21 +1733,21 @@ body.dark input[type="date"]::-webkit-calendar-picker-indicator {
   .hamburger { display: flex !important; }
 }
 
+.product-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+  transition: all 0.3s ease;
+}
+@media (max-width: 519px) {
   .product-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: auto;
-    transition: all 0.3s ease;
+    flex-direction: column;
+    align-items: stretch;
   }
-  @media (max-width: 519px) {
-    .product-actions {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    .product-actions button {
-      width: 100%;
-    }
+  .product-actions button {
+    width: 100%;
   }
+}
 /* Tombol Back to Top */
 .back-to-top-btn {
   position: fixed;
@@ -1783,7 +1785,7 @@ body.dark .back-to-top-btn {
 
 body.dark .back-to-top-btn:hover {
   background: linear-gradient(135deg, #f97316, #fb923c);
-  box-shadow: 0 6px 20px rgba(251, 146, 60, 0.5);
+  box-shadow: 0 66px 20px rgba(251, 146, 60, 0.5);
 }
 
 /* State for showing the button */
@@ -1821,18 +1823,22 @@ body.dark .back-to-top-btn:hover {
   padding: 2rem;
 }
 
+#update-modal h3 {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #f97316; /* Orange color for title */
+}
+
 #update-modal .update-item {
   background-color: #f3f4f6;
   padding: 1rem;
   border-radius: 0.75rem;
-  margin-bottom: 1rem; /* Added gap between update items */
+  margin-bottom: 0.75rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  border: 1px solid #e5e7eb; /* Light mode border */
 }
 
 body.dark #update-modal .update-item {
   background-color: #475569;
-  border: 1px solid #64748b; /* Dark mode border */
 }
 
 #update-modal .update-item h4 {
@@ -1845,20 +1851,24 @@ body.dark #update-modal .update-item h4 {
   color: #e2e8f0;
 }
 
+#update-modal .update-item p {
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+body.dark #update-modal .update-item p {
+  color: #cbd5e1;
+}
+
 #update-modal .update-item .update-date {
   font-size: 0.8rem;
-  color: #6b7280; /* Adjusted for better contrast in light mode */
-  margin-top: 0.25rem; /* Reduced margin for tighter spacing */
-  margin-bottom: 0.5rem; /* Added margin below date */
-  text-align: left; /* Align date to left */
+  color: #9ca3af;
+  margin-top: 0.5rem;
+  text-align: right;
 }
 
 body.dark #update-modal .update-item .update-date {
-  color: #94a3b8; /* Adjusted for better contrast in dark mode */
-}
-
-#update-modal .update-item ul {
-  margin-top: 0.5rem; /* Gap between date and list */
+  color: #94a3b8;
 }
 
 #update-modal #promo-content {
@@ -1877,10 +1887,6 @@ body.dark #update-modal .update-item .update-date {
 
 #update-modal #close-update-modal:hover {
   color: #1f2937;
-}
-
-body.dark #update-modal #close-update-modal {
-  color: #9ca3af;
 }
 
 body.dark #update-modal #close-update-modal:hover {
@@ -1956,46 +1962,430 @@ body.dark #update-modal label {
   color: #cbd5e1; /* Dark mode color */
 }
 
-/* Styling for promo price display */
-.promo-original-price {
+/* Product Detail Modal Styles */
+#product-detail-modal {
+  max-width: 500px; /* Larger modal for updates */
+  padding: 1.5rem;
+}
+
+#product-detail-modal .product-detail-content {
+  margin-bottom: 1.5rem;
+}
+
+/* Swiper for Product Detail Images */
+.product-detail-swiper {
+  width: 100%;
+  height: 200px; /* Tinggi gambar produk */
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.product-detail-swiper .swiper-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Custom Pagination for Product Detail Swiper (mini images) */
+.product-detail-pagination {
+  position: static !important; /* Override Swiper's default positioning */
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.product-detail-pagination .swiper-pagination-bullet {
+  width: 50px; /* Lebar mini gambar */
+  height: 50px; /* Tinggi mini gambar */
+  border-radius: 0.5rem;
+  background-color: #e5e7eb; /* Default background */
+  opacity: 1;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+}
+
+body.dark .product-detail-pagination .swiper-pagination-bullet {
+  background-color: #475569;
+}
+
+.product-detail-pagination .swiper-pagination-bullet img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.375rem; /* Slightly smaller border-radius for image inside bullet */
+}
+
+.product-detail-pagination .swiper-pagination-bullet-active {
+  border-color: #f97316; /* Orange border for active mini image */
+  transform: scale(1.05);
+}
+
+/* Product Variants Styling */
+#product-variants-options label {
+  cursor: pointer;
+}
+
+#product-variants-options input[type="radio"] {
+  /* Custom radio button styling */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #d1d5db;
+  border-radius: 50%;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.dark #product-variants-options input[type="radio"] {
+  border-color: #64748b;
+}
+
+#product-variants-options input[type="radio"]:checked {
+  background-color: #f97316; /* Orange when checked */
+  border-color: #f97316;
+}
+
+#product-variants-options input[type="radio"]:checked::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: white;
+  display: block;
+}
+
+/* Product Toppings Styling */
+#product-toppings-options label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: #f3f4f6; /* Light mode background for topping item */
+  color: #1f2937; /* Light mode text color for topping */
+  transition: all 0.2s ease;
+}
+
+body.dark #product-toppings-options label {
+  background-color: #475569; /* Dark mode background for topping item */
+  color: #e2e8f0; /* Dark mode text color for topping */
+}
+
+#product-toppings-options label:hover {
+  background-color: #e5e7eb; /* Light mode hover */
+}
+
+body.dark #product-toppings-options label:hover {
+  background-color: #334155; /* Dark mode hover */
+}
+
+#product-toppings-options input[type="checkbox"] {
+  /* Custom checkbox styling */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #d1d5db;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.dark #product-toppings-options input[type="checkbox"] {
+  border-color: #64748b;
+}
+
+#product-toppings-options input[type="checkbox"]:checked {
+  background-color: #f97316; /* Orange when checked */
+  border-color: #f97316;
+}
+
+#product-toppings-options input[type="checkbox"]:checked::before {
+  content: '\f00c'; /* Font Awesome check icon */
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: 12px;
+  color: white;
+  display: block;
+}
+
+/* Related Products in Modal */
+/* Changed to use product-card style */
+#related-products-modal-list .product-card {
+  padding: 1rem; /* Adjust padding for smaller cards in modal */
+  min-height: unset; /* Remove min-height constraint */
+}
+
+#related-products-modal-list .product-card img {
+  height: 80px; /* Adjust image height for smaller cards */
+}
+
+#related-products-modal-list .product-card h4 {
+  font-size: 0.9rem; /* Adjust font size for smaller cards */
+}
+
+#related-products-modal-list .product-card p {
+  font-size: 0.75rem; /* Adjust font size for smaller cards */
+}
+
+/* Ensure related products section on main page is hidden by default */
+#related-products-section {
+  display: none;
+}
+
+/* Perbaikan warna teks di modal produk untuk light/dark mode */
+#product-detail-modal #product-detail-description {
+  color: #4b5563; /* Default light mode color */
+}
+
+body.dark #product-detail-modal #product-detail-description {
+  color: #cbd5e1; /* Dark mode color */
+}
+
+#product-detail-modal #product-detail-price {
+  color: #1f2937; /* Default light mode color */
+}
+
+body.dark #product-detail-modal #product-detail-price {
+  color: #e2e8f0; /* Dark mode color */
+}
+
+#product-detail-modal #product-variants-container h4,
+#product-detail-modal #product-toppings-container h4 {
+  color: #1f2937; /* Default light mode color */
+}
+
+body.dark #product-detail-modal #product-variants-container h4,
+body.dark #product-detail-modal #product-toppings-container h4 {
+  color: #e2e8f0; /* Dark mode color */
+}
+
+#product-detail-modal #product-variants-options span {
+  color: #1f2937; /* Default light mode color */
+}
+
+body.dark #product-detail-modal #product-variants-options span {
+  color: #e2e8f0; /* Dark mode color */
+}
+
+/* Promo Price Display colors */
+#promo-price-display .promo-original-price {
+  color: #ef4444; /* Red for original price */
   text-decoration: line-through;
-  color: #ef4444; /* Red color for strikethrough price */
-  font-size: 0.875rem;
-  margin-right: 0.5rem;
 }
 
-.promo-discounted-price {
-  color: #22c55e; /* Green color for discounted price */
-  font-weight: bold;
+body.dark #promo-price-display .promo-original-price {
+  color: #f87171; /* Lighter red for dark mode */
 }
 
-/* Custom Scrollbar for update-content */
-#update-content {
-  scrollbar-width: thin; /* For Firefox */
-  scrollbar-color: transparent transparent; /* For Firefox: thumb track */
+#promo-price-display .promo-discounted-price {
+  color: #22c55e; /* Green for discounted price */
 }
 
-/* Webkit (Chrome, Safari) scrollbar styles */
-#update-content::-webkit-scrollbar {
-  width: 8px; /* Lebar scrollbar */
-  background-color: transparent; /* Latar belakang transparan */
+body.dark #promo-price-display .promo-discounted-price {
+  color: #4ade80; /* Lighter green for dark mode */
 }
 
-#update-content::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.5); /* Warna thumb default (light mode) */
-  border-radius: 10px;
-  border: 2px solid transparent; /* Border transparan agar terlihat melayang */
+/* Custom Scrollbar Styles for Modals */
+.modal::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 5px; /* Rounded corners for the scrollbar track */
 }
 
-#update-content::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(156, 163, 175, 0.7); /* Warna thumb saat hover */
+.modal::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1); /* Light transparent track for light mode */
+  border-radius: 5px;
 }
 
-/* Dark mode scrollbar */
-body.dark #update-content::-webkit-scrollbar-thumb {
-  background-color: rgba(100, 116, 139, 0.5); /* Warna thumb dark mode */
+.modal::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3); /* Darker transparent thumb for light mode */
+  border-radius: 5px;
 }
 
-body.dark #update-content::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(100, 116, 139, 0.7); /* Warna thumb dark mode saat hover */
+.modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+body.dark .modal::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1); /* Dark transparent track for dark mode */
+}
+
+body.dark .modal::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3); /* Lighter transparent thumb for dark mode */
+}
+
+body.dark .modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Product Detail Swiper Pagination Text */
+.product-detail-pagination .swiper-pagination-bullet span {
+  color: #1f2937; /* Default light mode text color */
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+body.dark .product-detail-pagination .swiper-pagination-bullet span {
+  color: #e2e8f0; /* Dark mode text color */
+}
+
+.product-detail-pagination .swiper-pagination-bullet-active span {
+  color: #f97316; /* Orange for active text */
+}
+
+/* Ensure text in promo content is readable */
+#promo-content p {
+  color: inherit; /* Inherit color from parent to ensure dark mode text is visible */
+}
+
+/* Ensure text in info-item is readable */
+.info-item .info-left,
+.info-item .info-right {
+  color: inherit; /* Inherit color from parent to ensure dark mode text is visible */
+}
+
+/* Ensure text in order event modal labels is readable */
+#order-event-modal label,
+#report-bug-modal label {
+  color: #374151; /* Default light mode color */
+}
+
+body.dark #order-event-modal label,
+body.dark #report-bug-modal label {
+  color: #e2e8f0; /* Dark mode color */
+}
+
+/* Ensure input fields have good contrast */
+#order-event-modal input,
+#order-event-modal textarea,
+#report-bug-modal input,
+#report-bug-modal textarea {
+  background-color: white;
+  color: #1f2937;
+  border-color: #d1d5db;
+}
+
+body.dark #order-event-modal input,
+body.dark #order-event-modal textarea,
+body.dark #report-bug-modal input,
+body.dark #report-bug-modal textarea {
+  background-color: #1f2937;
+  color: #e2e8f0;
+  border-color: #4b5563;
+}
+
+/* Placeholder color for inputs in modals */
+#order-event-modal input::placeholder,
+#order-event-modal textarea::placeholder,
+#report-bug-modal input::placeholder,
+#report-bug-modal textarea::placeholder {
+  color: #9ca3af;
+}
+
+body.dark #order-event-modal input::placeholder,
+body.dark #order-event-modal textarea::placeholder,
+body.dark #report-bug-modal input::placeholder,
+body.dark #report-bug-modal textarea::placeholder {
+  color: #6b7280;
+}
+
+/* Ensure text in confirm delete modal is readable */
+#confirm-delete-modal p {
+  color: #4b5563; /* Default light mode color */
+}
+
+body.dark #confirm-delete-modal p {
+  color: #cbd5e1; /* Dark mode color */
+}
+
+/* Ensure text in wishlist modal is readable */
+#wishlist-modal .bg-gray-50 p {
+  color: #374151; /* Default light mode color */
+}
+
+body.dark #wishlist-modal .bg-gray-50 p {
+  color: #e2e8f0; /* Dark mode color */
+}
+
+#wishlist-modal .bg-gray-50 .text-gray-500 {
+  color: #6b7280; /* Default light mode color */
+}
+
+body.dark #wishlist-modal .bg-gray-50 .text-gray-500 {
+  color: #94a3b8; /* Dark mode color */
+}
+
+/* Ensure text in cart modal is readable */
+#cart-modal .bg-gray-50 p {
+  color: #374151; /* Default light mode color */
+}
+
+body.dark #cart-modal .bg-gray-50 p {
+  color: #e2e8f0; /* Dark mode color */
+}
+
+#cart-modal .bg-gray-50 .text-gray-500 {
+  color: #6b7280; /* Default light mode color */
+}
+
+body.dark #cart-modal .bg-gray-50 .text-gray-500 {
+  color: #94a3b8; /* Dark mode color */
+}
+
+/* Ensure total text in cart modal is readable */
+#cart-modal .font-semibold span {
+  color: #1f2937; /* Default light mode color */
+}
+
+body.dark #cart-modal .font-semibold span {
+  color: #e2e8f0; /* Dark mode color */
+}
+
+/* Ensure edit cart modal text is readable */
+#edit-cart-modal p {
+  color: #374151; /* Default light mode color */
+}
+
+body.dark #edit-cart-modal p {
+  color: #e2e8f0; /* Dark mode color */
+}
+
+#edit-cart-modal .text-gray-500 {
+  color: #6b7280; /* Default light mode color */
+}
+
+body.dark #edit-cart-modal .text-gray-500 {
+  color: #94a3b8; /* Dark mode color */
+}
+
+/* Ensure search modal text is readable */
+#search-modal input {
+  color: #1f2937; /* Default light mode color */
+  background-color: white;
+  border-color: #d1d5db;
+}
+
+body.dark #search-modal input {
+  color: #e2e8f0; /* Dark mode color */
+  background-color: #1f2937;
+  border-color: #4b5563;
 }

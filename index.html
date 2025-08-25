@@ -15,6 +15,8 @@
   <link rel="stylesheet" href="style.css" />
   <!-- Three.js for Dispersion Effect -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- html2canvas for Dispersion Effect -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -111,7 +113,7 @@
   <h1 class="text-4xl font-extrabold text-center text-orange-500 mb-6 select-none" style="max-width:600px; margin-left:auto; margin-right:auto;">
     KEDAI MAS HARIS
   </h1>
-  
+
   <!-- Home Section -->
   <section id="home-section" class="w-5/6 mx-auto rounded-2xl shadow-md mb-6">
     <div class="swiper mySwiper">
@@ -129,7 +131,7 @@
           <p class="text-sm mt-2 bg-white inline-block px-4 py-1 rounded-full text-lime-600 font-semibold">NEW ARRIVALS</p>
         </div>
       </div>
-      
+
       <!-- Navigation Arrows -->
     <div class="swiper-button-next"></div>
     <div class="swiper-button-prev"></div>
@@ -137,7 +139,7 @@
     </div>
   </section>
 
-  <!-- Categories Section -->  
+  <!-- Categories Section -->
 <section id="categories-section">
     <h3 class="text-lg font-semibold mb-3">Kategori</h3>
   <div class="grid  grid-cols-2 sm:grid-cols-3 gap-4 mb-6" id="kategori-container">
@@ -151,6 +153,12 @@
 <section id="menu-section">
     <h3 class="text-lg font-semibold mb-3">Daftar Menu</h3>
   <div class="menu-grid grid grid-cols-2 gap-4 md:grid-cols-4" id="menu-container"></div>
+
+  <!-- Produk Terkait/Rekomendasi di Halaman Menu -->
+  <div id="related-products-section" class="mt-8 hidden">
+    <h3 class="text-lg font-semibold mb-3">Produk Lain yang Mungkin Anda Suka</h3>
+    <div class="menu-grid grid grid-cols-2 gap-4 md:grid-cols-4" id="related-products-container"></div>
+  </div>
 </main>
 
 <!-- Contact Section (Footer) -->
@@ -162,7 +170,7 @@
       <i class="fas fa-headset text-4xl text-orange-500 mb-4"></i>
       <h4 class="font-semibold text-xl mb-2">Kontak Cepat</h4>
       <p class="text-gray-600 mb-4 footer-text">Punya pertanyaan atau ingin memesan?</p>
-      
+
       <div class="contact-dropdown mb-3">
         <button class="contact-button whatsapp" id="whatsapp-contact-btn">
           <i class="fab fa-whatsapp"></i> WhatsApp
@@ -223,7 +231,7 @@
     </button>
   </div>
   <div id="cart-items" class="space-y-4 max-h-64 overflow-y-auto mb-4"></div>
-  
+
   <!-- Input Promo Code -->
   <div class="promo-input-container">
     <input type="text" id="promo-code-input" placeholder="Masukkan kode promo" />
@@ -434,9 +442,89 @@
   </div>
 </div>
 
+<!-- Modal Detail Produk -->
+<div id="product-detail-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="product-detail-title">
+  <h3 id="product-detail-title" class="mb-3"></h3>
+  <div class="product-detail-content">
+    <div class="swiper product-detail-swiper mb-4">
+      <div class="swiper-wrapper" id="product-detail-images">
+        <!-- Gambar akan dimuat di sini -->
+      </div>
+      <!-- Add Pagination -->
+      <div class="swiper-pagination product-detail-pagination"></div>
+    </div>
+    <p id="product-detail-description" class="text-sm text-gray-600 dark:text-gray-300 mb-4"></p>
+    <p class="font-semibold text-lg mb-4">Harga: <span id="product-detail-price">Rp 0</span></p>
+
+    <!-- Varian Produk (khusus Nasi Uduk & Nasi Kuning) -->
+    <div id="product-variants-container" class="mb-4 hidden">
+      <h4 class="font-semibold text-md mb-2">Pilih Varian:</h4>
+      <div id="product-variants-options" class="space-y-2">
+        <!-- Opsi varian akan dimuat di sini -->
+      </div>
+    </div>
+
+    <!-- Tambahan Topping (khusus Nasi Uduk & Nasi Kuning) -->
+    <div id="product-toppings-container" class="mb-4 hidden">
+      <h4 class="font-semibold text-md mb-2">Tambahan Topping:</h4>
+      <div id="product-toppings-options" class="space-y-2">
+        <!-- Opsi topping akan dimuat di sini -->
+      </div>
+    </div>
+
+    <!-- Penyesuaian Kuantitas -->
+    <div class="flex items-center justify-center gap-4 mb-4">
+      <button id="detail-minus-btn" class="qty-btn minus-red">
+        <i class="fas fa-minus"></i>
+      </button>
+      <span id="detail-qty-display" class="text-xl font-bold min-w-[40px] text-center">1</span>
+      <button id="detail-plus-btn" class="qty-btn plus">
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+
+    <div class="flex gap-3">
+      <button id="add-to-cart-detail-btn" class="flex-1 bg-orange-500 text-white py-2 rounded-xl font-semibold hover:bg-orange-600">
+        <i class="fas fa-shopping-cart mr-2"></i>Tambah ke Keranjang
+      </button>
+      <button id="add-to-wishlist-detail-btn" class="bg-pink-500 text-white px-4 rounded-xl hover:bg-pink-600">
+        <i class="fas fa-heart"></i>
+      </button>
+    </div>
+  </div>
+  <!-- Produk Terkait/Rekomendasi di Modal Detail -->
+  <div id="related-products-modal-container" class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+    <h4 class="font-semibold text-md mb-3">Produk Lain yang Mungkin Anda Suka</h4>
+    <div class="grid grid-cols-2 gap-3" id="related-products-modal-list">
+      <!-- Produk terkait akan dimuat di sini -->
+    </div>
+  </div>
+</div>
+
 <!-- Canvas for Dispersion Effect -->
 <canvas id="dispersion-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1500; pointer-events: none; display: none;"></canvas>
 
+  <!-- New: Update Notification Modal -->
+<div id="update-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="update-title">
+  <div class="flex justify-between items-center mb-4">
+    <h3 id="update-title" class="mb-0">Pembaruan Terbaru!</h3>
+    <button id="close-update-modal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+      <i class="fas fa-times text-xl"></i>
+    </button>
+  </div>
+  <div id="update-content" class="space-y-4 max-h-80 overflow-y-auto mb-4">
+    <!-- Content will be dynamically loaded here -->
+  </div>
+  <div id="promo-content" class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 rounded-lg dark:bg-orange-900 dark:border-orange-400 dark:text-orange-200">
+    <p class="font-semibold mb-2">🎉 Ada Promo Spesial!</p>
+    <p id="promo-text"></p>
+  </div>
+  <!-- Checkbox for "Don't show again for 10 minutes" -->
+  <div class="flex items-center mt-4">
+    <input type="checkbox" id="dont-show-again" class="mr-2">
+    <label for="dont-show-again" class="text-sm text-gray-600 dark:text-gray-300">Jangan tampilkan lagi selama 10 menit</label>
+  </div>
+</div>
 
 <!-- Tombol Back to Top -->
 <button id="back-to-top" class="back-to-top-btn">
