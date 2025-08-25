@@ -192,8 +192,10 @@ const productList = [
       { name: "Polos", price: 0, description: "Nasi, Orek, Bihun, Sambal" }
     ],
     toppings: [
+      { name: "Telor ½ Bulet Balado", price: 2000 },
       { name: "Telor Bulet Balado", price: 4000 },
-      { name: "Telor Dadar Iris", price: 4000 },
+      { name: "Telor Dadar", price: 4000 },
+      { name: "Telor Ceplok", price: 4000 },
       { name: "Bakwan", price: 1000 },
       { name: "Tempe Orek", price: 2000 },
       { name: "Bihun Goreng", price: 2000 }
@@ -239,8 +241,8 @@ const currentPromo = {
   discountPercentage: 0.10, // 10% diskon
   minPurchase: 20000, // Minimal pembelian Rp 20.000
   startDate: new Date("2025-08-21T20:00:00"), // Kamis, 21 Agustus 2025 pukul 20.00
-  endDate: new Date("2025-08-26T15:00:00"), // Selasa, 26 Agustus 2025 pukul 15.00
-  text: "Dapatkan diskon 10% untuk pembelian minimal Rp 20.000! Berlaku hingga 26 Agustus 2025 pukul 15.00 dengan kode promo: DISKON10."
+  endDate: new Date("2025-08-29T17:00:00"), // Selasa, 29 Agustus 2025 pukul 17.00
+  text: "Dapatkan diskon 10% untuk pembelian minimal Rp 20.000! Berlaku hingga 29 Agustus 2025 pukul 17.00 dengan kode promo: DISKON10."
 };
 
 // Cart & Wishlist state
