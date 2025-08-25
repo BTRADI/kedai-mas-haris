@@ -211,7 +211,8 @@ const updateLog = [
     changes: [
       "Kode promo diperpanjang hingga 29 Agustus 2025 pukul 17.00",
       "Fix bug button kode promo",
-      "Adding button back/exit pada setiap menu."
+      "Adding button back/exit pada setiap menu.",
+      "Fix animasi pada (Menu di Kategori yang anda suka)"
     ]
   },
   {
