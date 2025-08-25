@@ -1532,13 +1532,13 @@ body.dark .mobile-menu .menu-item:hover i {
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 1.25rem;
   padding: 1.5rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 16px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
 }
 
 .contact-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 3px 25px rgba(0, 0, 0, 0.2);
 }
 
 body.dark .contact-card {
@@ -2134,6 +2134,10 @@ body.dark #product-toppings-options input[type="checkbox"] {
 #related-products-modal-list .product-card {
   padding: 1rem; /* Adjust padding for smaller cards in modal */
   min-height: unset; /* Remove min-height constraint */
+  background-color: #ffffff; /* Light mode background */
+  border: 1px solid #e5e7eb; /* Light border for contrast */
+  border-radius: 0.75rem; /* Rounded corners */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5); /* Soft shadow */
 }
 
 #related-products-modal-list .product-card img {
