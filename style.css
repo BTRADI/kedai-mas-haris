@@ -334,6 +334,7 @@ body.dark .category-card.active {
 /* Kategori */
 .category-card {
   border-radius: 1rem;
+  color: white;
   padding: 1.2rem;
   font-weight: 600;
   text-align: center;
@@ -2202,7 +2203,7 @@ body.dark #promo-price-display .promo-original-price {
 }
 
 body.dark #promo-price-display .promo-discounted-price {
-  color: #4ade80; /* Lighter green for dark mode */
+  color: #4ade80;
 }
 
 /* Custom Scrollbar Styles for Modals */
@@ -2389,3 +2390,140 @@ body.dark #search-modal input {
   background-color: #1f2937;
   border-color: #4b5563;
 }
+
+/* New: Modal Close Button (X) */
+.modal-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6b7280; /* Default color for light mode */
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+  z-index: 10; /* Ensure it's above other modal content */
+}
+
+.modal-close-btn:hover {
+  color: #1f2937; /* Darker on hover for light mode */
+  transform: rotate(90deg);
+}
+
+body.dark .modal-close-btn {
+  color: #9ca3af; /* Default color for dark mode */
+}
+
+body.dark .modal-close-btn:hover {
+  color: #e2e8f0; /* Lighter on hover for dark mode */
+}
+
+/* New: Modal Back Button */
+.modal-back-btn {
+  background: #e5e7eb; /* Light gray for light mode */
+  color: #374151; /* Dark text for light mode */
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: fit-content; /* Adjust width to content */
+  margin-left: auto; /* Push to right */
+}
+
+.modal-back-btn:hover {
+  background: #d1d5db; /* Darker gray on hover for light mode */
+  transform: translateY(-1px);
+}
+
+body.dark .modal-back-btn {
+  background: #475569; /* Darker gray for dark mode */
+  color: #e2e8f0; /* Light text for dark mode */
+}
+
+body.dark .modal-back-btn:hover {
+  background: #334155; /* Even darker gray on hover for dark mode */
+}
+
+/* Responsive adjustments for buttons */
+@media (max-width: 640px) {
+  .modal-back-btn {
+    width: 100%; /* Full width on small screens */
+    margin-left: 0;
+  }
+}
+
+/* Responsive promo input container */
+@media (max-width: 768px) {
+  .promo-input-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .promo-input-container input {
+    width: 100%;
+    margin-bottom: 0.5rem; /* Space between input and button */
+  }
+
+  .promo-input-container button {
+    width: 100%;
+  }
+}
+
+/* --- START: REVISI UNTUK TOMBOL HAPUS SEMUA DI MODAL KERANJANG --- */
+/* Container untuk judul dan tombol hapus semua */
+#cart-modal .modal-header-cart {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  align-items: center; /* Center horizontally */
+  margin-bottom: 1rem; /* Space below header */
+  position: relative; /* For positioning the close button */
+}
+
+#cart-modal .modal-header-cart h3 {
+  margin-bottom: 0.5rem; /* Space between title and clear button */
+  text-align: center;
+  font-size: large; /* Center the title */
+}
+
+#cart-modal .clear-cart-btn {
+  /* Existing styles for clear-cart-btn */
+  background: none;
+  border: none;
+  color: #ef4444; /* Red color for delete icon */
+  font-size: 0.9rem; /* Adjust font size if needed */
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 0.25rem 0.5rem; /* Add some padding */
+  border-radius: 0.375rem; /* Slightly rounded corners */
+}
+
+#cart-modal .clear-cart-btn:hover {
+  color: #dc2626; /* Darker red on hover */
+  background-color: rgba(239, 68, 68, 0.1); /* Light red background on hover */
+}
+
+body.dark #cart-modal .clear-cart-btn {
+  color: #f87171; /* Lighter red for dark mode */
+}
+
+body.dark #cart-modal .clear-cart-btn:hover {
+  color: #ef4444; /* Darker red on hover in dark mode */
+  background-color: rgba(248, 113, 113, 0.1); /* Light red background on hover in dark mode */
+}
+
+/* Pastikan tombol close (X) tetap di kanan atas */
+#cart-modal .modal-close-btn {
+  position: absolute;
+  top: 0.5rem; /* Adjust as needed */
+  right: 0.5rem; /* Adjust as needed */
+  z-index: 11; /* Ensure it's above the header content */
+}
+/* --- END: REVISI UNTUK TOMBOL HAPUS SEMUA DI MODAL KERANJANG --- */

@@ -224,8 +224,9 @@
 
 <!-- Modal Keranjang -->
 <div id="cart-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="cart-title">
-  <div class="flex justify-between items-center mb-4">
-    <h3 id="cart-title" class="mb-0">Keranjang</h3>
+  <button class="modal-close-btn" data-modal-id="cart-modal"><i class="fas fa-times"></i></button>
+  <div class="modal-header-cart"> <!-- Tambahkan class baru di sini -->
+    <h3 id="cart-title">Keranjang</h3> <!-- Hapus mb-0 di sini -->
     <button id="clear-cart-btn" class="clear-cart-btn">
       <i class="fas fa-trash-alt"></i> Hapus Semua
     </button>
@@ -251,11 +252,17 @@
     <span id="discounted-total" class="promo-discounted-price"></span>
   </div>
 
-  <button id="checkout-btn">Checkout</button>
+  <div class="flex flex-col gap-3 mt-4">
+    <button id="checkout-btn">Checkout</button>
+    <button class="modal-back-btn" data-modal-id="cart-modal">
+      <i class="fas fa-arrow-left"></i> Kembali
+    </button>
+  </div>
 </div>
 
 <!-- Modal Edit Cart Item -->
 <div id="edit-cart-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="edit-cart-title">
+  <button class="modal-close-btn" data-modal-id="edit-cart-modal"><i class="fas fa-times"></i></button>
   <h3 id="edit-cart-title" class="mb-3">Edit Jumlah</h3>
   <div id="edit-cart-content" class="mb-4">
     <div class="bg-gray-50 p-3 rounded-lg flex items-center gap-3 mb-4">
@@ -275,18 +282,19 @@
       </button>
     </div>
   </div>
-  <div class="flex gap-3">
+  <div class="flex flex-col gap-3 mt-4">
     <button id="save-edit-cart" class="flex-1 bg-green-500 text-white py-2 rounded-xl font-semibold hover:bg-green-600">
       <i class="fas fa-check mr-2"></i>Simpan
     </button>
-    <button id="cancel-edit-cart" class="bg-gray-200 text-gray-800 px-4 rounded-xl">
-      <i class="fas fa-times"></i>
+    <button class="modal-back-btn" data-modal-id="edit-cart-modal">
+      <i class="fas fa-arrow-left"></i> Kembali
     </button>
   </div>
 </div>
 
 <!-- Modal Konfirmasi Hapus -->
 <div id="confirm-delete-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="confirm-delete-title">
+  <button class="modal-close-btn" data-modal-id="confirm-delete-modal"><i class="fas fa-times"></i></button>
   <h3 id="confirm-delete-title" class="mb-3 text-center">Konfirmasi Hapus</h3>
   <div class="text-center mb-4">
     <div class="text-4xl mb-2">
@@ -294,25 +302,31 @@
     </div>
     <p id="confirm-delete-message" class="text-gray-600"></p>
   </div>
-  <div class="flex gap-3">
+  <div class="flex flex-col gap-3 mt-4">
     <button id="confirm-delete-yes" class="flex-1 bg-red-500 text-white py-2 rounded-xl font-semibold hover:bg-red-600">
       <i class="fas fa-trash-alt mr-2"></i>Ya, Hapus
     </button>
-    <button id="confirm-delete-no" class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-xl">Batal</button>
+    <button class="modal-back-btn" data-modal-id="confirm-delete-modal">
+      <i class="fas fa-arrow-left"></i> Kembali
+    </button>
   </div>
 </div>
 
 <!-- Modal Wishlist -->
 <div id="wishlist-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="wishlist-title">
+  <button class="modal-close-btn" data-modal-id="wishlist-modal"><i class="fas fa-times"></i></button>
   <h3 id="wishlist-title">Wishlist</h3>
   <div id="wishlist-items" class="space-y-4 max-h-80 overflow-y-auto mb-4"></div>
-  <button id="close-wishlist" class="w-full bg-gray-200 text-gray-800 py-2 rounded-xl font-semibold hover:bg-gray-300">
-    <i class="fas fa-times mr-2"></i>Tutup
-  </button>
+  <div class="flex flex-col gap-3 mt-4">
+    <button class="modal-back-btn" data-modal-id="wishlist-modal">
+      <i class="fas fa-arrow-left"></i> Kembali
+    </button>
+  </div>
 </div>
 
 <!-- Modal Search -->
 <div id="search-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="search-title">
+  <button class="modal-close-btn" data-modal-id="search-modal"><i class="fas fa-times"></i></button>
   <h3 id="search-title" class="mb-3">Cari Produk</h3>
   <div class="mb-3">
     <input
@@ -323,18 +337,19 @@
       autocomplete="off"
     />
   </div>
-  <div class="flex gap-3">
+  <div class="flex flex-col gap-3 mt-4">
     <button id="do-search" class="flex-1 bg-orange-500 text-white py-2 rounded-xl font-semibold hover:bg-orange-600">
       <i class="fas fa-search mr-2"></i>Cari
     </button>
-    <button id="close-search" class="bg-gray-200 text-gray-800 px-4 rounded-xl">
-      <i class="fas fa-times"></i>
+    <button class="modal-back-btn" data-modal-id="search-modal">
+      <i class="fas fa-arrow-left"></i> Kembali
     </button>
   </div>
 </div>
 
 <!-- Modal Pilihan Pembayaran - ENHANCED -->
 <div id="payment-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="payment-title" tabindex="-1">
+  <button class="modal-close-btn" data-modal-id="payment-modal"><i class="fas fa-times"></i></button>
   <h3 id="payment-title" class="text-center mb-4">Pilih Metode Pembayaran</h3>
   <button id="pay-cash" class="payment-btn cash">
     <i class="fas fa-money-bill-wave text-xl"></i>
@@ -348,25 +363,34 @@
     <i class="fas fa-university text-xl"></i>
     <span>Transfer Bank</span>
   </button>
+  <div class="flex flex-col gap-3 mt-4">
+    <button class="modal-back-btn" data-modal-id="payment-modal">
+      <i class="fas fa-arrow-left"></i> Kembali
+    </button>
+  </div>
 </div>
 
 <!-- Modal Info Pembayaran -->
 <div id="info-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="info-title" tabindex="-1">
+  <button class="modal-close-btn" data-modal-id="info-modal"><i class="fas fa-times"></i></button>
   <h3 id="info-title" class="mb-3"></h3>
   <div id="info-content" class="mb-4">
     <!-- QR Code akan ditambahkan di sini oleh JS -->
     <img id="dana-qr-code" src="QR-Dana.jpeg" alt="QR Code DANA" class="hidden mx-auto mb-4 w-48 h-48 object-contain rounded-lg">
   </div>
-  <div class="flex gap-3">
+  <div class="flex flex-col gap-3 mt-4">
     <button id="send-wa" class="flex-1 bg-green-500 text-white py-2 rounded-xl font-semibold hover:bg-green-600">
       <i class="fab fa-whatsapp mr-2"></i>Kirim WA
     </button>
-    <button id="close-info" class="bg-gray-200 text-gray-800 px-4 rounded-xl">Tutup</button>
+    <button class="modal-back-btn" data-modal-id="info-modal">
+      <i class="fas fa-arrow-left"></i> Kembali
+    </button>
   </div>
 </div>
 
 <!-- Modal Order untuk Acara (WhatsApp & Email) -->
 <div id="order-event-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="order-event-title">
+  <button class="modal-close-btn" data-modal-id="order-event-modal"><i class="fas fa-times"></i></button>
   <h3 id="order-event-title" class="mb-3">Order untuk Acara</h3>
   <div class="space-y-3">
     <div>
@@ -390,16 +414,19 @@
       <textarea id="order-address" rows="3" class="w-full border px-3 py-2 rounded-lg mt-1" placeholder="Alamat lengkap pengiriman"></textarea>
     </div>
   </div>
-  <div class="flex gap-3 mt-4">
+  <div class="flex flex-col gap-3 mt-4">
     <button id="submit-order-event" class="flex-1 bg-orange-500 text-white py-2 rounded-xl font-semibold hover:bg-orange-600">
       Kirim Pesanan
     </button>
-    <button id="close-order-event-modal" class="bg-gray-200 text-gray-800 px-4 rounded-xl">Batal</button>
+    <button class="modal-back-btn" data-modal-id="order-event-modal">
+      <i class="fas fa-arrow-left"></i> Kembali
+    </button>
   </div>
 </div>
 
 <!-- Modal Report Bug -->
 <div id="report-bug-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="report-bug-title">
+  <button class="modal-close-btn" data-modal-id="report-bug-modal"><i class="fas fa-times"></i></button>
   <h3 id="report-bug-title" class="mb-3">Report Bug</h3>
   <div class="space-y-3">
     <div>
@@ -412,21 +439,22 @@
       <p class="text-xs text-gray-500 text-right" id="bug-char-count">0/500</p>
     </div>
   </div>
-  <div class="flex gap-3 mt-4">
+  <div class="flex flex-col gap-3 mt-4">
     <button id="submit-report-bug" class="flex-1 bg-red-500 text-white py-2 rounded-xl font-semibold hover:bg-red-600">
       Kirim Laporan
     </button>
-    <button id="close-report-bug-modal" class="bg-gray-200 text-gray-800 px-4 rounded-xl">Batal</button>
+    <button class="modal-back-btn" data-modal-id="report-bug-modal">
+      <i class="fas fa-arrow-left"></i> Kembali
+    </button>
   </div>
 </div>
 
 <!-- New: Update Notification Modal -->
 <div id="update-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="update-title">
+  <button class="modal-close-btn" data-modal-id="update-modal"><i class="fas fa-times"></i></button>
   <div class="flex justify-between items-center mb-4">
     <h3 id="update-title" class="mb-0">Pembaruan Terbaru!</h3>
-    <button id="close-update-modal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-      <i class="fas fa-times text-xl"></i>
-    </button>
+    <!-- Close button moved to modal-close-btn -->
   </div>
   <div id="update-content" class="space-y-4 max-h-80 overflow-y-auto mb-4">
     <!-- Content will be dynamically loaded here -->
@@ -440,10 +468,16 @@
     <input type="checkbox" id="dont-show-again" class="mr-2">
     <label for="dont-show-again" class="text-sm text-gray-600 dark:text-gray-300">Jangan tampilkan lagi selama 10 menit</label>
   </div>
+  <div class="flex flex-col gap-3 mt-4">
+    <button class="modal-back-btn" data-modal-id="update-modal">
+      <i class="fas fa-arrow-left"></i> Kembali
+    </button>
+  </div>
 </div>
 
 <!-- Modal Detail Produk -->
 <div id="product-detail-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="product-detail-title">
+  <button class="modal-close-btn" data-modal-id="product-detail-modal"><i class="fas fa-times"></i></button>
   <h3 id="product-detail-title" class="mb-3"></h3>
   <div class="product-detail-content">
     <div class="swiper product-detail-swiper mb-4">
@@ -499,32 +533,15 @@
       <!-- Produk terkait akan dimuat di sini -->
     </div>
   </div>
+  <div class="flex flex-col gap-3 mt-4">
+    <button class="modal-back-btn" data-modal-id="product-detail-modal">
+      <i class="fas fa-arrow-left"></i> Kembali
+    </button>
+  </div>
 </div>
 
 <!-- Canvas for Dispersion Effect -->
 <canvas id="dispersion-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1500; pointer-events: none; display: none;"></canvas>
-
-  <!-- New: Update Notification Modal -->
-<div id="update-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="update-title">
-  <div class="flex justify-between items-center mb-4">
-    <h3 id="update-title" class="mb-0">Pembaruan Terbaru!</h3>
-    <button id="close-update-modal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-      <i class="fas fa-times text-xl"></i>
-    </button>
-  </div>
-  <div id="update-content" class="space-y-4 max-h-80 overflow-y-auto mb-4">
-    <!-- Content will be dynamically loaded here -->
-  </div>
-  <div id="promo-content" class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 rounded-lg dark:bg-orange-900 dark:border-orange-400 dark:text-orange-200">
-    <p class="font-semibold mb-2">🎉 Ada Promo Spesial!</p>
-    <p id="promo-text"></p>
-  </div>
-  <!-- Checkbox for "Don't show again for 10 minutes" -->
-  <div class="flex items-center mt-4">
-    <input type="checkbox" id="dont-show-again" class="mr-2">
-    <label for="dont-show-again" class="text-sm text-gray-600 dark:text-gray-300">Jangan tampilkan lagi selama 10 menit</label>
-  </div>
-</div>
 
 <!-- Tombol Back to Top -->
 <button id="back-to-top" class="back-to-top-btn">

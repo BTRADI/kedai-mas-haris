@@ -44,7 +44,7 @@ const loginSuccessBadge = document.getElementById("login-success-badge");
 // Search elements
 const searchInput = document.getElementById("search-input");
 const doSearchBtn = document.getElementById("do-search");
-const closeSearchBtn = document.getElementById("close-search");
+// const closeSearchBtn = document.getElementById("close-search"); // Removed: Replaced by universal close button
 
 // Contact elements
 const whatsappContactBtn = document.getElementById("whatsapp-contact-btn");
@@ -75,7 +75,7 @@ const backToTopBtn = document.getElementById("back-to-top");
 // New: Update Modal Elements
 const updateContent = document.getElementById("update-content");
 const promoText = document.getElementById("promo-text");
-const closeUpdateModalBtn = document.getElementById("close-update-modal");
+// const closeUpdateModalBtn = document.getElementById("close-update-modal"); // Removed: Replaced by universal close button
 const dontShowAgainCheckbox = document.getElementById("dont-show-again"); // New: Checkbox
 const dispersionCanvas = document.getElementById("dispersion-canvas");
 
@@ -124,7 +124,7 @@ const productList = [
   {
     name: "Sosis Solo",
     price: 3000,
-    kategori: "Karbohidrat",
+    kategori: "Gorengan",
     description: "Sosis Solo dengan isian daging ayam cincang yang lezat, dibalut kulit tipis nan lembut.",
     images: ["https://via.placeholder.com/120?text=Sosis+Solo+1", "https://via.placeholder.com/120?text=Sosis+Solo+2", "https://via.placeholder.com/120?text=Sosis+Solo+3"]
   },
@@ -184,7 +184,7 @@ const productList = [
   },
   {
     name: "Nasi Kuning",
-    price: 7000,
+    price: 8000,
     kategori: "Karbohidrat",
     description: "Nasi kuning harum dengan lauk pelengkap, hidangan istimewa untuk berbagai acara.",
     images: ["https://via.placeholder.com/120?text=Nasi+Kuning+1", "https://via.placeholder.com/120?text=Nasi+Kuning+2", "https://via.placeholder.com/120?text=Nasi+Kuning+3"],
@@ -192,8 +192,10 @@ const productList = [
       { name: "Polos", price: 0, description: "Nasi, Orek, Bihun, Sambal" }
     ],
     toppings: [
+      { name: "Telor ½ Bulet Balado", price: 2000 },
       { name: "Telor Bulet Balado", price: 4000 },
-      { name: "Telor Dadar Iris", price: 4000 },
+      { name: "Telor Dadar", price: 4000 },
+      { name: "Telor Ceplok", price: 4000 },
       { name: "Bakwan", price: 1000 },
       { name: "Tempe Orek", price: 2000 },
       { name: "Bihun Goreng", price: 2000 }
@@ -203,6 +205,15 @@ const productList = [
 
 // New: Update Log Data
 const updateLog = [
+  {
+    version: "1.0.3",
+    date: "2025-08-25",
+    changes: [
+      "Kode promo diperpanjang hingga 29 Agustus 2025 pukul 17.00",
+      "Fix bug button kode promo",
+      "Adding button back/exit pada setiap menu."
+    ]
+  },
   {
     version: "1.0.2",
     date: "2025-08-24",
@@ -239,8 +250,8 @@ const currentPromo = {
   discountPercentage: 0.10, // 10% diskon
   minPurchase: 20000, // Minimal pembelian Rp 20.000
   startDate: new Date("2025-08-21T20:00:00"), // Kamis, 21 Agustus 2025 pukul 20.00
-  endDate: new Date("2025-08-26T15:00:00"), // Selasa, 26 Agustus 2025 pukul 15.00
-  text: "Dapatkan diskon 10% untuk pembelian minimal Rp 20.000! Berlaku hingga 26 Agustus 2025 pukul 15.00 dengan kode promo: DISKON10."
+  endDate: new Date("2025-08-29T17:00:00"), // Selasa, 29 Agustus 2025 pukul 17.00
+  text: "Dapatkan diskon 10% untuk pembelian minimal Rp 20.000! Diperpanjang berlaku hingga 29 Agustus 2025 pukul 17.00 dengan kode promo: DISKON10."
 };
 
 // Cart & Wishlist state
@@ -364,7 +375,7 @@ function closeModal(modal) {
 
 function goBackToPreviousModal() {
   if (modalStack.length <= 1) {
-    closeAllModals();
+    closeAllModals(); // If only one modal left, close all
     return;
   }
   const currentModal = modalStack[modalStack.length - 1];
@@ -401,13 +412,14 @@ function goBackToPreviousModal() {
 }
 
 function closeAllModals() {
-  modalStack.forEach((modal) => {
+  // Iterate through a copy of the stack to avoid issues with pop()
+  [...modalStack].reverse().forEach((modal) => {
     gsap.to(modal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
       gsap.set(modal, { display: "none" });
       modal.setAttribute("aria-hidden", "true");
     }});
   });
-  modalStack = [];
+  modalStack = []; // Clear the stack
   gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
     gsap.set(overlay, { display: "none" });
     overlay.setAttribute("aria-hidden", "true");
@@ -1443,8 +1455,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadWishlistFromLocalStorage();
   loadUsedPromoCodes(); // New: Load used promo codes (this is for the global `usedPromoCodes` set, not the `promoUsage` object)
   loadPromoUsage(); // New: Load promo usage data
-  updateCartCount();
-  updateWishlistCount();
 
   // Generate a new transaction ID on page load
   currentTransactionId = Date.now().toString();
@@ -1476,8 +1486,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => searchInput.focus(), 100);
   });
 
-  closeSearchBtn.addEventListener("click", closeAllModals);
-
   searchInput.addEventListener("input", () => {
     const query = searchInput.value.trim().toLowerCase();
     if (!query) {
@@ -1500,7 +1508,7 @@ document.addEventListener('DOMContentLoaded', () => {
       );
       displayProducts(filtered);
     }
-    closeAllModals();
+    closeAllModals(); // Close search modal after search
   });
 
   searchInput.addEventListener("keydown", (e) => {
@@ -1526,7 +1534,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (Object.keys(cart).length === 0) {
       showNotif("Keranjang kosong");
-      return;
+      return; // Do not open modal if cart is empty
     }
     renderCart();
     openModal(cartModal);
@@ -1545,8 +1553,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderWishlist();
     openModal(wishlistModal);
   });
-
-  document.getElementById("close-wishlist").addEventListener("click", closeAllModals);
 
   // Edit cart handlers
   document.getElementById("edit-minus-btn").addEventListener("click", () => {
@@ -1583,8 +1589,6 @@ document.addEventListener('DOMContentLoaded', () => {
     showNotif("Perubahan disimpan");
   });
 
-  document.getElementById("cancel-edit-cart").addEventListener("click", goBackToPreviousModal);
-
   // Clear cart and confirm delete handlers
   document.getElementById("clear-cart-btn").addEventListener("click", () => {
     currentDeleteType = 'all';
@@ -1620,12 +1624,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }});
 
     currentDeleteType = null;
-  });
-
-  document.getElementById("confirm-delete-no").addEventListener("click", () => {
-    currentDeleteItem = null;
-    currentDeleteType = null;
-    goBackToPreviousModal();
   });
 
   // Checkout handler
@@ -1763,7 +1761,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Info modal handlers
   document.getElementById("send-wa").addEventListener("click", sendToWhatsApp);
-  document.getElementById("close-info").addEventListener("click", closeAllModals);
 
   // Dark mode toggle (Desktop)
   darkToggle.addEventListener('click', () => {
@@ -1797,7 +1794,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modalStack.pop(); // Remove from stack after starting dispersion
         // Overlay will be closed by startDispersionEffect
       } else {
-        closeModal(currentTopModal);
+        closeAllModals(); // Close all modals when clicking overlay
       }
     }
   });
@@ -2224,8 +2221,6 @@ setInterval(syncMobileCounts, 500);
     closeAllModals();
   });
 
-  document.getElementById("close-order-event-modal").addEventListener('click', closeAllModals);
-
   function resetOrderEventForm() {
     orderNameInput.value = '';
     orderWaInput.value = '';
@@ -2273,8 +2268,6 @@ setInterval(syncMobileCounts, 500);
     closeAllModals();
   });
 
-  document.getElementById("close-report-bug-modal").addEventListener('click', closeAllModals);
-
   function resetReportBugForm() {
     bugTitleInput.value = '';
     bugDescriptionInput.value = '';
@@ -2312,13 +2305,6 @@ setInterval(syncMobileCounts, 500);
   });
 
   // New: Update Notification Modal Logic
-  closeUpdateModalBtn.addEventListener('click', () => {
-    // Trigger dispersion effect when closing update modal
-    startDispersionEffect(updateModal);
-    modalStack = modalStack.filter(modal => modal !== updateModal); // Remove from stack
-    // Overlay will be closed by startDispersionEffect
-  });
-
   // Checkbox event listener
   dontShowAgainCheckbox.addEventListener('change', () => {
     if (dontShowAgainCheckbox.checked) {
@@ -2333,6 +2319,10 @@ setInterval(syncMobileCounts, 500);
   // Initial call to show update modal on page load
   // Added a small delay to ensure all DOM elements are rendered and GSAP is ready
   setTimeout(showUpdateModal, 1000);
+
+  // Initial update of cart and wishlist counts
+  updateCartCount();
+  updateWishlistCount();
 });
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -2358,6 +2348,34 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       });
     }
-  }
-  );
+  });
+
+  // --- New: Universal Modal Close and Back Buttons ---
+  // Get all modals
+  const allModals = document.querySelectorAll('.modal');
+
+  allModals.forEach(modal => {
+    // Add event listener for the "X" close button
+    const closeBtn = modal.querySelector('.modal-close-btn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        // Special handling for updateModal with dispersion effect
+        if (modal.id === 'update-modal') {
+          startDispersionEffect(modal);
+          // Remove from modalStack after starting dispersion, as closeModal won't be called directly
+          modalStack = modalStack.filter(m => m !== modal);
+        } else {
+          closeAllModals(); // Close all modals
+        }
+      });
+    }
+
+    // Add event listener for the "Kembali" back button
+    const backBtn = modal.querySelector('.modal-back-btn');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        goBackToPreviousModal();
+      });
+    }
+  });
 });
