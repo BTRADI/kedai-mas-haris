@@ -304,7 +304,7 @@ body.dark .category-card.active {
 .payment-btn.cash:hover {
   background: linear-gradient(135deg, #059669, #047857);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5); /* FIX: Reduced vertical offset */
 }
 
 .payment-btn.dana {
@@ -316,7 +316,7 @@ body.dark .category-card.active {
 .payment-btn.dana:hover {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5); /* FIX: Reduced vertical offset */
 }
 
 .payment-btn.transfer {
@@ -328,7 +328,58 @@ body.dark .category-card.active {
 .payment-btn.transfer:hover {
   background: linear-gradient(135deg, #7c3aed, #6d28d9);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5); /* FIX: Changed from 66px to 6px */
+}
+
+.payment-btn.qris {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.payment-btn.qris:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+}
+
+/* Bank Sinarmas - Merah */
+.payment-btn.bank-sinarmas {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.payment-btn.bank-sinarmas:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+}
+
+/* Bank BCA - Biru tua elegan */
+.payment-btn.bank-bca {
+  background: linear-gradient(135deg, #1e3a5f, #0f2744);
+  color: white;
+  box-shadow: 0 4px 15px rgba(30, 58, 95, 0.4);
+}
+
+.payment-btn.bank-bca:hover {
+  background: linear-gradient(135deg, #0f2744, #0a1a2e);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(30, 58, 95, 0.5);
+}
+
+/* Bank BNI - Oranye elegan */
+.payment-btn.bank-bni {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: white;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+}
+
+.payment-btn.bank-bni:hover {
+  background: linear-gradient(135deg, #ea580c, #c2410c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
 }
 
 /* Kategori */
@@ -476,7 +527,7 @@ body.dark .category-card.active {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(0.8);
+  transform: translate(-50%, -50%);
   background: white;
   border-radius: 1.5rem;
   padding: 1.25rem 1.5rem;
@@ -486,20 +537,17 @@ body.dark .category-card.active {
   opacity: 0;
   z-index: 1000;
   display: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
-  /* Perbaikan untuk centering dan scroll */
-  max-height: 90vh; /* Batasi tinggi modal hingga 90% dari viewport height */
-  overflow-y: auto; /* Aktifkan scroll vertikal jika konten melebihi max-height */
-  /* Tambahan: Memberikan sedikit ruang di atas dan bawah jika modal terlalu tinggi */
-  margin-top: 20px;
-  margin-bottom: 20px;
+  /* Center + ruang aman dari taskbar */
+  max-height: 80vh;
+  overflow-y: auto;
+  margin: 0;
 }
 
 .modal.show {
   display: block;
   opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
+  transform: translate(-50%, -50%);
 }
 
 .modal h3 {
@@ -555,7 +603,7 @@ button {
 .payment-btn.cash:hover {
   background: linear-gradient(135deg, #059669, #047857);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5); /* FIX: Reduced vertical offset */
 }
 
 .payment-btn.dana {
@@ -567,7 +615,7 @@ button {
 .payment-btn.dana:hover {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5); /* FIX: Reduced vertical offset */
 }
 
 .payment-btn.transfer {
@@ -579,7 +627,58 @@ button {
 .payment-btn.transfer:hover {
   background: linear-gradient(135deg, #7c3aed, #6d28d9);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5); /* FIX: Changed from 66px to 6px */
+}
+
+.payment-btn.qris {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.payment-btn.qris:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+}
+
+/* Bank Sinarmas - Merah */
+.payment-btn.bank-sinarmas {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.payment-btn.bank-sinarmas:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+}
+
+/* Bank BCA - Biru tua elegan */
+.payment-btn.bank-bca {
+  background: linear-gradient(135deg, #1e3a5f, #0f2744);
+  color: white;
+  box-shadow: 0 4px 15px rgba(30, 58, 95, 0.4);
+}
+
+.payment-btn.bank-bca:hover {
+  background: linear-gradient(135deg, #0f2744, #0a1a2e);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(30, 58, 95, 0.5);
+}
+
+/* Bank BNI - Oranye elegan */
+.payment-btn.bank-bni {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: white;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+}
+
+.payment-btn.bank-bni:hover {
+  background: linear-gradient(135deg, #ea580c, #c2410c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
 }
 
 /* Icon colors for light/dark mode */
@@ -697,6 +796,7 @@ body.dark #wishlist-btn .fas.fa-heart {
   position: relative;
   overflow: hidden;
   min-height: 280px;
+  margin-top: 0;     /* pastikan tidak ada margin tambahan */
   display: flex;
   flex-direction: column;
 }
@@ -719,13 +819,24 @@ body.dark #wishlist-btn .fas.fa-heart {
   transition: opacity 0.35s ease;
 }
 
+#menu-section h3 {
+  margin-bottom: 0.75rem !important; /* 12px, konsisten */
+}
+
+body.dark #menu-section h3 {
+  margin-bottom: 0.75rem !important; /* samakan, cegah gap berlebihan */
+}
+
+
 /* Dark mode product cards */
 body.dark .product-card {
   background: rgba(51, 65, 85, 0.75);
+  min-height: 280px;
+  margin-top: 0;     /* pastikan tidak ada margin tambahan */
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.25),
     0 1px 4px rgba(0, 0, 0, 0.15);
+  padding: 1rem !important; /* default 1.25rem → diperkecil biar rapat */
 }
 
 body.dark .product-card::before {
@@ -739,15 +850,17 @@ body.dark .product-card::before {
 /* Hover effects - consistent positioning */
 .product-card:hover {
   transform: translateY(-2px);
+  /* Light mode hover: dark shadow */
   box-shadow:
-    0 8px 25px rgba(0, 0, 0, 0.12),
-    0 3px 8px rgba(0, 0, 0, 0.06);
+    0 8px 25px rgba(0, 0, 0, 0.2),
+    0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
 body.dark .product-card:hover {
+  /* Dark mode hover: light shadow */
   box-shadow:
-    0 8px 25px rgba(0, 0, 0, 0.35),
-    0 3px 8px rgba(0, 0, 0, 0.2);
+    0 8px 25px rgba(255, 255, 255, 0.15),
+    0 3px 8px rgba(255, 255, 255, 0.08);
 }
 
 /* Copy button styles */
@@ -914,6 +1027,7 @@ body.dark .bg-orange-500 {
   border-radius: 9999px;
   font-size: 0.875rem;
   transition: all 0.3s ease;
+  border: 2px solid transparent; /* Add transparent border for animation */
 }
 
 .btn-wishlist:not(.wishlist-active) {
@@ -932,6 +1046,17 @@ body.dark .btn-wishlist:not(.wishlist-active) {
 
 body.dark .btn-wishlist.wishlist-active {
   background-color: #be185d;
+}
+
+/* Hover effect for wishlist button */
+.btn-wishlist:hover {
+  border-color: #ec4899; /* Pink border on hover for light mode */
+  box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.2); /* Soft glow */
+}
+
+body.dark .btn-wishlist:hover {
+  border-color: #fff; /* White border on hover for dark mode */
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2); /* Soft glow */
 }
 
 /* Info content styles */
@@ -1193,7 +1318,7 @@ body.dark .bg-orange-300 h2 {
 
 body.dark .bg-orange-300 p {
   background: #c2410c !important;
-  color: #ecfdf5 !important;
+  color: #ecf5 !important;
 }
 
 /* Responsive untuk mobile */
@@ -1253,12 +1378,14 @@ body:not(.dark) #menu-container {
   background-color: transparent;
   padding: 0;
   border-radius: 0;
+  margin-top: -8px !important; /* tarik grid lebih dekat ke judul */
+  padding-top: 0 !important;
 }
 
 body:not(.dark) #menu-container .product-card {
   background: rgba(255, 255, 255, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
 }
 
 /* Mini Search Bar Trigger */
@@ -1404,6 +1531,15 @@ body.dark .hamburger span {
   }
   .hamburger {
     margin-left: 0.5rem; /* Sedikit jarak dari item sebelumnya */
+  }
+
+  /* REVISI: Tombol pesan di bawah tombol wishlist untuk layar <= 1023px */
+  .product-actions {
+    flex-direction: column; /* Stack buttons vertically */
+    align-items: stretch; /* Make buttons take full width */
+  }
+  .product-actions button {
+    width: 100%; /* Ensure buttons take full width */
   }
 }
 
@@ -1611,18 +1747,32 @@ body.dark .footer-text {
   width: 100%; /* Ensure it takes full width of its parent */
 }
 
+/* --- START: PERBAIKAN DROPDOWN EMAIL --- */
 .contact-dropdown-content {
-  display: none;
-  position: absolute;
+  display: none; /* Default hidden */
+  position: fixed; /* Change to fixed for overlay behavior */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center the dropdown */
   background-color: #f9fafb; /* Light mode background */
-  min-width: 100%; /* Match button width */
+  width: 90vw; /* Take 90% of viewport width */
+  max-width: 300px; /* Max width for larger screens */
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 10; /* Above other content */
+  z-index: 1001; /* Higher than overlay (999) and modals (1000) */
   border-radius: 0.75rem; /* Match button border-radius */
   overflow: hidden; /* For rounded corners */
-  top: 100%; /* Position below the button */
-  left: 0;
-  margin-top: 0.5rem; /* Space between button and dropdown */
+  max-height: 80vh; /* Max height for scrollable content */
+  overflow-y: auto; /* Enable vertical scroll */
+  opacity: 0; /* Start hidden for animation */
+  pointer-events: none; /* Disable interaction when hidden */
+  transition: opacity 0.3s ease, transform 0.3s ease; /* Smooth transition */
+}
+
+.contact-dropdown-content.show {
+  display: block; /* Show when 'show' class is present */
+  opacity: 1; /* Fade in */
+  pointer-events: auto; /* Enable interaction */
+  transform: translate(-50%, -50%) scale(1); /* Ensure scale is 1 */
 }
 
 body.dark .contact-dropdown-content {
@@ -1651,6 +1801,8 @@ body.dark .contact-dropdown-content a:hover {
   background-color: #475569; /* Dark mode hover */
   color: #e2e8f0;
 }
+/* --- END: PERBAIKAN DROPDOWN EMAIL --- */
+
 
 /* Date picker styling */
 input[type="date"] {
@@ -1739,7 +1891,29 @@ body.dark input[type="date"]::-webkit-calendar-picker-indicator {
   gap: 0.5rem;
   margin-top: auto;
   transition: all 0.3s ease;
+  /* Order the buttons */
+  flex-direction: row; /* Ensure row direction */
+  justify-content: space-between; /* Space out the buttons */
 }
+.product-actions .btn-wishlist {
+  order: 1; /* Wishlist first */
+}
+.product-actions .btn-pesan {
+  order: 2; /* Pesan second */
+  flex-grow: 1; /* Allow pesan button to grow */
+}
+
+/* REVISI: Tombol pesan di bawah tombol wishlist untuk layar <= 1023px */
+@media (max-width: 1023px) {
+  .product-actions {
+    flex-direction: column; /* Stack buttons vertically */
+    align-items: stretch; /* Make buttons take full width */
+  }
+  .product-actions button {
+    width: 100%; /* Ensure buttons take full width */
+  }
+}
+
 @media (max-width: 519px) {
   .product-actions {
     flex-direction: column;
@@ -1786,7 +1960,7 @@ body.dark .back-to-top-btn {
 
 body.dark .back-to-top-btn:hover {
   background: linear-gradient(135deg, #f97316, #fb923c);
-  box-shadow: 0 66px 20px rgba(251, 146, 60, 0.5);
+  box-shadow: 0 6px 20px rgba(251, 146, 60, 0.5);
 }
 
 /* State for showing the button */
@@ -2356,15 +2530,6 @@ body.dark #cart-modal .bg-gray-50 .text-gray-500 {
   color: #94a3b8; /* Dark mode color */
 }
 
-/* Ensure total text in cart modal is readable */
-#cart-modal .font-semibold span {
-  color: #1f2937; /* Default light mode color */
-}
-
-body.dark #cart-modal .font-semibold span {
-  color: #e2e8f0; /* Dark mode color */
-}
-
 /* Ensure edit cart modal text is readable */
 #edit-cart-modal p {
   color: #374151; /* Default light mode color */
@@ -2531,3 +2696,213 @@ body.dark #cart-modal .clear-cart-btn:hover {
   z-index: 11; /* Ensure it's above the header content */
 }
 /* --- END: REVISI UNTUK TOMBOL HAPUS SEMUA DI MODAL KERANJANG --- */
+
+/* New: Product Info Details (Rating & Sales) */
+.product-info-details {
+  display: flex;
+  justify-content: flex-end; /* Align to end (right) */
+  align-items: center;
+  margin-bottom: 0.75rem; /* Space between info and buttons */
+  font-size: 0.875rem; /* Small font size for info */
+}
+
+/* Removed .product-rating styles */
+
+.product-sales {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #ef4444; /* Red for sales icon */
+  font-weight: 600;
+}
+
+.product-sales .sales-icon {
+  font-size: 0.9rem; /* Adjust sales icon size */
+}
+
+/* Dark mode adjustments for rating and sales */
+body.dark .product-sales {
+  color: #f87171; /* Lighter red for dark mode */
+}
+
+/* Responsive adjustments for product info details */
+@media (max-width: 768px) {
+  .product-info-details {
+    flex-direction: row; /* Keep as row */
+    justify-content: flex-end; /* Keep aligned to right */
+    align-items: center;
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .product-info-details {
+    flex-direction: row; /* Keep as row */
+    justify-content: flex-end; /* Keep aligned to right */
+    align-items: center;
+    font-size: 0.75rem;
+  }
+  .product-sales .sales-icon {
+    font-size: 0.7rem; /* Even smaller on mobile */
+  }
+}
+
+/* New: Product Rating Styles */
+.product-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #f97316; /* Yellow for stars */
+  font-weight: 600;
+  margin-right: auto; /* Push to the left */
+  opacity: 1; /* Always visible */
+  transform: translateX(0); /* Always in position */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Container for the 5 empty stars */
+.stars-outer {
+  position: relative;
+  display: inline-block;
+  font-family: 'Font Awesome 6 Free'; /* Use Font Awesome */
+  font-weight: 900; /* For solid stars */
+  font-size: 1rem; /* Base size for stars */
+  line-height: 1; /* Prevent extra space */
+  white-space: nowrap; /* Keep stars on one line */
+}
+
+.stars-outer::before {
+  content: '\f005 \f005 \f005 \f005 \f005'; /* 5 empty stars */
+  color: #d1d5db; /* Light gray for empty stars */
+}
+
+/* Filled stars container */
+.stars-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 0%; /* Controlled by JS */
+}
+
+.stars-inner::before {
+  content: '\f005 \f005 \f005 \f005 \f005'; /* 5 filled stars */
+  color: #f97316; /* Yellow for filled stars */
+}
+
+/* Responsive star sizing */
+@media (max-width: 768px) {
+  .stars-outer {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .stars-outer {
+    font-size: 0.8rem;
+  }
+}
+
+/* Removed: Show rating on product card hover */
+/* .product-card:hover .product-rating {
+  opacity: 1;
+  transform: translateX(0);
+} */
+
+/* Dark mode adjustments for rating */
+body.dark .product-rating {
+  color: #fde047; /* Lighter yellow for dark mode */
+}
+
+body.dark .stars-outer::before {
+  color: #6b7280; /* Darker gray for empty stars in dark mode */
+}
+
+body.dark .stars-inner::before {
+  color: #fde047; /* Lighter yellow for filled stars in dark mode */
+}
+
+/* QR Code Enlarge Feature */
+#dana-qr-code.qr-enlargeable {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 2px solid transparent;
+}
+
+#dana-qr-code.qr-enlargeable:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  border-color: #f97316;
+}
+
+.qr-enlarge-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.qr-enlarge-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.qr-enlarge-overlay.hidden {
+  display: none !important;
+}
+
+.qr-enlarge-img {
+  max-width: min(90vw, 420px);
+  max-height: min(75vh, 420px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 1rem;
+  background: white;
+  padding: 0.75rem;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+.qr-enlarge-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  font-size: 2rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+  line-height: 1;
+  z-index: 2001;
+}
+
+.qr-enlarge-close:hover {
+  background: rgba(255,255,255,0.3);
+  transform: scale(1.1);
+}
+
+.qr-enlarge-hint {
+  color: rgba(255,255,255,0.75);
+  font-size: 0.85rem;
+  margin-top: 1.25rem;
+  text-align: center;
+}
+
+body.dark .qr-enlarge-img {
+  background: #1f2937;
+}
