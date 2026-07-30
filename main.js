@@ -2,11 +2,16 @@
 const WA_PHONE = "6281389868594";
 const DANA_NUMBER = "081389868594";
 const DANA_NAME = "Muhammad Haris Nugroho";
-const BANK_NUMBER = "0058168424";
+const BANK_NUMBER = "0058168424"; // default / Sinarmas
 const BANK_NAME = "Muhammad Haris Nugroho";
+const BANKS = {
+  sinarmas: { number: "0058168424", name: "Muhammad Haris Nugroho", label: "Bank Sinarmas" },
+  bca:      { number: "0058168424", name: "Muhammad Haris Nugroho", label: "Bank BCA" },
+  bni:      { number: "0058168424", name: "Muhammad Haris Nugroho", label: "Bank BNI" }
+};
 const MY_EMAIL = "mhdharisn21@gmail.com";
 const CC_EMAIL = "muhammad_nugroho@app.co.id"; // Email CC yang tidak diketahui user
-const DANA_QR_CODE_PATH = "QR-Dana.jpeg"; // Path ke gambar QR Code DANA Anda
+const DANA_QR_CODE_PATH = "QR-KDH.jpeg"; // Path ke gambar QR Code QRIS KDH terbaru
 
 // New: Cooldown for update modal
 const UPDATE_MODAL_COOLDOWN_KEY = 'updateModalCooldown';
@@ -116,56 +121,70 @@ let selectedToppings = {};
 const productList = [
   {
     name: "Lemper",
-    price: 3000,
+    price: 3500,
     kategori: "Karbohidrat",
     description: "Lemper ketan isi ayam suwir gurih, dibungkus daun pisang.",
     images: ["https://via.placeholder.com/120?text=Lemper+1", "https://via.placeholder.com/120?text=Lemper+2", "https://via.placeholder.com/120?text=Lemper+3"]
   },
   {
     name: "Sosis Solo",
-    price: 3000,
+    price: 3500,
     kategori: "Gorengan",
     description: "Sosis Solo dengan isian daging ayam cincang yang lezat, dibalut kulit tipis nan lembut.",
     images: ["https://via.placeholder.com/120?text=Sosis+Solo+1", "https://via.placeholder.com/120?text=Sosis+Solo+2", "https://via.placeholder.com/120?text=Sosis+Solo+3"]
   },
   {
     name: "Sus",
-    price: 3000,
+    price: 3500,
     kategori: "Manis",
     description: "Kue sus lembut dengan isian vla manis dan creamy.",
     images: ["https://via.placeholder.com/120?text=Sus+1", "https://via.placeholder.com/120?text=Sus+2", "https://via.placeholder.com/120?text=Sus+3"]
   },
   {
     name: "Pie Buah",
-    price: 3000,
+    price: 3500,
     kategori: "Manis",
     description: "Pie renyah dengan vla lembut dan topping buah-buahan segar.",
     images: ["https://via.placeholder.com/120?text=Pie+Buah+1", "https://via.placeholder.com/120?text=Pie+Buah+2", "https://via.placeholder.com/120?text=Pie+Buah+3"]
   },
   {
     name: "Risol Mayonais",
-    price: 3000,
+    price: 3500,
     kategori: "Gorengan",
     description: "Risol renyah dengan isian sosis, telur, dan mayonais creamy.",
     images: ["https://via.placeholder.com/120?text=Risol+Mayonais+1", "https://via.placeholder.com/120?text=Risol+Mayonais+2", "https://via.placeholder.com/120?text=Risol+Mayonais+3"]
   },
   {
     name: "Pastel Bihun",
-    price: 3000,
+    price: 3500,
     kategori: "Gorengan",
     description: "Pastel gurih dengan isian bihun dan sayuran.",
     images: ["https://via.placeholder.com/120?text=Pastel+Bihun+1", "https://via.placeholder.com/120?text=Pastel+Bihun+2", "https://via.placeholder.com/120?text=Pastel+Bihun+3"]
   },
   {
+    name: "Pastel Mayonais",
+    price: 3500,
+    kategori: "Gorengan",
+    description: "Pastel renyah dengan isian sayur, sosis, dan mayonais creamy yang lezat.",
+    images: ["https://via.placeholder.com/120?text=Pastel+Mayonais+1", "https://via.placeholder.com/120?text=Pastel+Mayonais+2", "https://via.placeholder.com/120?text=Pastel+Mayonais+3"]
+  },
+  {
     name: "Cente Manis / Hunkwe",
-    price: 3000,
+    price: 3500,
     kategori: "Manis",
     description: "Kue tradisional Cente Manis atau Hunkwe, kenyal dan manis.",
     images: ["https://via.placeholder.com/120?text=Cente+Manis+1", "https://via.placeholder.com/120?text=Cente+Manis+2", "https://via.placeholder.com/120?text=Cente+Manis+3"]
   },
   {
+    name: "Talam",
+    price: 3500,
+    kategori: "Manis",
+    description: "Kue talam tradisional lembut dengan rasa manis legit khas, cocok sebagai camilan.",
+    images: ["https://via.placeholder.com/120?text=Talam+1", "https://via.placeholder.com/120?text=Talam+2", "https://via.placeholder.com/120?text=Talam+3"]
+  },
+  {
     name: "Nasi Uduk",
-    price: 8000,
+    price: 3500,
     kategori: "Karbohidrat",
     description: "Nasi uduk gurih dengan aroma rempah khas, cocok untuk sarapan atau makan siang.",
     images: ["https://via.placeholder.com/120?text=Nasi+Uduk+1", "https://via.placeholder.com/120?text=Nasi+Uduk+2", "https://via.placeholder.com/120?text=Nasi+Uduk+3"],
@@ -184,7 +203,7 @@ const productList = [
   },
   {
     name: "Nasi Kuning",
-    price: 8000,
+    price: 3500,
     kategori: "Karbohidrat",
     description: "Nasi kuning harum dengan lauk pelengkap, hidangan istimewa untuk berbagai acara.",
     images: ["https://via.placeholder.com/120?text=Nasi+Kuning+1", "https://via.placeholder.com/120?text=Nasi+Kuning+2", "https://via.placeholder.com/120?text=Nasi+Kuning+3"],
@@ -318,17 +337,25 @@ function openModal(modal) {
   if (!modalStack.includes(modal)) {
     modalStack.push(modal);
   }
-  gsap.set(overlay, { display: "block" }); // Ensure overlay is block before animating
+  gsap.set(overlay, { display: "block" });
   gsap.to(overlay, { duration: 0.25, opacity: 1, ease: "power2.out", onComplete: () => {
     overlay.setAttribute("aria-hidden", "false");
     overlay.style.pointerEvents = "auto";
   }});
 
-  gsap.set(modal, { display: "block", scale: 0.8, opacity: 0 }); // Ensure modal is block before animating
-  gsap.to(modal, { duration: 0.3, opacity: 1, scale: 1, ease: "power2.out", onComplete: () => {
-    modal.setAttribute("aria-hidden", "false");
-    modal.focus();
-  }});
+  // Hanya animasi opacity — posisi diatur penuh oleh CSS agar selalu center
+  gsap.set(modal, { display: "block", opacity: 0 });
+  // Paksa clear transform dari GSAP sebelumnya supaya CSS translate(-50%,-50%) bekerja
+  modal.style.transform = "";
+  gsap.to(modal, {
+    duration: 0.3,
+    opacity: 1,
+    ease: "power2.out",
+    onComplete: () => {
+      modal.setAttribute("aria-hidden", "false");
+      modal.focus();
+    }
+  });
 }
 
 function closeModal(modal) {
@@ -337,8 +364,9 @@ function closeModal(modal) {
     modalStack.splice(index, 1);
   }
 
-  gsap.to(modal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+  gsap.to(modal, { duration: 0.3, opacity: 0, ease: "power2.in", onComplete: () => {
     gsap.set(modal, { display: "none" });
+    modal.style.transform = "";
     modal.setAttribute("aria-hidden", "true");
     if (modalStack.length === 0) {
       gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
@@ -347,9 +375,9 @@ function closeModal(modal) {
         overlay.style.pointerEvents = "none";
       }});
     } else {
-      // If there are other modals in stack, show the previous one
       const previousModal = modalStack[modalStack.length - 1];
-      gsap.set(previousModal, { display: "block", opacity: 1, scale: 1 });
+      gsap.set(previousModal, { display: "block", opacity: 1 });
+      previousModal.style.transform = "";
       previousModal.setAttribute("aria-hidden", "false");
       previousModal.focus();
     }
@@ -376,19 +404,21 @@ function closeModal(modal) {
 
 function goBackToPreviousModal() {
   if (modalStack.length <= 1) {
-    closeAllModals(); // If only one modal left, close all
+    closeAllModals();
     return;
   }
   const currentModal = modalStack[modalStack.length - 1];
   const previousModal = modalStack[modalStack.length - 2];
 
-  gsap.to(currentModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+  gsap.to(currentModal, { duration: 0.3, opacity: 0, ease: "power2.in", onComplete: () => {
     gsap.set(currentModal, { display: "none" });
+    currentModal.style.transform = "";
     currentModal.setAttribute("aria-hidden", "true");
-    modalStack.pop(); // Remove current modal from stack
+    modalStack.pop();
 
-    gsap.set(previousModal, { display: "block", opacity: 0, scale: 0.8 });
-    gsap.to(previousModal, { duration: 0.3, opacity: 1, scale: 1, ease: "power2.out", onComplete: () => {
+    gsap.set(previousModal, { display: "block", opacity: 0 });
+    previousModal.style.transform = "";
+    gsap.to(previousModal, { duration: 0.3, opacity: 1, ease: "power2.out", onComplete: () => {
       previousModal.setAttribute("aria-hidden", "false");
       previousModal.focus();
     }});
@@ -413,14 +443,14 @@ function goBackToPreviousModal() {
 }
 
 function closeAllModals() {
-  // Iterate through a copy of the stack to avoid issues with pop()
   [...modalStack].reverse().forEach((modal) => {
-    gsap.to(modal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+    gsap.to(modal, { duration: 0.3, opacity: 0, ease: "power2.in", onComplete: () => {
       gsap.set(modal, { display: "none" });
+      modal.style.transform = "";
       modal.setAttribute("aria-hidden", "true");
     }});
   });
-  modalStack = []; // Clear the stack
+  modalStack = [];
   gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
     gsap.set(overlay, { display: "none" });
     overlay.setAttribute("aria-hidden", "true");
@@ -1268,21 +1298,60 @@ function showUpdateModal() {
   // Check if the latest version has been seen
   const lastSeenVersion = localStorage.getItem(LAST_SEEN_UPDATE_VERSION_KEY);
 
-  // Check cooldown
+  // Check cooldown (only applies when user previously checked "jangan tampilkan 10 menit")
   const lastShownTime = localStorage.getItem(UPDATE_MODAL_COOLDOWN_KEY);
   const currentTime = new Date().getTime();
   const isInCooldown = lastShownTime && (currentTime - parseInt(lastShownTime, 10) < UPDATE_MODAL_COOLDOWN_DURATION);
 
-  // Only show if it's a new version OR if it's not in cooldown
-  if (lastSeenVersion !== latestVersion || !isInCooldown) {
-    openModal(updateModal);
-    // Store the latest version as seen
-    localStorage.setItem(LAST_SEEN_UPDATE_VERSION_KEY, latestVersion);
-    // Reset checkbox state
-    dontShowAgainCheckbox.checked = false;
-  } else {
-    console.log('Update modal is in cooldown or already seen. Not showing.');
+  // Show if: (new version) OR (cooldown already expired / never set)
+  // Do NOT show only when same version AND still inside the 10-minute cooldown
+  if (lastSeenVersion === latestVersion && isInCooldown) {
+    console.log('Update modal is in cooldown. Not showing.');
+    return;
   }
+
+  openModal(updateModal);
+  // Store the latest version as seen
+  localStorage.setItem(LAST_SEEN_UPDATE_VERSION_KEY, latestVersion);
+  // Reset checkbox state every time modal is shown
+  if (dontShowAgainCheckbox) {
+    dontShowAgainCheckbox.checked = false;
+  }
+}
+
+// Safe close for update modal (normal close only, no dispersion effect)
+function closeUpdateModalSafely() {
+  // Apply cooldown if checkbox is checked at the moment of closing
+  if (dontShowAgainCheckbox && dontShowAgainCheckbox.checked) {
+    localStorage.setItem(UPDATE_MODAL_COOLDOWN_KEY, new Date().getTime().toString());
+  } else {
+    localStorage.removeItem(UPDATE_MODAL_COOLDOWN_KEY);
+  }
+
+  // Remove from stack
+  modalStack = modalStack.filter(m => m !== updateModal);
+
+  // Normal close animation
+  gsap.to(updateModal, {
+    duration: 0.3,
+    opacity: 0,
+    ease: "power2.in",
+    onComplete: () => {
+      gsap.set(updateModal, { display: "none" });
+      updateModal.style.transform = "";
+      updateModal.setAttribute("aria-hidden", "true");
+    }
+  });
+  gsap.to(overlay, {
+    duration: 0.25,
+    opacity: 0,
+    ease: "power2.in",
+    onComplete: () => {
+      gsap.set(overlay, { display: "none" });
+      overlay.setAttribute("aria-hidden", "true");
+      overlay.style.pointerEvents = "none";
+    }
+  });
 }
 
 // ---------- New: Dispersion Effect with Three.js ----------
@@ -1636,9 +1705,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Close cart modal first, then open payment modal
-    gsap.to(cartModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+    gsap.to(cartModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
       gsap.set(cartModal, { display: "none" });
+      cartModal.style.transform = "";
       cartModal.setAttribute("aria-hidden", "true");
+      modalStack = modalStack.filter(m => m !== cartModal);
+      // Pastikan sub-pilihan bank tersembunyi saat buka payment
+      if (typeof hideBankOptions === "function") hideBankOptions();
+      else {
+        const bo = document.getElementById("bank-options");
+        if (bo) bo.classList.add("hidden");
+        ["pay-cash","pay-dana","pay-transfer","pay-qris"].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.classList.remove("hidden");
+        });
+        const title = document.getElementById("payment-title");
+        if (title) title.textContent = "Pilih Metode Pembayaran";
+      }
       openModal(paymentModal);
     }});
   });
@@ -1667,9 +1750,11 @@ document.addEventListener('DOMContentLoaded', () => {
     danaQrCodeImg.src = '';
 
     // Close payment modal first, then open info modal
-    gsap.to(paymentModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+    gsap.to(paymentModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
       gsap.set(paymentModal, { display: "none" });
+      paymentModal.style.transform = "";
       paymentModal.setAttribute("aria-hidden", "true");
+      modalStack = modalStack.filter(m => m !== paymentModal);
       openModal(infoModal);
     }});
   });
@@ -1710,36 +1795,73 @@ document.addEventListener('DOMContentLoaded', () => {
     danaQrCodeImg.classList.remove('hidden');
 
     // Close payment modal first, then open info modal
-    gsap.to(paymentModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+    gsap.to(paymentModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
       gsap.set(paymentModal, { display: "none" });
+      paymentModal.style.transform = "";
       paymentModal.setAttribute("aria-hidden", "true");
+      modalStack = modalStack.filter(m => m !== paymentModal);
       openModal(infoModal);
     }});
   });
 
+  // Helper: tampilkan / sembunyikan sub-pilihan bank
+  const bankOptionsEl = document.getElementById("bank-options");
+  const mainPayButtons = [
+    document.getElementById("pay-cash"),
+    document.getElementById("pay-dana"),
+    document.getElementById("pay-transfer"),
+    document.getElementById("pay-qris")
+  ];
+
+  function showBankOptions() {
+    mainPayButtons.forEach(btn => { if (btn) btn.classList.add("hidden"); });
+    if (bankOptionsEl) bankOptionsEl.classList.remove("hidden");
+    document.getElementById("payment-title").textContent = "Pilih Bank";
+  }
+
+  function hideBankOptions() {
+    mainPayButtons.forEach(btn => { if (btn) btn.classList.remove("hidden"); });
+    if (bankOptionsEl) bankOptionsEl.classList.add("hidden");
+    document.getElementById("payment-title").textContent = "Pilih Metode Pembayaran";
+  }
+
+  // Klik Transfer Bank → tampilkan 3 pilihan bank
   document.getElementById("pay-transfer").addEventListener("click", () => {
-    currentPaymentMethod = "Transfer Bank";
+    showBankOptions();
+  });
+
+  // Helper: buka info modal untuk transfer bank
+  function openBankTransferInfo(bankKey) {
+    const bank = BANKS[bankKey];
+    if (!bank) return;
+
+    currentPaymentMethod = bank.label;
     currentOrderData = {
       method: "transfer",
-      number: BANK_NUMBER,
-      name: BANK_NAME
+      bank: bank.label,
+      number: bank.number,
+      name: bank.name
     };
 
-    document.getElementById("info-title").textContent = "Pembayaran Transfer Bank";
+    document.getElementById("info-title").textContent = `Pembayaran ${bank.label}`;
     document.getElementById("info-content").innerHTML = `
       <div class="space-y-3">
         <div class="info-item">
+          <span class="info-left">Bank:</span>
+          <span class="info-right">${bank.label}</span>
+        </div>
+        <div class="info-item">
           <span class="info-left">No. Rekening:</span>
           <span class="info-right">
-            ${BANK_NUMBER}
-            <button class="copy-btn-inline" onclick="copyToClipboard(\`${BANK_NUMBER}\`)">
+            ${bank.number}
+            <button class="copy-btn-inline" onclick="copyToClipboard(\`${bank.number}\`)">
               <i class="fas fa-copy"></i>
             </button>
           </span>
         </div>
         <div class="info-item">
           <span class="info-left">Atas Nama:</span>
-          <span class="info-right">${BANK_NAME}</span>
+          <span class="info-right">${bank.name}</span>
         </div>
         <div class="info-item">
           <span class="info-left">Total Bayar:</span>
@@ -1748,16 +1870,134 @@ document.addEventListener('DOMContentLoaded', () => {
         <p class="text-sm text-center text-gray-500 dark:text-gray-300">Silakan transfer ke rekening di atas, lalu klik "Kirim WA" untuk konfirmasi pesanan</p>
       </div>
     `;
-    // Hide QR code for bank transfer
     danaQrCodeImg.classList.add('hidden');
     danaQrCodeImg.src = '';
 
-    // Close payment modal first, then open info modal
-    gsap.to(paymentModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+    // Reset bank options sebelum tutup
+    hideBankOptions();
+
+    gsap.to(paymentModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
       gsap.set(paymentModal, { display: "none" });
+      paymentModal.style.transform = "";
       paymentModal.setAttribute("aria-hidden", "true");
+      // Hapus payment modal dari stack karena kita ganti ke info modal
+      modalStack = modalStack.filter(m => m !== paymentModal);
       openModal(infoModal);
     }});
+  }
+
+  document.getElementById("pay-sinarmas").addEventListener("click", () => openBankTransferInfo("sinarmas"));
+  document.getElementById("pay-bca").addEventListener("click", () => openBankTransferInfo("bca"));
+  document.getElementById("pay-bni").addEventListener("click", () => openBankTransferInfo("bni"));
+
+  document.getElementById("pay-qris").addEventListener("click", () => {
+    currentPaymentMethod = "QRIS";
+    currentOrderData = {
+      method: "qris",
+      name: "KEDAI MAS HARIS"
+    };
+
+    document.getElementById("info-title").textContent = "Pembayaran QRIS";
+    document.getElementById("info-content").innerHTML = `
+      <div class="space-y-3">
+        <div class="info-item">
+          <span class="info-left">Nama Toko:</span>
+          <span class="info-right">KEDAI MAS HARIS</span>
+        </div>
+        <div class="info-item">
+          <span class="info-left">Total Bayar:</span>
+          <span class="info-right">Rp ${finalDiscountedPrice.toLocaleString('id-ID')}</span>
+        </div>
+        <p class="text-sm text-center text-gray-500 dark:text-gray-300 mt-2 mb-3">Scan QR Code di bawah ini untuk melakukan pembayaran</p>
+      </div>
+    `;
+
+    // Re-append the QR image (because innerHTML removed it) and show it
+    const infoContent = document.getElementById("info-content");
+    danaQrCodeImg.src = DANA_QR_CODE_PATH;
+    danaQrCodeImg.classList.remove('hidden');
+    danaQrCodeImg.alt = "QR Code QRIS KEDAI MAS HARIS";
+    infoContent.appendChild(danaQrCodeImg);
+
+    // Add the important note below the QR
+    const noteEl = document.createElement("p");
+    noteEl.className = "text-sm text-center text-gray-600 dark:text-gray-300 mt-4 px-1";
+    noteEl.innerHTML = `⚠️ Jika sudah melakukan pembayaran, harap melampirkan <strong>bukti pembayaran berhasil</strong> ke WhatsApp.`;
+    infoContent.appendChild(noteEl);
+
+    // Add hint text above QR so users know they can enlarge
+    const enlargeHint = document.createElement("p");
+    enlargeHint.className = "text-xs text-center text-orange-500 dark:text-orange-400 mb-2 font-medium";
+    enlargeHint.innerHTML = `<i class="fas fa-search-plus mr-1"></i> Ketuk gambar QR untuk memperbesar agar mudah di-scan`;
+    infoContent.insertBefore(enlargeHint, danaQrCodeImg);
+
+    // Close payment modal first, then open info modal
+    gsap.to(paymentModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
+      gsap.set(paymentModal, { display: "none" });
+      paymentModal.style.transform = "";
+      paymentModal.setAttribute("aria-hidden", "true");
+      modalStack = modalStack.filter(m => m !== paymentModal);
+      openModal(infoModal);
+    }});
+  });
+
+  // ---------- QR Code Enlarge Feature ----------
+  const qrEnlargeOverlay = document.getElementById("qr-enlarge-overlay");
+  const qrEnlargeImg = document.getElementById("qr-enlarge-img");
+  const qrEnlargeClose = document.getElementById("qr-enlarge-close");
+
+  function openQrEnlarge(src) {
+    if (!src || !qrEnlargeOverlay) return;
+    qrEnlargeImg.src = src;
+    qrEnlargeOverlay.classList.remove("hidden");
+    // Force reflow then show
+    void qrEnlargeOverlay.offsetWidth;
+    qrEnlargeOverlay.classList.add("show");
+    qrEnlargeOverlay.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeQrEnlarge() {
+    if (!qrEnlargeOverlay) return;
+    qrEnlargeOverlay.classList.remove("show");
+    setTimeout(() => {
+      qrEnlargeOverlay.classList.add("hidden");
+      qrEnlargeImg.src = "";
+      qrEnlargeOverlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }, 250);
+  }
+
+  // Click on QR image to enlarge
+  if (danaQrCodeImg) {
+    danaQrCodeImg.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!danaQrCodeImg.classList.contains("hidden") && danaQrCodeImg.src) {
+        openQrEnlarge(danaQrCodeImg.src);
+      }
+    });
+  }
+
+  // Close enlarge overlay
+  if (qrEnlargeClose) {
+    qrEnlargeClose.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeQrEnlarge();
+    });
+  }
+  if (qrEnlargeOverlay) {
+    qrEnlargeOverlay.addEventListener("click", (e) => {
+      // Close only if clicking the dark background (not the image itself)
+      if (e.target === qrEnlargeOverlay) {
+        closeQrEnlarge();
+      }
+    });
+  }
+  // ESC key to close
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && qrEnlargeOverlay && qrEnlargeOverlay.classList.contains("show")) {
+      closeQrEnlarge();
+    }
   });
 
   // Info modal handlers
@@ -1789,11 +2029,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mobileMenuOpen) {
       hamburger.click();
     } else if (currentTopModal) {
-      // If the top modal is the update modal, trigger dispersion
+      // If the top modal is the update modal, use safe close
       if (currentTopModal === updateModal) {
-        startDispersionEffect(updateModal);
-        modalStack.pop(); // Remove from stack after starting dispersion
-        // Overlay will be closed by startDispersionEffect
+        closeUpdateModalSafely();
       } else {
         closeAllModals(); // Close all modals when clicking overlay
       }
@@ -2360,11 +2598,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const closeBtn = modal.querySelector('.modal-close-btn');
     if (closeBtn) {
       closeBtn.addEventListener('click', () => {
-        // Special handling for updateModal with dispersion effect
+        // Special handling for updateModal – always use safe close
         if (modal.id === 'update-modal') {
-          startDispersionEffect(modal);
-          // Remove from modalStack after starting dispersion, as closeModal won't be called directly
-          modalStack = modalStack.filter(m => m !== modal);
+          closeUpdateModalSafely();
         } else {
           closeAllModals(); // Close all modals
         }
@@ -2375,7 +2611,24 @@ document.addEventListener("DOMContentLoaded", function() {
     const backBtn = modal.querySelector('.modal-back-btn');
     if (backBtn) {
       backBtn.addEventListener('click', () => {
-        goBackToPreviousModal();
+        if (modal.id === 'update-modal') {
+          closeUpdateModalSafely();
+        } else if (modal.id === 'payment-modal') {
+          // Jika sedang di sub-pilihan bank, kembali ke metode pembayaran
+          const bankOpts = document.getElementById("bank-options");
+          if (bankOpts && !bankOpts.classList.contains("hidden")) {
+            bankOpts.classList.add("hidden");
+            ["pay-cash","pay-dana","pay-transfer","pay-qris"].forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.classList.remove("hidden");
+            });
+            document.getElementById("payment-title").textContent = "Pilih Metode Pembayaran";
+          } else {
+            goBackToPreviousModal();
+          }
+        } else {
+          goBackToPreviousModal();
+        }
       });
     }
   });
