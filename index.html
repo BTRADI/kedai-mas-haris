@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>KEDAI MAS HARIS</title>
+  <link rel="icon" type="image/png" href="logo-kmh.png" />
+  <link rel="apple-touch-icon" href="logo-kmh.png" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -363,6 +365,28 @@
     <i class="fas fa-university text-xl"></i>
     <span>Transfer Bank</span>
   </button>
+  <button id="pay-qris" class="payment-btn qris">
+    <i class="fas fa-qrcode text-xl"></i>
+    <span>QRIS</span>
+  </button>
+
+  <!-- Sub-pilihan bank (muncul setelah klik Transfer Bank) -->
+  <div id="bank-options" class="hidden space-y-3 mt-1">
+    <p class="text-sm text-center text-gray-500 dark:text-gray-300 mb-2">Pilih Bank:</p>
+    <button id="pay-sinarmas" class="payment-btn bank-sinarmas">
+      <i class="fas fa-university text-xl"></i>
+      <span>Bank Sinarmas</span>
+    </button>
+    <button id="pay-bca" class="payment-btn bank-bca">
+      <i class="fas fa-university text-xl"></i>
+      <span>Bank BCA</span>
+    </button>
+    <button id="pay-bni" class="payment-btn bank-bni">
+      <i class="fas fa-university text-xl"></i>
+      <span>Bank BNI</span>
+    </button>
+  </div>
+
   <div class="flex flex-col gap-3 mt-4">
     <button class="modal-back-btn" data-modal-id="payment-modal">
       <i class="fas fa-arrow-left"></i> Kembali
@@ -376,7 +400,7 @@
   <h3 id="info-title" class="mb-3"></h3>
   <div id="info-content" class="mb-4">
     <!-- QR Code akan ditambahkan di sini oleh JS -->
-    <img id="dana-qr-code" src="QR-Dana.jpeg" alt="QR Code DANA" class="hidden mx-auto mb-4 w-48 h-48 object-contain rounded-lg">
+    <img id="dana-qr-code" src="QR-KDH.jpeg" alt="QR Code QRIS KEDAI MAS HARIS" class="hidden mx-auto mb-4 w-64 h-64 object-contain rounded-lg cursor-pointer qr-enlargeable" title="Klik untuk perbesar QR Code">
   </div>
   <div class="flex flex-col gap-3 mt-4">
     <button id="send-wa" class="flex-1 bg-green-500 text-white py-2 rounded-xl font-semibold hover:bg-green-600">
@@ -539,6 +563,13 @@
       <i class="fas fa-arrow-left"></i> Kembali
     </button>
   </div>
+</div>
+
+<!-- Fullscreen QR Enlarge Overlay -->
+<div id="qr-enlarge-overlay" class="qr-enlarge-overlay hidden" aria-hidden="true">
+  <button id="qr-enlarge-close" class="qr-enlarge-close" aria-label="Tutup">&times;</button>
+  <img id="qr-enlarge-img" src="" alt="QR Code diperbesar" class="qr-enlarge-img">
+  <p class="qr-enlarge-hint">Ketuk di luar gambar atau tombol ✕ untuk menutup</p>
 </div>
 
 <!-- Canvas for Dispersion Effect -->
