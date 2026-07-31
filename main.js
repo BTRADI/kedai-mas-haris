@@ -184,7 +184,7 @@ const productList = [
   },
   {
     name: "Nasi Uduk",
-    price: 10000,
+    price: 3500,
     kategori: "Karbohidrat",
     description: "Nasi uduk gurih dengan aroma rempah khas, cocok untuk sarapan atau makan siang.",
     images: ["https://via.placeholder.com/120?text=Nasi+Uduk+1", "https://via.placeholder.com/120?text=Nasi+Uduk+2", "https://via.placeholder.com/120?text=Nasi+Uduk+3"],
@@ -203,7 +203,7 @@ const productList = [
   },
   {
     name: "Nasi Kuning",
-    price: 10000,
+    price: 3500,
     kategori: "Karbohidrat",
     description: "Nasi kuning harum dengan lauk pelengkap, hidangan istimewa untuk berbagai acara.",
     images: ["https://via.placeholder.com/120?text=Nasi+Kuning+1", "https://via.placeholder.com/120?text=Nasi+Kuning+2", "https://via.placeholder.com/120?text=Nasi+Kuning+3"],
@@ -1184,11 +1184,19 @@ function renderRelatedProductsInModal(currentProduct) {
 function generateOrderMessage() {
   const items = Object.values(cart);
   let totalOriginal = items.reduce((sum, item) => sum + item.qty * item.price, 0);
-  let totalAfterDiscount = finalDiscountedPrice; // Use the globally stored final discounted price
+  let totalAfterDiscount = finalDiscountedPrice;
+
+  const checkoutName = (document.getElementById("checkout-name")?.value || "").trim();
+  const checkoutAddress = (document.getElementById("checkout-address")?.value || "").trim();
 
   let message = `🛒 *PESANAN BARU*\n\n`;
   message += `📍 *KEDAI MAS HARIS*\n`;
   message += `⏰ ${new Date().toLocaleString('id-ID')}\n\n`;
+
+  message += `👤 *Data Pemesan:*\n`;
+  message += `Nama: ${checkoutName}\n`;
+  message += `Alamat Pengantaran: ${checkoutAddress}\n\n`;
+
   message += `📋 *Detail Pesanan:*\n`;
 
   items.forEach((item, index) => {
@@ -1207,7 +1215,7 @@ function generateOrderMessage() {
   if (promoApplied) {
     message += `\n🎉 *PROMO DITERAPKAN!* 🎉\n`;
     message += `Menggunakan Kode Promo: *${currentPromo.code}*\n`;
-    message += `Mendapatkan potongan ${currentPromo.discountPercentage * 100}% 💰\n`; // Emote diskon
+    message += `Mendapatkan potongan ${currentPromo.discountPercentage * 100}% 💰\n`;
     message += `Harga Asli: Rp ${totalOriginal.toLocaleString('id-ID')}\n`;
     message += `Diskon: Rp ${(totalOriginal - totalAfterDiscount).toLocaleString('id-ID')}\n`;
   }
@@ -1245,7 +1253,47 @@ function copyToClipboard(text) {
   }
 }
 
+function isDeliveryFormValid() {
+  const name = (document.getElementById("checkout-name")?.value || "").trim();
+  const address = (document.getElementById("checkout-address")?.value || "").trim();
+  return name.length > 0 && address.length > 0;
+}
+
+function updateSendWaButtonState() {
+  const sendWaBtn = document.getElementById("send-wa");
+  const hint = document.getElementById("delivery-form-hint");
+  if (!sendWaBtn) return;
+
+  const valid = isDeliveryFormValid();
+  sendWaBtn.disabled = !valid;
+  if (hint) {
+    if (valid) {
+      hint.classList.add("hidden");
+    } else {
+      hint.classList.remove("hidden");
+    }
+  }
+}
+
+function resetDeliveryForm() {
+  const nameInput = document.getElementById("checkout-name");
+  const addressInput = document.getElementById("checkout-address");
+  if (nameInput) nameInput.value = "";
+  if (addressInput) addressInput.value = "";
+  updateSendWaButtonState();
+}
+
 function sendToWhatsApp() {
+  // Blokir jika data pengantaran belum lengkap
+  if (!isDeliveryFormValid()) {
+    showNotif("Harap isi nama dan alamat pengantaran!");
+    updateSendWaButtonState();
+    const nameInput = document.getElementById("checkout-name");
+    if (nameInput && !nameInput.value.trim()) nameInput.focus();
+    else document.getElementById("checkout-address")?.focus();
+    return;
+  }
+
   const message = generateOrderMessage();
   const encodedMessage = encodeURIComponent(message);
   const whatsappUrl = `https://wa.me/${WA_PHONE}?text=${encodedMessage}`;
@@ -1253,8 +1301,8 @@ function sendToWhatsApp() {
   // Update promo usage count if promo was applied for this transaction
   if (promoApplied && promoUsage[currentPromo.code] && promoUsage[currentPromo.code].currentTransactionId === currentTransactionId) {
       promoUsage[currentPromo.code].count++;
-      promoUsage[currentPromo.code].currentTransactionId = null; // Reset transaction ID
-      savePromoUsage(); // Save updated usage to localStorage
+      promoUsage[currentPromo.code].currentTransactionId = null;
+      savePromoUsage();
   }
 
   // Clear cart after sending order
@@ -1262,7 +1310,8 @@ function sendToWhatsApp() {
   updateCartCount();
 
   showBadge(sentBadge, "Pesanan terkirim");
-  closeAllModals(); // This will also reset promoApplied and promoCodeInput.value
+  resetDeliveryForm();
+  closeAllModals();
 
   // Generate a new transaction ID for the next potential transaction
   currentTransactionId = Date.now().toString();
@@ -1997,6 +2046,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Info modal handlers
   document.getElementById("send-wa").addEventListener("click", sendToWhatsApp);
+
+  // Validasi form pengantaran → aktifkan/nonaktifkan tombol Kirim WA
+  const checkoutNameInput = document.getElementById("checkout-name");
+  const checkoutAddressInput = document.getElementById("checkout-address");
+  if (checkoutNameInput) {
+    checkoutNameInput.addEventListener("input", updateSendWaButtonState);
+  }
+  if (checkoutAddressInput) {
+    checkoutAddressInput.addEventListener("input", updateSendWaButtonState);
+  }
+  // Pastikan tombol WA disabled saat awal
+  updateSendWaButtonState();
 
   // Dark mode toggle (Desktop)
   darkToggle.addEventListener('click', () => {
