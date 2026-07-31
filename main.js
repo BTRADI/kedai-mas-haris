@@ -6,8 +6,8 @@ const BANK_NUMBER = "0058168424"; // default / Sinarmas
 const BANK_NAME = "Muhammad Haris Nugroho";
 const BANKS = {
   sinarmas: { number: "0058168424", name: "Muhammad Haris Nugroho", label: "Bank Sinarmas" },
-  bca:      { number: "0058168424", name: "Muhammad Haris Nugroho", label: "Bank BCA" },
-  bni:      { number: "0058168424", name: "Muhammad Haris Nugroho", label: "Bank BNI" }
+  bca:      { number: "1093201390", name: "Muhammad Haris Nugroho", label: "Bank BCA" },
+  bni:      { number: "1856732591", name: "Muhammad Haris Nugroho", label: "Bank BNI" }
 };
 const MY_EMAIL = "mhdharisn21@gmail.com";
 const CC_EMAIL = "muhammad_nugroho@app.co.id"; // Email CC yang tidak diketahui user
@@ -184,7 +184,7 @@ const productList = [
   },
   {
     name: "Nasi Uduk",
-    price: 10000,
+    price: 3500,
     kategori: "Karbohidrat",
     description: "Nasi uduk gurih dengan aroma rempah khas, cocok untuk sarapan atau makan siang.",
     images: ["https://via.placeholder.com/120?text=Nasi+Uduk+1", "https://via.placeholder.com/120?text=Nasi+Uduk+2", "https://via.placeholder.com/120?text=Nasi+Uduk+3"],
@@ -192,18 +192,18 @@ const productList = [
       { name: "Polos", price: 0, description: "Nasi, Orek, Bihun, Sambal" }
     ],
     toppings: [
-      { name: "Telor ½ Bulet Balado", price: 3000 },
-      { name: "Telor Bulet Balado", price: 6000 },
-      { name: "Telor Dadar", price: 6000 },
-      { name: "Telor Ceplok", price: 6000 },
-      { name: "Bakwan", price: 2000 },
-      { name: "Tempe Orek", price: 3000 },
-      { name: "Bihun Goreng", price: 4000 }
+      { name: "Telor ½ Bulet Balado", price: 2000 },
+      { name: "Telor Bulet Balado", price: 4000 },
+      { name: "Telor Dadar", price: 4000 },
+      { name: "Telor Ceplok", price: 4000 },
+      { name: "Bakwan", price: 1000 },
+      { name: "Tempe Orek", price: 2000 },
+      { name: "Bihun Goreng", price: 2000 }
     ]
   },
   {
     name: "Nasi Kuning",
-    price: 10000,
+    price: 3500,
     kategori: "Karbohidrat",
     description: "Nasi kuning harum dengan lauk pelengkap, hidangan istimewa untuk berbagai acara.",
     images: ["https://via.placeholder.com/120?text=Nasi+Kuning+1", "https://via.placeholder.com/120?text=Nasi+Kuning+2", "https://via.placeholder.com/120?text=Nasi+Kuning+3"],
@@ -211,13 +211,13 @@ const productList = [
       { name: "Polos", price: 0, description: "Nasi, Orek, Bihun, Sambal" }
     ],
     toppings: [
-      { name: "Telor ½ Bulet Balado", price: 3000 },
-      { name: "Telor Bulet Balado", price: 6000 },
-      { name: "Telor Dadar", price: 6000 },
-      { name: "Telor Ceplok", price: 6000 },
-      { name: "Bakwan", price: 2000 },
-      { name: "Tempe Orek", price: 3000 },
-      { name: "Bihun Goreng", price: 4000 }
+      { name: "Telor ½ Bulet Balado", price: 2000 },
+      { name: "Telor Bulet Balado", price: 4000 },
+      { name: "Telor Dadar", price: 4000 },
+      { name: "Telor Ceplok", price: 4000 },
+      { name: "Bakwan", price: 1000 },
+      { name: "Tempe Orek", price: 2000 },
+      { name: "Bihun Goreng", price: 2000 }
     ]
   },
 ];
@@ -424,21 +424,32 @@ function goBackToPreviousModal() {
     }});
   }});
 
-  // New: Hide QR code if going back from info modal
+  // Hide QR code if going back from info modal
   if (currentModal.id === 'info-modal') {
     danaQrCodeImg.classList.add('hidden');
-    danaQrCodeImg.src = ''; // Clear src
+    danaQrCodeImg.src = '';
   }
   // Reset product detail modal state if going back from it
   if (currentModal.id === 'product-detail-modal') {
     currentProductDetail = null;
     currentProductDetailQty = 1;
     selectedVariant = null;
-    selectedToppings = {}; // Reset selected toppings
+    selectedToppings = {};
     if (productDetailModal.swiper) {
       productDetailModal.swiper.destroy(true, true);
       productDetailModal.swiper = null;
     }
+  }
+  // Reset bank options when returning to payment modal
+  if (previousModal && previousModal.id === 'payment-modal') {
+    const bankOpts = document.getElementById("bank-options");
+    if (bankOpts) bankOpts.classList.add("hidden");
+    ["pay-cash","pay-dana","pay-transfer","pay-qris"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove("hidden");
+    });
+    const title = document.getElementById("payment-title");
+    if (title) title.textContent = "Pilih Metode Pembayaran";
   }
 }
 
@@ -640,9 +651,10 @@ function openEditCartModal(itemKey) { // itemKey now includes variant if applica
 
   updateEditButtons(item.qty);
 
-  // Close cart modal first, then open edit modal
-  gsap.to(cartModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+  // Sembunyikan cart, buka edit (cart tetap di stack)
+  gsap.to(cartModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
     gsap.set(cartModal, { display: "none" });
+    cartModal.style.transform = "";
     cartModal.setAttribute("aria-hidden", "true");
     openModal(editCartModal);
   }});
@@ -670,9 +682,10 @@ function deleteCartItem(itemKey) { // itemKey now includes variant if applicable
 
   document.getElementById("confirm-delete-message").textContent = `Hapus "${itemDetails}" dari keranjang?`;
 
-  // Close cart modal first, then open confirm delete modal
-  gsap.to(cartModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+  // Sembunyikan cart, buka konfirmasi (cart tetap di stack)
+  gsap.to(cartModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
     gsap.set(cartModal, { display: "none" });
+    cartModal.style.transform = "";
     cartModal.setAttribute("aria-hidden", "true");
     openModal(confirmDeleteModal);
   }});
@@ -1648,15 +1661,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById("save-edit-cart").addEventListener("click", () => {
     updateCartCount();
     updateCartTotal();
-
-    // Close edit modal and open cart modal
-    gsap.to(editCartModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
-      gsap.set(editCartModal, { display: "none" });
-      editCartModal.setAttribute("aria-hidden", "true");
-      renderCart(); // Re-render cart to show updated quantities
-      openModal(cartModal); // Open cart modal again
-    }});
+    renderCart();
     showNotif("Perubahan disimpan");
+    // Kembali ke cart (hapus edit dari stack, tampilkan cart)
+    goBackToPreviousModal();
   });
 
   // Clear cart and confirm delete handlers
@@ -1664,9 +1672,10 @@ document.addEventListener('DOMContentLoaded', () => {
     currentDeleteType = 'all';
     document.getElementById("confirm-delete-message").textContent = "Hapus semua item dari keranjang?";
 
-    // Close cart modal first, then open confirm delete modal
-    gsap.to(cartModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
+    // Sembunyikan cart, buka konfirmasi (cart tetap di stack)
+    gsap.to(cartModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
       gsap.set(cartModal, { display: "none" });
+      cartModal.style.transform = "";
       cartModal.setAttribute("aria-hidden", "true");
       openModal(confirmDeleteModal);
     }});
@@ -1684,16 +1693,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateCartCount();
     updateCartTotal();
-
-    // Close confirm delete modal and open cart modal
-    gsap.to(confirmDeleteModal, { duration: 0.3, opacity: 0, scale: 0.8, ease: "power2.in", onComplete: () => {
-      gsap.set(confirmDeleteModal, { display: "none" });
-      confirmDeleteModal.setAttribute("aria-hidden", "true");
-      renderCart(); // Re-render cart to show updated state
-      openModal(cartModal); // Open cart modal again
-    }});
-
+    renderCart();
     currentDeleteType = null;
+    // Kembali ke cart
+    goBackToPreviousModal();
   });
 
   // Checkout handler
@@ -1704,24 +1707,20 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Close cart modal first, then open payment modal
+    // Sembunyikan cart, buka payment (cart tetap di stack agar Kembali bisa kembali)
     gsap.to(cartModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
       gsap.set(cartModal, { display: "none" });
       cartModal.style.transform = "";
       cartModal.setAttribute("aria-hidden", "true");
-      modalStack = modalStack.filter(m => m !== cartModal);
-      // Pastikan sub-pilihan bank tersembunyi saat buka payment
-      if (typeof hideBankOptions === "function") hideBankOptions();
-      else {
-        const bo = document.getElementById("bank-options");
-        if (bo) bo.classList.add("hidden");
-        ["pay-cash","pay-dana","pay-transfer","pay-qris"].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.classList.remove("hidden");
-        });
-        const title = document.getElementById("payment-title");
-        if (title) title.textContent = "Pilih Metode Pembayaran";
-      }
+      // Reset sub-pilihan bank
+      const bo = document.getElementById("bank-options");
+      if (bo) bo.classList.add("hidden");
+      ["pay-cash","pay-dana","pay-transfer","pay-qris"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("hidden");
+      });
+      const title = document.getElementById("payment-title");
+      if (title) title.textContent = "Pilih Metode Pembayaran";
       openModal(paymentModal);
     }});
   });
@@ -1754,7 +1753,6 @@ document.addEventListener('DOMContentLoaded', () => {
       gsap.set(paymentModal, { display: "none" });
       paymentModal.style.transform = "";
       paymentModal.setAttribute("aria-hidden", "true");
-      modalStack = modalStack.filter(m => m !== paymentModal);
       openModal(infoModal);
     }});
   });
@@ -1799,7 +1797,6 @@ document.addEventListener('DOMContentLoaded', () => {
       gsap.set(paymentModal, { display: "none" });
       paymentModal.style.transform = "";
       paymentModal.setAttribute("aria-hidden", "true");
-      modalStack = modalStack.filter(m => m !== paymentModal);
       openModal(infoModal);
     }});
   });
@@ -1881,7 +1878,6 @@ document.addEventListener('DOMContentLoaded', () => {
       paymentModal.style.transform = "";
       paymentModal.setAttribute("aria-hidden", "true");
       // Hapus payment modal dari stack karena kita ganti ke info modal
-      modalStack = modalStack.filter(m => m !== paymentModal);
       openModal(infoModal);
     }});
   }
@@ -1936,7 +1932,6 @@ document.addEventListener('DOMContentLoaded', () => {
       gsap.set(paymentModal, { display: "none" });
       paymentModal.style.transform = "";
       paymentModal.setAttribute("aria-hidden", "true");
-      modalStack = modalStack.filter(m => m !== paymentModal);
       openModal(infoModal);
     }});
   });
