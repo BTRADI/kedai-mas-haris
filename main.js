@@ -184,7 +184,7 @@ const productList = [
   },
   {
     name: "Nasi Uduk",
-    price: 3500,
+    price: 10000,
     kategori: "Karbohidrat",
     description: "Nasi uduk gurih dengan aroma rempah khas, cocok untuk sarapan atau makan siang.",
     images: ["https://via.placeholder.com/120?text=Nasi+Uduk+1", "https://via.placeholder.com/120?text=Nasi+Uduk+2", "https://via.placeholder.com/120?text=Nasi+Uduk+3"],
@@ -192,18 +192,18 @@ const productList = [
       { name: "Polos", price: 0, description: "Nasi, Orek, Bihun, Sambal" }
     ],
     toppings: [
-      { name: "Telor ½ Bulet Balado", price: 2000 },
-      { name: "Telor Bulet Balado", price: 4000 },
-      { name: "Telor Dadar", price: 4000 },
-      { name: "Telor Ceplok", price: 4000 },
-      { name: "Bakwan", price: 1000 },
-      { name: "Tempe Orek", price: 2000 },
-      { name: "Bihun Goreng", price: 2000 }
+      { name: "Telor ½ Bulet Balado", price: 3000 },
+      { name: "Telor Bulet Balado", price: 6000 },
+      { name: "Telor Dadar", price: 6000 },
+      { name: "Telor Ceplok", price: 6000 },
+      { name: "Bakwan", price: 2000 },
+      { name: "Tempe Orek", price: 3000 },
+      { name: "Bihun Goreng", price: 4000 }
     ]
   },
   {
     name: "Nasi Kuning",
-    price: 3500,
+    price: 10000,
     kategori: "Karbohidrat",
     description: "Nasi kuning harum dengan lauk pelengkap, hidangan istimewa untuk berbagai acara.",
     images: ["https://via.placeholder.com/120?text=Nasi+Kuning+1", "https://via.placeholder.com/120?text=Nasi+Kuning+2", "https://via.placeholder.com/120?text=Nasi+Kuning+3"],
@@ -211,13 +211,13 @@ const productList = [
       { name: "Polos", price: 0, description: "Nasi, Orek, Bihun, Sambal" }
     ],
     toppings: [
-      { name: "Telor ½ Bulet Balado", price: 2000 },
-      { name: "Telor Bulet Balado", price: 4000 },
-      { name: "Telor Dadar", price: 4000 },
-      { name: "Telor Ceplok", price: 4000 },
-      { name: "Bakwan", price: 1000 },
-      { name: "Tempe Orek", price: 2000 },
-      { name: "Bihun Goreng", price: 2000 }
+      { name: "Telor ½ Bulet Balado", price: 3000 },
+      { name: "Telor Bulet Balado", price: 6000 },
+      { name: "Telor Dadar", price: 6000 },
+      { name: "Telor Ceplok", price: 6000 },
+      { name: "Bakwan", price: 2000 },
+      { name: "Tempe Orek", price: 3000 },
+      { name: "Bihun Goreng", price: 4000 }
     ]
   },
 ];
