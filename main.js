@@ -1298,6 +1298,13 @@ function sendToWhatsApp() {
   const encodedMessage = encodeURIComponent(message);
   const whatsappUrl = `https://wa.me/${WA_PHONE}?text=${encodedMessage}`;
 
+  // Buka WhatsApp DULU (harus langsung dari user click agar tidak diblokir browser)
+  const waWindow = window.open(whatsappUrl, '_blank');
+  if (!waWindow) {
+    // Fallback jika popup diblokir
+    window.location.href = whatsappUrl;
+  }
+
   // Update promo usage count if promo was applied for this transaction
   if (promoApplied && promoUsage[currentPromo.code] && promoUsage[currentPromo.code].currentTransactionId === currentTransactionId) {
       promoUsage[currentPromo.code].count++;
@@ -1315,8 +1322,6 @@ function sendToWhatsApp() {
 
   // Generate a new transaction ID for the next potential transaction
   currentTransactionId = Date.now().toString();
-
-  window.open(whatsappUrl, '_blank');
 }
 
 // ---------- New: Update Notification Modal Functions ----------
@@ -1789,7 +1794,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="text-6xl mb-3">
           <i class="fas fa-money-bill-wave text-green-500"></i>
         </div>
-        <p class="text-gray-600 mb-2">Siapkan uang tunai saat pengambilan pesanan</p>
+        <p class="info-hint mb-2">Siapkan uang tunai saat pengambilan pesanan</p>
         <p class="font-semibold text-lg">Total: Rp ${finalDiscountedPrice.toLocaleString('id-ID')}</p>
       </div>
     `;
@@ -1834,7 +1839,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="info-left">Total Bayar:</span>
           <span class="info-right">Rp ${finalDiscountedPrice.toLocaleString('id-ID')}</span>
         </div>
-        <p class="text-sm text-center text-gray-500 dark:text-gray-300">Silakan scan QR Code atau transfer ke nomor DANA di atas, lalu klik "Kirim WA" untuk konfirmasi pesanan</p>
+        <p class="info-hint text-sm text-center">Silakan scan QR Code atau transfer ke nomor DANA di atas, lalu klik "Kirim WA" untuk konfirmasi pesanan</p>
       </div>
     `;
     // Show QR code for DANA payment
@@ -1913,7 +1918,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="info-left">Total Bayar:</span>
           <span class="info-right">Rp ${finalDiscountedPrice.toLocaleString('id-ID')}</span>
         </div>
-        <p class="text-sm text-center text-gray-500 dark:text-gray-300">Silakan transfer ke rekening di atas, lalu klik "Kirim WA" untuk konfirmasi pesanan</p>
+        <p class="info-hint text-sm text-center">Silakan transfer ke rekening di atas, lalu klik "Kirim WA" untuk konfirmasi pesanan</p>
       </div>
     `;
     danaQrCodeImg.classList.add('hidden');
@@ -1953,7 +1958,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="info-left">Total Bayar:</span>
           <span class="info-right">Rp ${finalDiscountedPrice.toLocaleString('id-ID')}</span>
         </div>
-        <p class="text-sm text-center text-gray-500 dark:text-gray-300 mt-2 mb-3">Scan QR Code di bawah ini untuk melakukan pembayaran</p>
+        <p class="info-hint text-sm text-center mt-2 mb-3">Scan QR Code di bawah ini untuk melakukan pembayaran</p>
       </div>
     `;
 
@@ -1966,7 +1971,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add the important note below the QR
     const noteEl = document.createElement("p");
-    noteEl.className = "text-sm text-center text-gray-600 dark:text-gray-300 mt-4 px-1";
+    noteEl.className = "info-hint text-sm text-center mt-4 px-1";
     noteEl.innerHTML = `⚠️ Jika sudah melakukan pembayaran, harap melampirkan <strong>bukti pembayaran berhasil</strong> ke WhatsApp.`;
     infoContent.appendChild(noteEl);
 
