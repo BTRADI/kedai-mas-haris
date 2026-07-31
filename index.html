@@ -402,8 +402,23 @@
     <!-- QR Code akan ditambahkan di sini oleh JS -->
     <img id="dana-qr-code" src="QR-KDH.jpeg" alt="QR Code QRIS KEDAI MAS HARIS" class="hidden mx-auto mb-4 w-64 h-64 object-contain rounded-lg cursor-pointer qr-enlargeable" title="Klik untuk perbesar QR Code">
   </div>
+
+  <!-- Data pengantaran (wajib diisi sebelum Kirim WA) -->
+  <div id="delivery-form" class="space-y-3 mb-4 border-t border-gray-200 dark:border-gray-600 pt-4">
+    <p class="text-sm font-semibold text-gray-700 dark:text-gray-200">Data Pengantaran</p>
+    <div>
+      <label for="checkout-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Pemesan <span class="text-red-500">*</span></label>
+      <input type="text" id="checkout-name" class="w-full border px-3 py-2 rounded-lg mt-1" placeholder="Nama lengkap pemesan" autocomplete="name" />
+    </div>
+    <div>
+      <label for="checkout-address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Alamat Pengantaran <span class="text-red-500">*</span></label>
+      <textarea id="checkout-address" rows="2" class="w-full border px-3 py-2 rounded-lg mt-1" placeholder="Alamat lengkap tujuan pengantaran"></textarea>
+    </div>
+    <p id="delivery-form-hint" class="text-xs text-red-500 hidden">Harap isi nama dan alamat pengantaran terlebih dahulu.</p>
+  </div>
+
   <div class="flex flex-col gap-3 mt-4">
-    <button id="send-wa" class="flex-1 bg-green-500 text-white py-2 rounded-xl font-semibold hover:bg-green-600">
+    <button id="send-wa" class="flex-1 bg-green-500 text-white py-2 rounded-xl font-semibold hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-500" disabled>
       <i class="fab fa-whatsapp mr-2"></i>Kirim WA
     </button>
     <button class="modal-back-btn" data-modal-id="info-modal">
