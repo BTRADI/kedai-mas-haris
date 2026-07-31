@@ -2442,6 +2442,14 @@ body.dark .product-detail-pagination .swiper-pagination-bullet span {
   color: inherit; /* Inherit color from parent to ensure dark mode text is visible */
 }
 
+/* Petunjuk di modal info pembayaran — kontras jelas di light & dark mode */
+#info-modal .info-hint {
+  color: #374151 !important; /* gray-700 — mudah dibaca di light mode */
+}
+body.dark #info-modal .info-hint {
+  color: #d1d5db !important; /* gray-300 — mudah dibaca di dark mode */
+}
+
 /* Ensure text in order event modal labels is readable */
 #order-event-modal label,
 #report-bug-modal label {
