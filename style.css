@@ -2457,7 +2457,9 @@ body.dark #report-bug-modal label {
 #order-event-modal input,
 #order-event-modal textarea,
 #report-bug-modal input,
-#report-bug-modal textarea {
+#report-bug-modal textarea,
+#info-modal #checkout-name,
+#info-modal #checkout-address {
   background-color: white;
   color: #1f2937;
   border-color: #d1d5db;
@@ -2466,7 +2468,9 @@ body.dark #report-bug-modal label {
 body.dark #order-event-modal input,
 body.dark #order-event-modal textarea,
 body.dark #report-bug-modal input,
-body.dark #report-bug-modal textarea {
+body.dark #report-bug-modal textarea,
+body.dark #info-modal #checkout-name,
+body.dark #info-modal #checkout-address {
   background-color: #1f2937;
   color: #e2e8f0;
   border-color: #4b5563;
@@ -2476,15 +2480,30 @@ body.dark #report-bug-modal textarea {
 #order-event-modal input::placeholder,
 #order-event-modal textarea::placeholder,
 #report-bug-modal input::placeholder,
-#report-bug-modal textarea::placeholder {
+#report-bug-modal textarea::placeholder,
+#info-modal #checkout-name::placeholder,
+#info-modal #checkout-address::placeholder {
   color: #9ca3af;
 }
 
 body.dark #order-event-modal input::placeholder,
 body.dark #order-event-modal textarea::placeholder,
 body.dark #report-bug-modal input::placeholder,
-body.dark #report-bug-modal textarea::placeholder {
+body.dark #report-bug-modal textarea::placeholder,
+body.dark #info-modal #checkout-name::placeholder,
+body.dark #info-modal #checkout-address::placeholder {
   color: #6b7280;
+}
+
+/* Label form pengantaran di info modal */
+#info-modal #delivery-form label {
+  color: #374151;
+}
+body.dark #info-modal #delivery-form label {
+  color: #e2e8f0;
+}
+body.dark #info-modal #delivery-form p {
+  color: #e2e8f0;
 }
 
 /* Ensure text in confirm delete modal is readable */
