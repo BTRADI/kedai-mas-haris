@@ -980,8 +980,12 @@ function openProductDetailModal(itemName) {
     productDetailModal.swiper = null;
   }
   productDetailModal.swiper = new Swiper(".product-detail-swiper", {
-    loop: false,
-    autoplay: false,
+    loop: true,
+    autoplay: {
+      delay: 2800,
+      disableOnInteraction: false,
+      pauseOnMouseEnter: true,
+    },
     spaceBetween: 8,
     navigation: {
       nextEl: ".product-detail-swiper .swiper-button-next",
