@@ -1,2728 +1,3007 @@
-// ---------- Config & refs ----------
-const WA_PHONE = "6281389868594";
-const DANA_NUMBER = "081389868594";
-const DANA_NAME = "Muhammad Haris Nugroho";
-const BANK_NUMBER = "0058168424"; // default / Sinarmas
-const BANK_NAME = "Muhammad Haris Nugroho";
-const BANKS = {
-  sinarmas: { number: "0058168424", name: "Muhammad Haris Nugroho", label: "Bank Sinarmas" },
-  bca:      { number: "1093201390", name: "Muhammad Haris Nugroho", label: "Bank BCA" },
-  bni:      { number: "1856732591", name: "Muhammad Haris Nugroho", label: "Bank BNI" }
-};
-const MY_EMAIL = "mhdharisn21@gmail.com";
-const CC_EMAIL = "muhammad_nugroho@app.co.id"; // Email CC yang tidak diketahui user
-const DANA_QR_CODE_PATH = "QR-KDH.jpeg"; // Path ke gambar QR Code QRIS KDH terbaru
-
-// New: Cooldown for update modal
-const UPDATE_MODAL_COOLDOWN_KEY = 'updateModalCooldown';
-const UPDATE_MODAL_COOLDOWN_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
-const LAST_SEEN_UPDATE_VERSION_KEY = 'lastSeenUpdateVersion'; // Key for storing last seen version
-
-// DOM Elements
-const container = document.getElementById("menu-container");
-const cartCount = document.getElementById("cart-count");
-const wishlistCount = document.getElementById("wishlist-count");
-const notif = document.getElementById("notif");
-const kategoriButtons = document.querySelectorAll(".category-card");
-const overlay = document.getElementById("overlay");
-const darkToggle = document.getElementById('darkToggle');
-const darkModeIcon = darkToggle.querySelector('.toggle-icon');
-
-// Modals
-const cartModal = document.getElementById("cart-modal");
-const editCartModal = document.getElementById("edit-cart-modal");
-const confirmDeleteModal = document.getElementById("confirm-delete-modal");
-const wishlistModal = document.getElementById("wishlist-modal");
-const paymentModal = document.getElementById("payment-modal");
-const infoModal = document.getElementById("info-modal");
-const searchModal = document.getElementById("search-modal");
-const orderEventModal = document.getElementById("order-event-modal");
-const reportBugModal = document.getElementById("report-bug-modal");
-const updateModal = document.getElementById("update-modal"); // New: Update Modal
-const productDetailModal = document.getElementById("product-detail-modal"); // New: Product Detail Modal
-
-// Badges
-const copiedBadge = document.getElementById("copied");
-const sentBadge = document.getElementById("sent");
-const loginSuccessBadge = document.getElementById("login-success-badge");
-
-// Search elements
-const searchInput = document.getElementById("search-input");
-const doSearchBtn = document.getElementById("do-search");
-// const closeSearchBtn = document.getElementById("close-search"); // Removed: Replaced by universal close button
-
-// Contact elements
-const whatsappContactBtn = document.getElementById("whatsapp-contact-btn");
-const emailContactBtn = document.getElementById("email-contact-btn");
-const whatsappDropdownContent = document.getElementById("whatsapp-dropdown-content");
-const emailDropdownContent = document.getElementById("email-dropdown-content");
-
-// Order Event Form elements
-const orderNameInput = document.getElementById("order-name");
-const orderWaInput = document.getElementById("order-wa");
-const orderEventNameInput = document.getElementById("order-event-name");
-const orderDateInput = document.getElementById("order-date");
-const orderAddressInput = document.getElementById("order-address");
-const submitOrderEventBtn = document.getElementById("submit-order-event");
-
-// Report Bug Form elements
-const bugTitleInput = document.getElementById("bug-title");
-const bugDescriptionInput = document.getElementById("bug-description");
-const bugCharCount = document.getElementById("bug-char-count");
-const submitReportBugBtn = document.getElementById("submit-report-bug");
-
-// QR Code element
-const danaQrCodeImg = document.getElementById("dana-qr-code");
-
-// Back to Top button
-const backToTopBtn = document.getElementById("back-to-top");
-
-// New: Update Modal Elements
-const updateContent = document.getElementById("update-content");
-const promoText = document.getElementById("promo-text");
-// const closeUpdateModalBtn = document.getElementById("close-update-modal"); // Removed: Replaced by universal close button
-const dontShowAgainCheckbox = document.getElementById("dont-show-again"); // New: Checkbox
-const dispersionCanvas = document.getElementById("dispersion-canvas");
-
-// Promo elements
-const promoCodeInput = document.getElementById("promo-code-input");
-const applyPromoBtn = document.getElementById("apply-promo-btn");
-const promoMessage = document.getElementById("promo-message");
-const promoPriceDisplay = document.getElementById("promo-price-display"); // New: Promo Price Display
-const originalTotalSpan = document.getElementById("original-total"); // New: Original Total Span
-const discountedTotalSpan = document.getElementById("discounted-total"); // New: Discounted Total Span
-
-// Product Detail Modal Elements
-const productDetailTitle = document.getElementById("product-detail-title");
-const productDetailImagesContainer = document.getElementById("product-detail-images");
-const productDetailDescription = document.getElementById("product-detail-description");
-const productDetailPrice = document.getElementById("product-detail-price");
-const detailMinusBtn = document.getElementById("detail-minus-btn");
-const detailPlusBtn = document.getElementById("detail-plus-btn");
-const detailQtyDisplay = document.getElementById("detail-qty-display");
-const addToCartDetailBtn = document.getElementById("add-to-cart-detail-btn");
-const addToWishlistDetailBtn = document.getElementById("add-to-wishlist-detail-btn");
-const productVariantsContainer = document.getElementById("product-variants-container");
-const productVariantsOptions = document.getElementById("product-variants-options");
-const productToppingsContainer = document.getElementById("product-toppings-container"); // New: Toppings Container
-const productToppingsOptions = document.getElementById("product-toppings-options"); // New: Toppings Options
-const relatedProductsModalList = document.getElementById("related-products-modal-list");
-const relatedProductsSection = document.getElementById("related-products-section");
-const relatedProductsContainer = document.getElementById("related-products-container");
-
-// Global variables for product detail modal
-let currentProductDetail = null;
-let currentProductDetailQty = 1;
-let selectedVariant = null;
-let selectedToppings = {};
-
-
-// ---------- Data ----------
-const productList = [
-  {
-    name: "Lemper",
-    price: 3500,
-    kategori: "Karbohidrat",
-    description: "Lemper ketan isi ayam suwir gurih, dibungkus daun pisang.",
-    images: ["https://via.placeholder.com/120?text=Lemper+1", "https://via.placeholder.com/120?text=Lemper+2", "https://via.placeholder.com/120?text=Lemper+3"]
-  },
-  {
-    name: "Sosis Solo",
-    price: 3500,
-    kategori: "Asin",
-    description: "Sosis Solo dengan isian daging ayam cincang yang lezat, dibalut kulit tipis nan lembut.",
-    images: ["Soslo1.PNG", "Soslo2.png", "Soslo3.png"]
-  },
-  {
-    name: "Sus",
-    price: 3500,
-    kategori: "Manis",
-    description: "Kue sus lembut dengan isian vla manis dan creamy.",
-    images: ["https://via.placeholder.com/120?text=Sus+1", "https://via.placeholder.com/120?text=Sus+2", "https://via.placeholder.com/120?text=Sus+3"]
-  },
-  {
-    name: "Pie Buah",
-    price: 3500,
-    kategori: "Manis",
-    description: "Pie renyah dengan vla lembut dan topping buah-buahan segar.",
-    images: ["https://via.placeholder.com/120?text=Pie+Buah+1", "https://via.placeholder.com/120?text=Pie+Buah+2", "https://via.placeholder.com/120?text=Pie+Buah+3"]
-  },
-  {
-    name: "Risol Mayonais",
-    price: 3500,
-    kategori: "Asin",
-    description: "Risol renyah dengan isian sosis, telur, dan mayonais creamy.",
-    images: ["https://via.placeholder.com/120?text=Risol+Mayonais+1", "https://via.placeholder.com/120?text=Risol+Mayonais+2", "https://via.placeholder.com/120?text=Risol+Mayonais+3"]
-  },
-  {
-    name: "Pastel Bihun",
-    price: 3500,
-    kategori: "Asin",
-    description: "Pastel gurih dengan isian bihun dan sayuran.",
-    images: ["https://via.placeholder.com/120?text=Pastel+Bihun+1", "https://via.placeholder.com/120?text=Pastel+Bihun+2", "https://via.placeholder.com/120?text=Pastel+Bihun+3"]
-  },
-  {
-    name: "Pastel Mayonais",
-    price: 3500,
-    kategori: "Asin",
-    description: "Pastel renyah dengan isian sayur, sosis, dan mayonais creamy yang lezat.",
-    images: ["https://via.placeholder.com/120?text=Pastel+Mayonais+1", "https://via.placeholder.com/120?text=Pastel+Mayonais+2", "https://via.placeholder.com/120?text=Pastel+Mayonais+3"]
-  },
-  {
-    name: "Cente Manis / Hunkwe",
-    price: 3500,
-    kategori: "Manis",
-    description: "Kue tradisional Cente Manis atau Hunkwe, kenyal dan manis.",
-    images: ["https://via.placeholder.com/120?text=Cente+Manis+1", "https://via.placeholder.com/120?text=Cente+Manis+2", "https://via.placeholder.com/120?text=Cente+Manis+3"]
-  },
-  {
-    name: "Talam",
-    price: 3500,
-    kategori: "Manis",
-    description: "Kue talam tradisional lembut dengan rasa manis legit khas, cocok sebagai camilan.",
-    images: ["https://via.placeholder.com/120?text=Talam+1", "https://via.placeholder.com/120?text=Talam+2", "https://via.placeholder.com/120?text=Talam+3"]
-  },
-  {
-    name: "Nasi Uduk",
-    price: 10000,
-    kategori: "Karbohidrat",
-    description: "Nasi uduk gurih dengan aroma rempah khas, cocok untuk sarapan atau makan siang.",
-    images: ["https://via.placeholder.com/120?text=Nasi+Uduk+1", "https://via.placeholder.com/120?text=Nasi+Uduk+2", "https://via.placeholder.com/120?text=Nasi+Uduk+3"],
-    variants: [
-      { name: "Polos", price: 0, description: "Nasi, Orek, Bihun, Sambal" }
-    ],
-    toppings: [
-      { name: "Telor ½ Bulet Balado", price: 3000 },
-      { name: "Telor Bulet Balado", price: 6000 },
-      { name: "Telor Dadar", price: 6000 },
-      { name: "Telor Ceplok", price: 6000 },
-      { name: "Bakwan", price: 2000 },
-      { name: "Tempe Orek", price: 3000 },
-      { name: "Bihun Goreng", price: 3000 }
-    ]
-  },
-  {
-    name: "Nasi Kuning",
-    price: 10000,
-    kategori: "Karbohidrat",
-    description: "Nasi kuning harum dengan lauk pelengkap, hidangan istimewa untuk berbagai acara.",
-    images: ["https://via.placeholder.com/120?text=Nasi+Kuning+1", "https://via.placeholder.com/120?text=Nasi+Kuning+2", "https://via.placeholder.com/120?text=Nasi+Kuning+3"],
-    variants: [
-      { name: "Polos", price: 0, description: "Nasi, Orek, Bihun, Sambal" }
-    ],
-    toppings: [
-      { name: "Telor ½ Bulet Balado", price: 3000 },
-      { name: "Telor Bulet Balado", price: 6000 },
-      { name: "Telor Dadar", price: 6000 },
-      { name: "Telor Ceplok", price: 6000 },
-      { name: "Bakwan", price: 2000 },
-      { name: "Tempe Orek", price: 3000 },
-      { name: "Bihun Goreng", price: 3000 }
-    ]
-  },
-];
-
-// New: Update Log Data
-const updateLog = [
-  {
-    version: "1.0.3",
-    date: "2025-08-25",
-    changes: [
-      "Kode promo diperpanjang hingga 29 Agustus 2025 pukul 17.00",
-      "Fix bug button kode promo",
-      "Adding button back/exit pada setiap menu.",
-      "Fix animasi pada (Menu di Kategori yang anda suka)"
-    ]
-  },
-  {
-    version: "1.0.2",
-    date: "2025-08-24",
-    changes: [
-      "Penambahan Menu Nasi Uduk/Kuning dengan disediakan all topping",
-      "Fix bug kode promo",
-      "Perbaikan animasi di semua layout."
-    ]
-  },
-  {
-    version: "1.0.1",
-    date: "2025-08-21",
-    changes: [
-      "Perbaikan tombol 'Pesan' pada setiap menu untuk pengguna handphone.",
-      "Penambahan tombol 'back to the top'.",
-      "Perbaikan animasi.",
-      "Penambahan kode promo terbatas."
-    ]
-  },
-  {
-    version: "1.0.0",
-    date: "2025-08-20",
-    changes: [
-      "Aplikasi eCatalog Kedai Mas Haris resmi diluncurkan!",
-      "Fitur keranjang belanja, wishlist, search produk tersedia.",
-      "Mode terang dan gelap untuk kenyamanan pengguna.",
-      "6 Menu tersedia (Lemper, Sosis Solo, Sus, Pie Buah, Cente Manis / Hunkwe / Risol Mayonais / Pastel Bihun)."
-    ]
-  }
-];
-
-const currentPromo = {
-  code: "DISKON10", // Kode promo yang Anda inginkan
-  discountPercentage: 0.10, // 10% diskon
-  minPurchase: 20000, // Minimal pembelian Rp 20.000
-  startDate: new Date("2025-08-21T20:00:00"), // Kamis, 21 Agustus 2025 pukul 20.00
-  endDate: new Date("2025-08-29T17:00:00"), // Selasa, 29 Agustus 2025 pukul 17.00
-  text: "Dapatkan diskon 10% untuk pembelian minimal Rp 20.000! Diperpanjang berlaku hingga 29 Agustus 2025 pukul 17.00 dengan kode promo: DISKON10."
-};
-
-// Cart & Wishlist state
-let cart = {}; // Changed to let for re-assignment from localStorage
-let wishlist = {}; // Changed to let for re-assignment from localStorage
-let usedPromoCodes = new Set(); // New: To store used promo codes
-let currentEditItem = null;
-let currentDeleteItem = null;
-let currentDeleteType = null;
-let modalStack = [];
-let currentPaymentMethod = '';
-let currentOrderData = {};
-let currentContactActionType = ''; // 'whatsapp' or 'email'
-let currentContactAction = ''; // 'order-event' or 'report-bug'
-let promoApplied = false; // Status apakah promo sedang diterapkan pada keranjang saat ini
-let finalDiscountedPrice = 0; // New: To store the final price after discount
-
-// New: Promo usage tracking per user (stored in localStorage)
-const PROMO_USAGE_KEY = 'promoUsage';
-const MAX_PROMO_USAGE = 3; // Max 3 times per user
-let promoUsage = {}; // { 'DISKON10': { count: 0, currentTransactionId: null } }
-
-// New: Unique ID for current transaction (to track promo usage within a single transaction)
-let currentTransactionId = null;
-
-// ---------- Utility Functions ----------
-function showNotif(text) {
-  notif.textContent = text;
-  gsap.killTweensOf(notif); // Stop any ongoing animations
-  gsap.set(notif, { opacity: 0, y: -10, display: "block" }); // Ensure it's visible for animation
-  gsap.to(notif, { duration: 0.28, opacity: 1, y: 0, ease: "power2.out" });
-  gsap.to(notif, {
-    delay: 1.6,
-    duration: 0.28,
-    opacity: 0,
-    y: -10,
-    ease: "power2.in",
-    onComplete: () => {
-      gsap.set(notif, { display: "none" }); // Hide it completely after animation
-    },
-  });
+body {
+  font-family: 'Poppins', sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
-function showBadge(badge, text) {
-  badge.textContent = text;
-  gsap.killTweensOf(badge); // Stop any ongoing animations
-  gsap.set(badge, { opacity: 0, scale: 0.8, display: "block" }); // Ensure it's visible for animation
-  gsap.to(badge, { duration: 0.3, opacity: 1, scale: 1, ease: "back.out" });
-  gsap.to(badge, {
-    delay: 1.5,
-    duration: 0.3,
-    opacity: 0,
-    scale: 0.8,
-    ease: "back.in",
-    onComplete: () => {
-      gsap.set(badge, { display: "none" }); // Hide it completely after animation
-    },
-  });
+/* Tambahkan transisi untuk dark mode */
+body, body.dark {
+  transition: background-color 0.5s ease, color 0.3s ease;
 }
 
-// ---------- Modal Management ----------
-function openModal(modal) {
-  if (!modalStack.includes(modal)) {
-    modalStack.push(modal);
-  }
-  gsap.set(overlay, { display: "block" });
-  gsap.to(overlay, { duration: 0.25, opacity: 1, ease: "power2.out", onComplete: () => {
-    overlay.setAttribute("aria-hidden", "false");
-    overlay.style.pointerEvents = "auto";
-  }});
+/* NAV underline custom */
+.nav-link { position: relative; }
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  height: 2px;
+  width: 0;
+  background: #f97316;
+  transition: width 0.3s ease;
+}
+.nav-link:hover::after { width: 100%; }
 
-  // Hanya animasi opacity — posisi diatur penuh oleh CSS agar selalu center
-  gsap.set(modal, { display: "block", opacity: 0 });
-  // Paksa clear transform dari GSAP sebelumnya supaya CSS translate(-50%,-50%) bekerja
-  modal.style.transform = "";
-  gsap.to(modal, {
-    duration: 0.3,
-    opacity: 1,
-    ease: "power2.out",
-    onComplete: () => {
-      modal.setAttribute("aria-hidden", "false");
-      modal.focus();
-    }
-  });
+
+/* Pastikan semua section yang dituju navigasi transparan */
+#home-section,
+#categories-section,
+#menu-section,
+#contact-section {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 
-function closeModal(modal) {
-  const index = modalStack.indexOf(modal);
-  if (index > -1) {
-    modalStack.splice(index, 1);
-  }
-
-  gsap.to(modal, { duration: 0.3, opacity: 0, ease: "power2.in", onComplete: () => {
-    gsap.set(modal, { display: "none" });
-    modal.style.transform = "";
-    modal.setAttribute("aria-hidden", "true");
-    if (modalStack.length === 0) {
-      gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
-        gsap.set(overlay, { display: "none" });
-        overlay.setAttribute("aria-hidden", "true");
-        overlay.style.pointerEvents = "none";
-      }});
-    } else {
-      const previousModal = modalStack[modalStack.length - 1];
-      gsap.set(previousModal, { display: "block", opacity: 1 });
-      previousModal.style.transform = "";
-      previousModal.setAttribute("aria-hidden", "false");
-      previousModal.focus();
-    }
-  }});
-
-  // New: Hide QR code when closing info modal
-  if (modal.id === 'info-modal') {
-    danaQrCodeImg.classList.add('hidden');
-    danaQrCodeImg.src = ''; // Clear src
-  }
-  // Reset product detail modal state
-  if (modal.id === 'product-detail-modal') {
-    currentProductDetail = null;
-    currentProductDetailQty = 1;
-    selectedVariant = null;
-    selectedToppings = {}; // Reset selected toppings
-    // Destroy Swiper instance if it exists
-    if (productDetailModal.swiper) {
-      productDetailModal.swiper.destroy(true, true);
-      productDetailModal.swiper = null;
-    }
-  }
+/* Glassmorphism Header tanpa garis bawah */
+header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 50;
+  transition: all 0.3s ease, border-color 0.3s ease; /* Tambahkan border-color ke transisi */
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid transparent; /* Border selalu ada, tapi transparan */
+  display: flex; /* Tambahkan flex untuk layout header */
+  align-items: center;
+  justify-content: space-between; /* Pisahkan elemen kiri, tengah, kanan */
 }
 
-function goBackToPreviousModal() {
-  if (modalStack.length <= 1) {
-    closeAllModals();
-    return;
-  }
-  const currentModal = modalStack[modalStack.length - 1];
-  const previousModal = modalStack[modalStack.length - 2];
-
-  gsap.to(currentModal, { duration: 0.3, opacity: 0, ease: "power2.in", onComplete: () => {
-    gsap.set(currentModal, { display: "none" });
-    currentModal.style.transform = "";
-    currentModal.setAttribute("aria-hidden", "true");
-    modalStack.pop();
-
-    gsap.set(previousModal, { display: "block", opacity: 0 });
-    previousModal.style.transform = "";
-    gsap.to(previousModal, { duration: 0.3, opacity: 1, ease: "power2.out", onComplete: () => {
-      previousModal.setAttribute("aria-hidden", "false");
-      previousModal.focus();
-    }});
-  }});
-
-  // Hide QR code if going back from info modal
-  if (currentModal.id === 'info-modal') {
-    danaQrCodeImg.classList.add('hidden');
-    danaQrCodeImg.src = '';
-  }
-  // Reset product detail modal state if going back from it
-  if (currentModal.id === 'product-detail-modal') {
-    currentProductDetail = null;
-    currentProductDetailQty = 1;
-    selectedVariant = null;
-    selectedToppings = {};
-    if (productDetailModal.swiper) {
-      productDetailModal.swiper.destroy(true, true);
-      productDetailModal.swiper = null;
-    }
-  }
-  // Reset bank options when returning to payment modal
-  if (previousModal && previousModal.id === 'payment-modal') {
-    const bankOpts = document.getElementById("bank-options");
-    if (bankOpts) bankOpts.classList.add("hidden");
-    ["pay-cash","pay-dana","pay-transfer","pay-qris"].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.classList.remove("hidden");
-    });
-    const title = document.getElementById("payment-title");
-    if (title) title.textContent = "Pilih Metode Pembayaran";
-  }
+/* Saat di atas (no scroll) → transparan */
+header.top {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
 }
 
-function closeAllModals() {
-  [...modalStack].reverse().forEach((modal) => {
-    gsap.to(modal, { duration: 0.3, opacity: 0, ease: "power2.in", onComplete: () => {
-      gsap.set(modal, { display: "none" });
-      modal.style.transform = "";
-      modal.setAttribute("aria-hidden", "true");
-    }});
-  });
-  modalStack = [];
-  gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
-    gsap.set(overlay, { display: "none" });
-    overlay.setAttribute("aria-hidden", "true");
-    overlay.style.pointerEvents = "none";
-  }});
-  // New: Hide QR code when closing all modals
-  danaQrCodeImg.classList.add('hidden');
-  danaQrCodeImg.src = ''; // Clear src
-
-  // Reset product detail modal state
-  currentProductDetail = null;
-  currentProductDetailQty = 1;
-  selectedVariant = null;
-  selectedToppings = {}; // Reset selected toppings
-  if (productDetailModal.swiper) {
-    productDetailModal.swiper.destroy(true, true);
-    productDetailModal.swiper = null;
-  }
-
-  // Reset promo state when all modals are closed (e.g., after a successful transaction)
-  // IMPORTANT: Only reset promoApplied and input value here.
-  // The usedPromoCodes set should NOT be cleared here, as it tracks used codes across transactions.
-  promoApplied = false;
-  promoCodeInput.value = '';
-  promoMessage.classList.add('hidden');
-  updateCartTotal(); // Ensure total is reset
+/* Saat discroll → efek glass tanpa border */
+header.scrolled {
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-bottom-color: transparent; /* Pastikan border transparan di light mode saat discroll */
 }
 
-// ---------- Persistensi Data (New) ----------
-function saveCartToLocalStorage() {
-  localStorage.setItem('cart', JSON.stringify(cart));
+/* Dark mode */
+body.dark header.top {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
 }
 
-function loadCartFromLocalStorage() {
-  const storedCart = localStorage.getItem('cart');
-  if (storedCart) {
-    cart = JSON.parse(storedCart);
-  }
+body.dark header.scrolled {
+  background: rgba(26, 35, 50, 0.35);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-bottom-color: rgba(255, 255, 255, 0.1); /* Atur warna border untuk dark mode saat discroll */
 }
 
-function saveWishlistToLocalStorage() {
-  localStorage.setItem('wishlist', JSON.stringify(wishlist));
+/* Logo text color control */
+.logo-text {
+  color: rgb(var(--dark-body-color)); /* Light mode orange */
 }
 
-function loadWishlistFromLocalStorage() {
-  const storedWishlist = localStorage.getItem('wishlist');
-  if (storedWishlist) {
-    wishlist = JSON.parse(storedWishlist);
-  }
+body.dark .logo-text {
+  color: #f97316; /* Ikut warna body dark mode */
 }
 
-// New: Save/Load used promo codes (this is for the global `usedPromoCodes` set, not the `promoUsage` object)
-function saveUsedPromoCodes() {
-  localStorage.setItem('usedPromoCodes', JSON.stringify(Array.from(usedPromoCodes)));
+/* Modern Toggle Switch Styles */
+.toggle-switch {
+  position: relative;
+  width: 60px;
+  height: 32px;
+  background: #374151;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-function loadUsedPromoCodes() {
-  const storedUsedPromoCodes = localStorage.getItem('usedPromoCodes');
-  if (storedUsedPromoCodes) {
-    usedPromoCodes = new Set(JSON.parse(storedUsedPromoCodes));
-  }
+.toggle-switch::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 28px;
+  height: 28px;
+  background: white;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 2;
 }
 
-// New: Save/Load promo usage data
-function savePromoUsage() {
-    localStorage.setItem(PROMO_USAGE_KEY, JSON.stringify(promoUsage));
+.toggle-switch .toggle-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
 }
 
-function loadPromoUsage() {
-    const storedPromoUsage = localStorage.getItem(PROMO_USAGE_KEY);
-    if (storedPromoUsage) {
-        promoUsage = JSON.parse(storedPromoUsage);
-    }
+.toggle-switch .sun-icon {
+  left: 8px;
+  color: #ffcc00 !important;
+  opacity: 0;
+  transform: translateY(-50%) scale(0.8);
 }
 
-// ---------- Cart Functions ----------
-function updateCartCount() {
-  const count = Object.values(cart).reduce((sum, item) => sum + item.qty, 0);
-  cartCount.textContent = count;
-  const mobileCartCountEl = document.getElementById('cart-count-mobile');
-  if (mobileCartCountEl) {
-    mobileCartCountEl.textContent = count;
-    if (count > 0) {
-      gsap.from(mobileCartCountEl, { scale: 1.5, duration: 0.3, ease: "back.out" });
-    }
-  }
-  if (count > 0) {
-    gsap.from(cartCount, { scale: 1.5, duration: 0.3, ease: "back.out" });
-  }
-  saveCartToLocalStorage(); // Save to localStorage on update
+.toggle-switch .moon-icon {
+  right: 8px;
+  color: white !important;
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
 }
 
-function updateCartTotal() {
-  let total = Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0);
-  let originalTotal = total; // Store original total before discount
-
-  // Apply promo if active
-  if (promoApplied) {
-    finalDiscountedPrice = originalTotal * (1 - currentPromo.discountPercentage);
-    promoPriceDisplay.classList.remove('hidden');
-    originalTotalSpan.textContent = `Rp ${originalTotal.toLocaleString("id-ID")}`;
-    discountedTotalSpan.textContent = `Rp ${finalDiscountedPrice.toLocaleString("id-ID")}`;
-    document.getElementById("cart-total").style.display = 'none'; // Hide regular total
-  } else {
-    finalDiscountedPrice = originalTotal; // If no promo, final price is original total
-    promoPriceDisplay.classList.add('hidden');
-    document.getElementById("cart-total").style.display = 'block'; // Show regular total
-  }
-
-  document.getElementById("cart-total").textContent = "Rp " + originalTotal.toLocaleString("id-ID");
+/* Active (Dark Mode) State */
+body.dark .toggle-switch {
+  background-color: transparent;
+  border: 1px solid white !important
 }
 
-function renderCart() {
-  const cartItemsContainer = document.getElementById("cart-items");
-  cartItemsContainer.innerHTML = "";
-
-  if (Object.keys(cart).length === 0) {
-    cartItemsContainer.innerHTML = `
-      <div class="text-center text-gray-500 py-8">
-        Keranjang kosong 🛒<br>
-        <small>Silakan tambahkan produk!</small>
-      </div>`;
-    promoMessage.classList.add('hidden'); // Hide promo message if cart is empty
-    promoCodeInput.value = ''; // Clear promo input
-    promoApplied = false; // Reset promo status
-    updateCartTotal(); // Recalculate total
-    return;
-  }
-
-  Object.entries(cart).forEach(([key, item]) => {
-    const wrap = document.createElement("div");
-    wrap.className = "flex justify-between items-center bg-gray-50 p-3 rounded-lg";
-
-    let itemDetails = item.name;
-    if (item.variant) {
-      itemDetails += ` (${item.variant})`;
-    }
-    if (item.toppings && item.toppings.length > 0) {
-      // Display toppings with their quantities
-      const toppingStrings = item.toppings.map(t => `${t.name} (${t.qty})`);
-      itemDetails += ` + ${toppingStrings.join(', ')}`;
-    }
-
-    wrap.innerHTML = `
-      <div class="flex items-center gap-3">
-        <img src="${item.images ? item.images[0] : `https://via.placeholder.com/50?text=${encodeURIComponent(item.name)}`}"
-             class="w-10 h-10 object-cover rounded-lg">
-        <div>
-          <p class="font-medium text-sm">${itemDetails}</p>
-          <p class="text-xs text-gray-500">Rp ${item.price.toLocaleString("id-ID")} x ${item.qty}</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-2">
-        <button class="edit-cart-btn" onclick="openEditCartModal('${key}')">
-          <i class="fas fa-edit"></i>
-        </button>
-        <button class="delete-item-btn" onclick="deleteCartItem('${key}')">
-          <i class="fas fa-trash-alt"></i>
-        </button>
-      </div>
-    `;
-
-    cartItemsContainer.appendChild(wrap);
-  });
-
-  // Update cart total after rendering items
-  updateCartTotal();
+body.dark .toggle-switch::before {
+  transform: translateX(28px);
+  background-color: white;
 }
 
-function openEditCartModal(itemKey) { // itemKey now includes variant if applicable
-  currentEditItem = itemKey;
-  const item = cart[itemKey];
-
-  let itemDetails = item.name;
-  if (item.variant) {
-    itemDetails += ` (${item.variant})`;
-  }
-  if (item.toppings && item.toppings.length > 0) {
-    const toppingStrings = item.toppings.map(t => `${t.name} (${t.qty})`);
-    itemDetails += ` + ${toppingStrings.join(', ')}`;
-  }
-
-  document.getElementById("edit-item-name").textContent = itemDetails;
-  document.getElementById("edit-item-price").textContent = `Rp ${item.price.toLocaleString("id-ID")}`;
-  document.getElementById("edit-item-image").src = item.images ? item.images[0] : "https://via.placeholder.com/50?text=" + encodeURIComponent(item.name);
-  document.getElementById("edit-qty-display").textContent = item.qty;
-
-  updateEditButtons(item.qty);
-
-  // Sembunyikan cart, buka edit (cart tetap di stack)
-  gsap.to(cartModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
-    gsap.set(cartModal, { display: "none" });
-    cartModal.style.transform = "";
-    cartModal.setAttribute("aria-hidden", "true");
-    openModal(editCartModal);
-  }});
+body.dark .toggle-switch .sun-icon {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
 }
 
-function updateEditButtons(qty) {
-  const minusBtn = document.getElementById("edit-minus-btn");
-  minusBtn.disabled = qty <= 1;
-  minusBtn.className = qty <= 1 ? "qty-btn minus-gray" : "qty-btn minus-red";
+body.dark .toggle-switch .moon-icon {
+  opacity: 0;
+  transform: translateY(-50%) scale(0.8);
 }
 
-function deleteCartItem(itemKey) { // itemKey now includes variant if applicable
-  currentDeleteItem = itemKey;
-  currentDeleteType = 'item';
-  const item = cart[itemKey];
-
-  let itemDetails = item.name;
-  if (item.variant) {
-    itemDetails += ` (${item.variant})`;
-  }
-  if (item.toppings && item.toppings.length > 0) {
-    const toppingStrings = item.toppings.map(t => `${t.name} (${t.qty})`);
-    itemDetails += ` + ${toppingStrings.join(', ')}`;
-  }
-
-  document.getElementById("confirm-delete-message").textContent = `Hapus "${itemDetails}" dari keranjang?`;
-
-  // Sembunyikan cart, buka konfirmasi (cart tetap di stack)
-  gsap.to(cartModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
-    gsap.set(cartModal, { display: "none" });
-    cartModal.style.transform = "";
-    cartModal.setAttribute("aria-hidden", "true");
-    openModal(confirmDeleteModal);
-  }});
+/* Kategori */
+.category-card {
+  border-radius: 1rem;
+  color: white;
+  padding: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-// ---------- Fixed Promo Logic ----------
-function applyPromoCode() {
-  const inputCode = promoCodeInput.value.trim().toUpperCase();
-  
-  // Check if input is empty
-  if (!inputCode) {
-    showNotif("Masukkan kode promo terlebih dahulu");
-    return;
-  }
-
-  const totalPriceInCart = Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0);
-  const today = new Date();
-
-  // Ensure a transaction ID exists for the current session
-  if (!currentTransactionId) {
-      currentTransactionId = Date.now().toString(); // Simple unique ID for the current session
-  }
-
-  // Get promo usage for the current promo code
-  let promoData = promoUsage[inputCode] || { count: 0, currentTransactionId: null };
-  const remainingUses = MAX_PROMO_USAGE - promoData.count;
-
-  if (inputCode === currentPromo.code) {
-      // Scenario 1: Promo already applied for this transaction
-      if (promoApplied && promoData.currentTransactionId === currentTransactionId) {
-          showNotif(`Maaf kode promo (${inputCode} - tersisa ${remainingUses}/${MAX_PROMO_USAGE}) sudah dipakai untuk transaksi ini, silahkan selesaikan terlebih dahulu baru bisa menggunakan kembali.`);
-          return;
-      }
-
-      // Scenario 2: Promo usage limit reached
-      if (remainingUses <= 0) {
-          promoApplied = false;
-          promoMessage.textContent = `Maaf kode promo yang anda masukkan sudah mencapai limit. Terima kasih 🙏`;
-          promoMessage.classList.remove('hidden');
-          updateCartTotal();
-          return;
-      }
-
-      // Scenario 3: Promo not yet active
-      if (today < currentPromo.startDate) {
-          promoMessage.textContent = "Kode promo belum aktif.";
-          promoMessage.classList.remove('hidden');
-          promoApplied = false;
-      }
-      // Scenario 4: Promo expired
-      else if (today > currentPromo.endDate) {
-          promoMessage.textContent = "Maaf, kode promo sudah kadaluarsa.";
-          promoMessage.classList.remove('hidden');
-          promoApplied = false;
-      }
-      // Scenario 5: Minimum purchase not met
-      else if (totalPriceInCart < currentPromo.minPurchase) {
-          promoMessage.textContent = `Promo "${inputCode}" belum memenuhi syarat (minimal pembelian Rp ${currentPromo.minPurchase.toLocaleString("id-ID")}).`;
-          promoMessage.classList.remove('hidden');
-          promoApplied = false;
-      }
-      // Scenario 6: Promo successfully applied
-      else {
-          promoApplied = true;
-          promoMessage.textContent = `Kode promo berhasil diterapkan! Anda mendapatkan diskon 10%! 🎉 (Sisa penggunaan: ${remainingUses})`;
-          promoMessage.classList.remove('hidden');
-
-          // Mark promo as used for this transaction
-          promoData.currentTransactionId = currentTransactionId;
-          promoUsage[inputCode] = promoData;
-          savePromoUsage(); // Save updated usage to localStorage
-      }
-  } else {
-      // Scenario 7: Invalid promo code
-      promoMessage.textContent = "Kode promo tidak valid.";
-      promoMessage.classList.remove('hidden');
-      promoApplied = false;
-  }
-  updateCartTotal();
+.category-card.active {
+  border: 3px solid #1f2937;
+  transform: scale(1.05);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-// ---------- Wishlist Functions ----------
-function updateWishlistCount() {
-  const count = Object.keys(wishlist).length;
-  wishlistCount.textContent = count;
-  const mobileWishlistCountEl = document.getElementById('wishlist-count-mobile');
-  if (mobileWishlistCountEl) {
-    mobileWishlistCountEl.textContent = count;
-    if (count > 0) {
-      gsap.from(mobileWishlistCountEl, { scale: 1.5, duration: 0.3, ease: "back.out" });
-    }
-  }
-  if (count > 0) {
-    gsap.from(wishlistCount, { scale: 1.5, duration: 0.3, ease: "back.out" });
-  }
-  saveWishlistToLocalStorage(); // Save to localStorage on update
+/* Enhanced Button Styles */
+.btn-pesan,
+#checkout-btn,
+#send-wa,
+#do-search,
+.copy-btn,
+.payment-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-function updateWishlistButtonsState() {
-  document.querySelectorAll('.btn-wishlist').forEach(button => {
-    const itemName = button.getAttribute('data-name');
-    if (wishlist[itemName]) {
-      button.classList.add("wishlist-active");
-    } else {
-      button.classList.remove("wishlist-active");
-    }
-  });
-  // Also update the detail modal wishlist button
-  if (currentProductDetail) {
-    if (wishlist[currentProductDetail.name]) {
-      addToWishlistDetailBtn.classList.add("wishlist-active");
-    } else {
-      addToWishlistDetailBtn.classList.remove("wishlist-active");
-    }
-  }
+.btn-pesan::before,
+#checkout-btn::before,
+#send-wa::before,
+#do-search::before,
+.copy-btn::before,
+.payment-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
 }
 
-function renderWishlist() {
-  const wishlistItemsContainer = document.getElementById("wishlist-items");
-  wishlistItemsContainer.innerHTML = "";
-
-  if (Object.keys(wishlist).length === 0) {
-    wishlistItemsContainer.innerHTML = `
-      <div class="text-center text-gray-500 py-8">
-        Wishlist kosong 😔<br>
-        <small>Tambahkan produk favorit Anda!</small>
-      </div>`;
-    return;
-  }
-
-  Object.entries(wishlist).forEach(([key, item]) => {
-    const card = document.createElement("div");
-    card.className = "bg-gray-50 p-3 rounded-lg flex items-center gap-3";
-
-    card.innerHTML = `
-      <img src="${item.images ? item.images[0] : `https://via.placeholder.com/60?text=${encodeURIComponent(item.name)}`}"
-           class="w-12 h-12 object-cover rounded-lg">
-      <div class="flex-1">
-        <p class="font-medium text-sm">${item.name}</p>
-        <p class="text-xs text-gray-500">Rp ${item.price.toLocaleString("id-ID")}</p>
-        <p class="text-xs text-blue-600">${item.kategori}</p>
-      </div>
-      <div class="flex flex-col gap-1">
-        <button onclick="addToCartFromWishlist('${item.name}')"
-                class="bg-orange-500 text-white text-xs px-3 py-1 rounded-full hover:bg-orange-600">
-          <i class="fas fa-shopping-cart mr-1"></i>Pesan
-        </button>
-        <button onclick="removeFromWishlist('${item.name}')"
-                class="bg-red-500 text-white text-xs px-3 py-1 rounded-full hover:bg-red-600">
-          <i class="fas fa-trash-alt mr-1"></i>Hapus
-        </button>
-      </div>
-    `;
-
-    wishlistItemsContainer.appendChild(card);
-  });
+.btn-pesan:hover::before,
+#checkout-btn:hover::before,
+#send-wa:hover::before,
+#do-search:hover::before,
+.copy-btn:hover::before,
+.payment-btn:hover::before {
+  left: 100%;
 }
 
-function addToCartFromWishlist(itemName) {
-  const item = productList.find(p => p.name === itemName); // Get full product data
-  if (!item) return;
-
-  const itemKey = item.name; // For simple products, key is just name
-  if (cart[itemKey]) {
-    cart[itemKey].qty++;
-  } else {
-    cart[itemKey] = {
-      name: item.name,
-      price: item.price,
-      qty: 1,
-      images: item.images ? item.images : []
-    };
-  }
-  updateCartCount();
-  showNotif(`${item.name} ditambahkan ke keranjang`);
+/* Button Gradients and Effects */
+.btn-pesan {
+  background: linear-gradient(135deg, #f97316, #ea580c) !important;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
 }
 
-function removeFromWishlist(itemName) {
-  delete wishlist[itemName];
-  updateWishlistCount();
-  updateWishlistButtonsState();
-  renderWishlist();
-  showNotif(`${itemName} dihapus dari wishlist`);
+.btn-pesan:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
 }
 
-// ---------- Display Functions ----------
-function displayProducts(list, targetContainer = container) {
-  targetContainer.innerHTML = "";
-  if (!list || !list.length) {
-    const msg = document.createElement("div");
-    msg.className = "col-span-full text-center py-8 text-gray-500";
-    msg.innerHTML = `Maaf yang anda cari tidak/belum tersedia. 😔`;
-    targetContainer.appendChild(msg);
-    gsap.fromTo(msg, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.36, ease: "power2.out" });
-    return;
-  }
+#checkout-btn {
+  background: linear-gradient(135deg, #f97316, #ea580c) !important;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+}
 
-  list.forEach((item) => {
-    const card = document.createElement("div");
-    card.className = "product-card";
-    card.setAttribute("data-name", item.name); // Add data-name for click listener
+#checkout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+}
 
-    const image = document.createElement("img");
-    image.src = item.images && item.images.length > 0 ? item.images[0] : "https://via.placeholder.com/120?text=" + encodeURIComponent(item.name);
-    image.className = "w-full h-32 object-cover rounded-lg mb-3";
+/* Search Input Contrast Fix */
+#search-input {
+  background: white;
+  color: #1f2937;
+  transition: all 0.3s ease;
+}
 
-    const title = document.createElement("h4");
-    title.className = "font-semibold text-base mb-1";
-    title.textContent = item.name;
+/* Dark Mode Styles */
+body.dark {
+  --dark-body-color: 26, 35, 50; /* RGB dari warna body dark */
+  background: rgb(var(--dark-body-color));
+  color: #e2e8f0;
+}
 
-    const price = document.createElement("p");
-    price.className = "text-sm text-green-600 mb-2";
-    price.textContent = "Rp " + item.price.toLocaleString("id-ID");
+body.dark #search-input {
+  background: #1f2937;
+  color: #e2e8f0;
+  border-color: #4b5563;
+}
 
-    const buttonContainer = document.createElement("div");
-    buttonContainer.className = "product-actions"; /* Menggunakan class product-actions */
+body.dark #search-input::placeholder {
+  color: #9ca3af;
+}
 
-    const wishlistButton = document.createElement("button");
-    wishlistButton.className = "btn-wishlist";
-    wishlistButton.innerHTML = `
-      <i class="fas fa-heart"></i>
-      <span>Wishlist</span>
-    `;
-    wishlistButton.setAttribute("data-name", item.name);
+/* Coming Soon Banner Dark Mode */
+body.dark .bg-lime-300 {
+  background: #064e3b;
+}
 
-    if (wishlist[item.name]) {
-      wishlistButton.classList.add("wishlist-active");
-    }
+body.dark .bg-lime-300 h2 {
+  color: #34d399;
+}
 
-    const orderButton = document.createElement("button");
-    orderButton.className = "btn-pesan bg-orange-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-orange-600 transition-all flex-1";
-    orderButton.textContent = "Pesan";
-    orderButton.setAttribute("data-name", item.name);
+body.dark .bg-lime-300 p {
+  background: #059669;
+  color: #ecfdf5;
+}
 
-    buttonContainer.append(wishlistButton, orderButton);
-    card.append(image, title, price, buttonContainer);
-    targetContainer.appendChild(card);
-  });
+/* Category Active State */
+body.dark .category-card.active {
+  border: 3px solid rgba(255,255,255,0.8);
+}
 
-  gsap.fromTo(
-    targetContainer.children,
-    { opacity: 0, y: 8 },
-    { opacity: 1, y: 0, duration: 0.36, stagger: 0.06, ease: "power2.out" }
+/* Payment Modal Buttons */
+.payment-btn {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.payment-btn.cash {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.payment-btn.cash:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5); /* FIX: Reduced vertical offset */
+}
+
+.payment-btn.dana {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.payment-btn.dana:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5); /* FIX: Reduced vertical offset */
+}
+
+.payment-btn.transfer {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.payment-btn.transfer:hover {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5); /* FIX: Changed from 66px to 6px */
+}
+
+.payment-btn.qris {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.payment-btn.qris:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+}
+
+/* Bank Sinarmas - Merah */
+.payment-btn.bank-sinarmas {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.payment-btn.bank-sinarmas:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+}
+
+/* Bank BCA - Biru tua elegan */
+.payment-btn.bank-bca {
+  background: linear-gradient(135deg, #1e3a5f, #0f2744);
+  color: white;
+  box-shadow: 0 4px 15px rgba(30, 58, 95, 0.4);
+}
+
+.payment-btn.bank-bca:hover {
+  background: linear-gradient(135deg, #0f2744, #0a1a2e);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(30, 58, 95, 0.5);
+}
+
+/* Bank BNI - Oranye elegan */
+.payment-btn.bank-bni {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: white;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+}
+
+.payment-btn.bank-bni:hover {
+  background: linear-gradient(135deg, #ea580c, #c2410c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+}
+
+/* Kategori */
+.category-card {
+  border-radius: 1rem;
+  color: white;
+  padding: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+  background-position: center;
+  background-size: 200% auto;
+}
+
+/* Hover effect untuk semua kategori */
+.category-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Kategori "Semua" dengan gradient baru */
+.category-card[data-kategori="all"] {
+  background-image: linear-gradient(45deg, #3b82f6, #2563eb);
+  color: #fff;
+}
+
+.category-card[data-kategori="all"]:hover {
+  background-position: right center;
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
+}
+
+.category-card[data-kategori="all"].active {
+  border: 3px solid #1d4ed8;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+/* Karbohidrat kategori */
+.category-card[data-kategori="Karbohidrat"] {
+  background-image: linear-gradient(45deg, #22c55e, #16a34a);
+}
+
+.category-card[data-kategori="Karbohidrat"]:hover {
+  box-shadow: 0 10px 20px rgba(34, 197, 94, 0.2);
+}
+
+.category-card[data-kategori="Karbohidrat"].active {
+  border: 3px solid #15803d;
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+}
+
+/* Asin kategori (sebelumnya Gorengan) */
+.category-card[data-kategori="Asin"] {
+  background-image: linear-gradient(45deg, #eab308, #ca8a04);
+}
+
+.category-card[data-kategori="Asin"]:hover {
+  box-shadow: 0 10px 20px rgba(234, 179, 8, 0.2);
+}
+
+.category-card[data-kategori="Asin"].active {
+  border: 3px solid #a16207;
+  box-shadow: 0 8px 25px rgba(234, 179, 8, 0.3);
+}
+
+/* Manis kategori */
+.category-card[data-kategori="Manis"] {
+  background-image: linear-gradient(45deg, #ec4899, #db2777);
+}
+
+.category-card[data-kategori="Manis"]:hover {
+  box-shadow: 0 10px 20px rgba(236, 72, 153, 0.2);
+}
+
+/* Active state untuk semua kategori */
+.category-card.active {
+  transform: scale(1.05);
+  background-position: right center;
+}
+
+/* Notifikasi - FIX: Hidden by default */
+.notif {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4ade80;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 1200;
+  opacity: 0;
+  pointer-events: none;
+  display: none; /* FIX: Initially hidden */
+}
+
+.copied-badge, .sent-badge {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border-radius: 999px;
+  color: white;
+  font-size: 13px;
+  z-index: 1300;
+  opacity: 0;
+  pointer-events: none;
+  display: none; /* FIX: Initially hidden */
+}
+
+.copied-badge {
+  top: 88px;
+  background: rgba(17,24,39,0.92);
+}
+
+.sent-badge {
+  top: 130px;
+  background: rgba(59,130,246,0.95);
+}
+
+/* Overlay */
+#overlay {
+  background: rgba(0,0,0,0.5);
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 999;
+  transition: opacity 0.25s ease;
+  display: none;
+}
+
+#overlay.show {
+  display: block;
+  pointer-events: auto;
+  opacity: 1;
+}
+
+/* Modal Base Styles */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+  width: 90vw;
+  max-width: 400px;
+  opacity: 0;
+  z-index: 1000;
+  display: none;
+  outline: none;
+  /* Center + ruang aman dari taskbar */
+  max-height: 80vh;
+  overflow-y: auto;
+  margin: 0;
+}
+
+.modal.show {
+  display: block;
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+
+.modal h3 {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Buttons style */
+button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Payment Modal Buttons - ENHANCED */
+.payment-btn {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.payment-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.payment-btn:hover::before {
+  left: 100%;
+}
+
+.payment-btn.cash {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.payment-btn.cash:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5); /* FIX: Reduced vertical offset */
+}
+
+.payment-btn.dana {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.payment-btn.dana:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5); /* FIX: Reduced vertical offset */
+}
+
+.payment-btn.transfer {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.payment-btn.transfer:hover {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5); /* FIX: Changed from 66px to 6px */
+}
+
+.payment-btn.qris {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.payment-btn.qris:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+}
+
+/* Bank Sinarmas - Merah */
+.payment-btn.bank-sinarmas {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.payment-btn.bank-sinarmas:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+}
+
+/* Bank BCA - Biru tua elegan */
+.payment-btn.bank-bca {
+  background: linear-gradient(135deg, #1e3a5f, #0f2744);
+  color: white;
+  box-shadow: 0 4px 15px rgba(30, 58, 95, 0.4);
+}
+
+.payment-btn.bank-bca:hover {
+  background: linear-gradient(135deg, #0f2744, #0a1a2e);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(30, 58, 95, 0.5);
+}
+
+/* Bank BNI - Oranye elegan */
+.payment-btn.bank-bni {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: white;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+}
+
+.payment-btn.bank-bni:hover {
+  background: linear-gradient(135deg, #ea580c, #c2410c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+}
+
+/* Icon colors for light/dark mode */
+.fas {
+  transition: color 0.3s ease;
+}
+
+body:not(.dark) .fas {
+  color: #1f2937; /* gray-800 for light mode */
+}
+
+body:not(.dark) .product-card {
+  background-color: transparent; /* Changed to transparent */
+  box-shadow: 0 1px 2px rgba(17,24,39,0.05);
+}
+
+body.dark .product-card:hover {
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,0.06) inset,
+    0 0 12px rgba(255,255,255,0.35),
+    0 0 24px rgba(255,255,255,0.25);
+  transform: translateY(-2px);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+body.dark .fas {
+  color: #e2e8f0; /* gray-200 for dark mode */
+}
+
+body.dark .nav-link {
+  color: #e2e8f0;
+}
+
+body.dark .nav-link:hover {
+  color: #f97316;
+}
+
+/* Wishlist icon specific colors */
+body:not(.dark) #wishlist-btn .fas.fa-heart {
+  color: #ec4899; /* pink-500 for light mode */
+}
+
+body.dark #wishlist-btn .fas.fa-heart {
+  color: #fff; /* white for dark mode */
+}
+
+#checkout-btn {
+  width: 100%;
+  background: #f97316;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+}
+
+#checkout-btn:hover {
+  background: #ea580c;
+}
+
+/* Cart edit buttons */
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.qty-btn.plus {
+  background: #3b82f6;
+  color: white;
+}
+
+.qty-btn.plus:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.qty-btn.minus-red {
+  background: #ef4444;
+  color: white;
+}
+
+.qty-btn.minus-red:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.qty-btn.minus-gray {
+  background: #d1d5db;
+  color: #9ca3af;
+}
+
+/* Product card styles - Enhanced MacOS Glassmorphism */
+.product-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.06),
+    0 1px 4px rgba(0, 0, 0, 0.03);
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+  min-height: 280px;
+  margin-top: 0;     /* pastikan tidak ada margin tambahan */
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 100%
   );
-  updateWishlistButtonsState(); // Ensure wishlist state is updated after rendering products
+  border-radius: 1.25rem;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.35s ease;
 }
 
-function renderMenu(kategori = "all") {
-  const filtered = kategori === "all" ? productList : productList.filter((item) => item.kategori === kategori);
-  displayProducts(filtered);
-  renderRelatedProducts(filtered); // Render related products on menu page
+#menu-section h3 {
+  margin-bottom: 0.75rem !important; /* 12px, konsisten */
 }
 
-// ---------- Product Detail Modal Functions (New) ----------
-function openProductDetailModal(itemName) {
-  const product = productList.find(p => p.name === itemName);
-  if (!product) return;
-
-  currentProductDetail = product;
-  currentProductDetailQty = 1;
-  selectedVariant = null; // Reset selected variant
-  selectedToppings = {}; // Reset selected toppings (object for quantities)
-
-  productDetailTitle.textContent = product.name;
-  productDetailDescription.textContent = product.description;
-  detailQtyDisplay.textContent = currentProductDetailQty;
-  updateDetailButtons(currentProductDetailQty);
-
-  // Render images for Swiper (gambar asli)
-  productDetailImagesContainer.innerHTML = '';
-  const productImages = (product.images && product.images.length > 0)
-    ? product.images
-    : [`https://via.placeholder.com/400?text=${encodeURIComponent(product.name)}`];
-
-  productImages.forEach((imgSrc, index) => {
-    const slide = document.createElement('div');
-    slide.className = 'swiper-slide';
-    slide.innerHTML = `
-      <img src="${imgSrc}"
-           alt="${product.name} ${index + 1}"
-           class="product-detail-main-img w-full h-full object-cover rounded-lg cursor-pointer"
-           data-full-src="${imgSrc}"
-           loading="lazy"
-           onerror="this.src='https://via.placeholder.com/400?text=${encodeURIComponent(product.name)}'" />
-    `;
-    productDetailImagesContainer.appendChild(slide);
-  });
-
-  // Initialize Swiper: no loop, navigation, thumbnail bullets
-  if (productDetailModal.swiper) {
-    productDetailModal.swiper.destroy(true, true);
-    productDetailModal.swiper = null;
-  }
-  productDetailModal.swiper = new Swiper(".product-detail-swiper", {
-    loop: true,
-    autoplay: {
-      delay: 2800,
-      disableOnInteraction: false,
-      pauseOnMouseEnter: true,
-    },
-    spaceBetween: 8,
-    navigation: {
-      nextEl: ".product-detail-swiper .swiper-button-next",
-      prevEl: ".product-detail-swiper .swiper-button-prev",
-    },
-    pagination: {
-      el: ".product-detail-pagination",
-      clickable: true,
-      renderBullet: function (index, className) {
-        const thumbSrc = productImages[index] || "";
-        return `<span class="${className}" role="button" aria-label="Gambar ${index + 1}">
-          <img src="${thumbSrc}" alt="Thumb ${index + 1}" loading="lazy"
-               onerror="this.style.display='none'" />
-        </span>`;
-      },
-    },
-  });
-
-  // Klik gambar besar → perbesar (reuse enlarge overlay)
-  productDetailImagesContainer.querySelectorAll(".product-detail-main-img").forEach(img => {
-    img.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const src = img.getAttribute("data-full-src") || img.src;
-      if (typeof window.openQrEnlarge === "function") {
-        window.openQrEnlarge(src);
-      }
-    });
-  });
-
-  // Handle variants
-  if (product.variants && product.variants.length > 0) {
-    productVariantsContainer.classList.remove('hidden');
-    productVariantsOptions.innerHTML = '';
-    product.variants.forEach((variant, index) => {
-      const variantId = `variant-${product.name.replace(/\s/g, '-')}-${index}`;
-      const div = document.createElement('div');
-      div.className = 'variant-option p-2 rounded-md flex items-center justify-between'; // Added class for styling
-      div.innerHTML = `
-        <label for="${variantId}" class="flex items-center gap-2 cursor-pointer flex-1">
-          <input type="radio" id="${variantId}" name="product-variant" value="${variant.name}" data-price-offset="${variant.price}" class="form-radio text-orange-500">
-          <span class="text-sm">${variant.name} (${variant.description})</span>
-        </label>
-        <span class="text-sm font-medium">${variant.price > 0 ? `+ Rp ${variant.price.toLocaleString("id-ID")}` : ''}</span>
-      `;
-      productVariantsOptions.appendChild(div);
-    });
-
-    // Add event listener for variant selection
-    productVariantsOptions.querySelectorAll('input[name="product-variant"]').forEach(radio => {
-      radio.addEventListener('change', (e) => {
-        selectedVariant = {
-          name: e.target.value,
-          priceOffset: Number(e.target.dataset.priceOffset)
-        };
-        updateProductDetailPrice();
-      });
-    });
-    // Select the first variant ("Polos") by default and update price
-    const defaultVariantRadio = productVariantsOptions.querySelector('input[name="product-variant"][value="Polos"]');
-    if (defaultVariantRadio) {
-      defaultVariantRadio.checked = true;
-      selectedVariant = {
-        name: defaultVariantRadio.value,
-        priceOffset: Number(defaultVariantRadio.dataset.priceOffset)
-      };
-    } else { // Fallback if "Polos" not found, select first
-      productVariantsOptions.querySelector('input[name="product-variant"]').checked = true;
-      selectedVariant = {
-        name: product.variants[0].name,
-        priceOffset: product.variants[0].price
-      };
-    }
-    updateProductDetailPrice(); // Call to update price based on initial selection
-
-  } else {
-    productVariantsContainer.classList.add('hidden');
-    productVariantsOptions.innerHTML = '';
-    updateProductDetailPrice(); // Call to update price for products without variants
-  }
-
-  // Handle toppings (New)
-  if (product.toppings && product.toppings.length > 0) {
-    productToppingsContainer.classList.remove('hidden');
-    productToppingsOptions.innerHTML = '';
-    product.toppings.forEach((topping, index) => {
-      const toppingId = `topping-${topping.name.replace(/\s/g, '-')}-${index}`;
-      const div = document.createElement('div');
-      div.className = 'topping-item p-2 rounded-md flex items-center justify-between'; // Added class for styling
-      div.innerHTML = `
-        <div class="flex items-center gap-2 flex-1">
-          <span class="text-sm">${topping.name}</span>
-          <span class="text-sm font-medium">${topping.price > 0 ? `(+ Rp ${topping.price.toLocaleString("id-ID")})` : ''}</span>
-        </div>
-        <div class="topping-controls flex items-center gap-2">
-          <button type="button" class="qty-btn minus-red" data-topping-name="${topping.name}" data-action="minus-topping">
-            <i class="fas fa-minus"></i>
-          </button>
-          <span class="topping-qty text-sm font-bold" id="topping-qty-${topping.name.replace(/\s/g, '-')}" data-topping-name="${topping.name}">0</span>
-          <button type="button" class="qty-btn plus" data-topping-name="${topping.name}" data-action="plus-topping">
-            <i class="fas fa-plus"></i>
-          </button>
-        </div>
-      `;
-      productToppingsOptions.appendChild(div);
-
-      // Initialize topping quantity to 0
-      selectedToppings[topping.name] = { qty: 0, price: topping.price };
-    });
-
-    // Add event listeners for topping quantity buttons
-    productToppingsOptions.querySelectorAll('.qty-btn').forEach(button => {
-      button.addEventListener('click', (e) => {
-        const toppingName = e.currentTarget.dataset.toppingName;
-        const action = e.currentTarget.dataset.action;
-        const toppingQtySpan = document.getElementById(`topping-qty-${toppingName.replace(/\s/g, '-')}`);
-
-        if (action === 'plus-topping') {
-          selectedToppings[toppingName].qty++;
-        } else if (action === 'minus-topping' && selectedToppings[toppingName].qty > 0) {
-          selectedToppings[toppingName].qty--;
-        }
-        toppingQtySpan.textContent = selectedToppings[toppingName].qty;
-        updateProductDetailPrice();
-        updateToppingButtonsState(toppingName);
-      });
-    });
-    // Initial state for topping buttons
-    product.toppings.forEach(topping => updateToppingButtonsState(topping.name));
-
-  } else {
-    productToppingsContainer.classList.add('hidden');
-    productToppingsOptions.innerHTML = '';
-  }
-
-  // Update wishlist button state
-  updateWishlistButtonsState(); // Call this to update the button in the modal
-
-  renderRelatedProductsInModal(product); // Render related products in modal
-
-  openModal(productDetailModal);
-}
-
-function updateToppingButtonsState(toppingName) {
-  const qty = selectedToppings[toppingName].qty;
-  const minusBtn = productToppingsOptions.querySelector(`button[data-topping-name="${toppingName}"][data-action="minus-topping"]`);
-  if (minusBtn) {
-    minusBtn.disabled = qty <= 0;
-    minusBtn.className = qty <= 0 ? "qty-btn minus-gray" : "qty-btn minus-red";
-  }
-}
-
-function updateProductDetailPrice() {
-  let basePrice = currentProductDetail.price;
-  if (currentProductDetail.variants && selectedVariant) {
-    basePrice += selectedVariant.priceOffset;
-  }
-  // Add price of selected toppings based on their quantities
-  for (const toppingName in selectedToppings) {
-    basePrice += selectedToppings[toppingName].price * selectedToppings[toppingName].qty;
-  }
-  productDetailPrice.textContent = `Rp ${basePrice.toLocaleString("id-ID")}`;
-}
-
-function updateDetailButtons(qty) {
-  detailMinusBtn.disabled = qty <= 1;
-  detailMinusBtn.className = qty <= 1 ? "qty-btn minus-gray" : "qty-btn minus-red";
-}
-
-// ---------- Related Products Functions (New) ----------
-function renderRelatedProducts(excludeProduct = null, targetContainer = relatedProductsContainer) {
-  const allProducts = [...productList];
-  let filteredProducts = allProducts;
-
-  if (excludeProduct) {
-    filteredProducts = allProducts.filter(p => p.name !== excludeProduct.name);
-  }
-
-  // Shuffle products and take a few (e.g., 4)
-  const shuffled = filteredProducts.sort(() => 0.5 - Math.random());
-  const recommended = shuffled.slice(0, 4);
-
-  if (recommended.length > 0) {
-    relatedProductsSection.classList.remove('hidden');
-    displayProducts(recommended, targetContainer); // Use displayProducts to render with full product-card style
-  } else {
-    relatedProductsSection.classList.add('hidden');
-    targetContainer.innerHTML = '';
-  }
-}
-
-function renderRelatedProductsInModal(currentProduct) {
-  const allProducts = [...productList];
-  const filteredProducts = allProducts.filter(p => p.name !== currentProduct.name);
-
-  // Shuffle products and take a few (e.g., 2 for modal)
-  const shuffled = filteredProducts.sort(() => 0.5 - Math.random());
-  const recommended = shuffled.slice(0, 2);
-
-  relatedProductsModalList.innerHTML = '';
-  if (recommended.length > 0) {
-    recommended.forEach(item => {
-      const card = document.createElement("div");
-      // Use the same product-card class for consistency
-      card.className = "product-card cursor-pointer"; // Added cursor-pointer for clickability
-      card.setAttribute("data-name", item.name);
-      card.innerHTML = `
-        <img src="${item.images && item.images.length > 0 ? item.images[0] : `https://via.placeholder.com/120?text=${encodeURIComponent(item.name)}`}"
-             class="w-full h-32 object-cover rounded-lg mb-3">
-        <h4 class="font-semibold text-base mb-1">${item.name}</h4>
-        <p class="text-sm text-green-600 mb-2">Rp ${item.price.toLocaleString("id-ID")}</p>
-      `;
-      card.addEventListener('click', () => {
-        closeModal(productDetailModal); // Close current modal
-        openProductDetailModal(item.name); // Open new modal for related product
-      });
-      relatedProductsModalList.appendChild(card);
-    });
-  } else {
-    relatedProductsModalList.innerHTML = '<p class="text-center text-gray-500 text-sm col-span-2">Tidak ada rekomendasi.</p>';
-  }
+body.dark #menu-section h3 {
+  margin-bottom: 0.75rem !important; /* samakan, cegah gap berlebihan */
 }
 
 
-// ---------- Payment Functions ----------
-function generateOrderMessage() {
-  const items = Object.values(cart);
-  let totalOriginal = items.reduce((sum, item) => sum + item.qty * item.price, 0);
-  let totalAfterDiscount = finalDiscountedPrice;
-
-  const checkoutName = (document.getElementById("checkout-name")?.value || "").trim();
-  const checkoutAddress = (document.getElementById("checkout-address")?.value || "").trim();
-
-  let message = `🛒 *PESANAN BARU*\n\n`;
-  message += `📍 *KEDAI MAS HARIS*\n`;
-  message += `⏰ ${new Date().toLocaleString('id-ID')}\n\n`;
-
-  message += `👤 *Data Pemesan:*\n`;
-  message += `Nama: ${checkoutName}\n`;
-  message += `Alamat Pengantaran: ${checkoutAddress}\n\n`;
-
-  message += `📋 *Detail Pesanan:*\n`;
-
-  items.forEach((item, index) => {
-    message += `${index + 1}. ${item.name}`;
-    if (item.variant) {
-      message += ` (${item.variant})`;
-    }
-    if (item.toppings && item.toppings.length > 0) {
-      const toppingStrings = item.toppings.map(t => `${t.name} (${t.qty})`);
-      message += ` + ${toppingStrings.join(', ')}`;
-    }
-    message += `\n`;
-    message += `   ${item.qty} x Rp ${item.price.toLocaleString('id-ID')} = Rp ${(item.qty * item.price).toLocaleString('id-ID')}\n\n`;
-  });
-
-  if (promoApplied) {
-    message += `\n🎉 *PROMO DITERAPKAN!* 🎉\n`;
-    message += `Menggunakan Kode Promo: *${currentPromo.code}*\n`;
-    message += `Mendapatkan potongan ${currentPromo.discountPercentage * 100}% 💰\n`;
-    message += `Harga Asli: Rp ${totalOriginal.toLocaleString('id-ID')}\n`;
-    message += `Diskon: Rp ${(totalOriginal - totalAfterDiscount).toLocaleString('id-ID')}\n`;
-  }
-
-  message += `💰 *Total Bayar: Rp ${totalAfterDiscount.toLocaleString('id-ID')}*\n\n`;
-  message += `💳 *Metode Pembayaran: ${currentPaymentMethod}*\n\n`;
-  message += `Terima kasih! 🙏`;
-
-  return message;
+/* Dark mode product cards */
+body.dark .product-card {
+  background: rgba(51, 65, 85, 0.75);
+  min-height: 280px;
+  margin-top: 0;     /* pastikan tidak ada margin tambahan */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.15);
+  padding: 1rem !important; /* default 1.25rem → diperkecil biar rapat */
 }
 
-function copyToClipboard(text) {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => {
-      showBadge(copiedBadge, "Nomor disalin");
-    }).catch(() => {
-      // Fallback if writeText fails (e.g., not in a secure context)
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      showBadge(copiedBadge, "Nomor disalin");
-    });
-  } else {
-    // Fallback for older browsers
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textArea);
-    showBadge(copiedBadge, "Nomor disalin");
-  }
+body.dark .product-card::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
 }
 
-function isDeliveryFormValid() {
-  const name = (document.getElementById("checkout-name")?.value || "").trim();
-  const address = (document.getElementById("checkout-address")?.value || "").trim();
-  return name.length > 0 && address.length > 0;
+/* Hover effects - consistent positioning */
+.product-card:hover {
+  transform: translateY(-2px);
+  /* Light mode hover: dark shadow */
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.2),
+    0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
-function updateSendWaButtonState() {
-  const sendWaBtn = document.getElementById("send-wa");
-  const hint = document.getElementById("delivery-form-hint");
-  if (!sendWaBtn) return;
-
-  const valid = isDeliveryFormValid();
-  sendWaBtn.disabled = !valid;
-  if (hint) {
-    if (valid) {
-      hint.classList.add("hidden");
-    } else {
-      hint.classList.remove("hidden");
-    }
-  }
+body.dark .product-card:hover {
+  /* Dark mode hover: light shadow */
+  box-shadow:
+    0 8px 25px rgba(255, 255, 255, 0.15),
+    0 3px 8px rgba(255, 255, 255, 0.08);
 }
 
-function resetDeliveryForm() {
-  const nameInput = document.getElementById("checkout-name");
-  const addressInput = document.getElementById("checkout-address");
-  if (nameInput) nameInput.value = "";
-  if (addressInput) addressInput.value = "";
-  updateSendWaButtonState();
+/* Copy button styles */
+.copy-btn {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
 }
 
-function sendToWhatsApp() {
-  // Blokir jika data pengantaran belum lengkap
-  if (!isDeliveryFormValid()) {
-    showNotif("Harap isi nama dan alamat pengantaran!");
-    updateSendWaButtonState();
-    const nameInput = document.getElementById("checkout-name");
-    if (nameInput && !nameInput.value.trim()) nameInput.focus();
-    else document.getElementById("checkout-address")?.focus();
-    return;
-  }
-
-  const message = generateOrderMessage();
-  const encodedMessage = encodeURIComponent(message);
-  const whatsappUrl = `https://wa.me/${WA_PHONE}?text=${encodedMessage}`;
-
-  // Buka WhatsApp DULU (harus langsung dari user click agar tidak diblokir browser)
-  const waWindow = window.open(whatsappUrl, '_blank');
-  if (!waWindow) {
-    // Fallback jika popup diblokir
-    window.location.href = whatsappUrl;
-  }
-
-  // Update promo usage count if promo was applied for this transaction
-  if (promoApplied && promoUsage[currentPromo.code] && promoUsage[currentPromo.code].currentTransactionId === currentTransactionId) {
-      promoUsage[currentPromo.code].count++;
-      promoUsage[currentPromo.code].currentTransactionId = null;
-      savePromoUsage();
-  }
-
-  // Clear cart after sending order
-  Object.keys(cart).forEach(key => delete cart[key]);
-  updateCartCount();
-
-  showBadge(sentBadge, "Pesanan terkirim");
-  resetDeliveryForm();
-  closeAllModals();
-
-  // Generate a new transaction ID for the next potential transaction
-  currentTransactionId = Date.now().toString();
+.copy-btn:hover {
+  background: #e5e7eb;
 }
 
-// ---------- New: Update Notification Modal Functions ----------
-function renderUpdateModalContent() {
-  updateContent.innerHTML = '';
-  updateLog.forEach(log => {
-    const updateItem = document.createElement('div');
-    updateItem.className = 'update-item';
-
-    const title = document.createElement('h4');
-    title.textContent = `Versi ${log.version}`;
-    updateItem.appendChild(title);
-
-    // Mengubah format tanggal menjadi "Diperbarui pada [tanggal]"
-    const dateElement = document.createElement('p');
-    dateElement.className = 'update-date'; // Menambahkan kelas untuk styling
-    dateElement.textContent = `Diperbarui pada ${new Date(log.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
-    updateItem.appendChild(dateElement);
-
-    const ul = document.createElement('ul');
-    ul.className = 'list-disc list-inside text-sm';
-    log.changes.forEach(change => {
-      const li = document.createElement('li');
-      li.textContent = change;
-      ul.appendChild(li);
-    });
-    updateItem.appendChild(ul);
-
-    updateContent.appendChild(updateItem);
-  });
-
-  promoText.textContent = currentPromo.text;
+/* Dark Mode Styles */
+body.dark {
+  background: #1a2332;
+  color: #e2e8f0;
 }
 
-function showUpdateModal() {
-  renderUpdateModalContent();
+body.dark header {
+  background: transparent; /* 0.35 = tingkat transparansi */
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-  // Get the latest version from your updateLog data
-  const latestVersion = updateLog[0].version;
+body.dark .modal {
+  background: #334155;
+  color: #e2e8f0;
+}
 
-  // Check if the latest version has been seen
-  const lastSeenVersion = localStorage.getItem(LAST_SEEN_UPDATE_VERSION_KEY);
+body.dark .product-card,
+body.dark .bg-white {
+  background: #475569 !important;
+  color: #e2e8f0;
+}
 
-  // Check cooldown (only applies when user previously checked "jangan tampilkan 10 menit")
-  const lastShownTime = localStorage.getItem(UPDATE_MODAL_COOLDOWN_KEY);
-  const currentTime = new Date().getTime();
-  const isInCooldown = lastShownTime && (currentTime - parseInt(lastShownTime, 10) < UPDATE_MODAL_COOLDOWN_DURATION);
+body.dark .category-card {
+  color: #fff;
+}
 
-  // Show if: (new version) OR (cooldown already expired / never set)
-  // Do NOT show only when same version AND still inside the 10-minute cooldown
-  if (lastSeenVersion === latestVersion && isInCooldown) {
-    console.log('Update modal is in cooldown. Not showing.');
-    return;
+body.dark .category-card[data-kategori="all"] {
+  background-image: linear-gradient(45deg, #2563eb, #1d4ed8);
+}
+
+body.dark .category-card[data-kategori="all"].active {
+  border: 3px solid #60a5fa;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+body.dark .category-card[data-kategori="Karbohidrat"] {
+  background-image: linear-gradient(45deg, #16a34a, #15803d);
+}
+
+body.dark .category-card[data-kategori="Karbohidrat"].active {
+  border: 3px solid #4ade80;
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+}
+
+body.dark .category-card[data-kategori="Asin"] {
+  background-image: linear-gradient(45deg, #ca8a04, #a16207);
+}
+
+body.dark .category-card[data-kategori="Asin"].active {
+  border: 3px solid #fbbf24;
+  box-shadow: 0 8px 25px rgba(234, 179, 8, 0.4);
+}
+
+body.dark .category-card[data-kategori="Manis"] {
+  background-image: linear-gradient(45deg, #db2777, #be185d);
+}
+
+body.dark .category-card[data-kategori="Manis"].active {
+  border: 3px solid #f472b6;
+  box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
+}
+
+/* Hover effects for dark mode */
+body.dark .category-card:hover {
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+/* Additional animation for smooth transitions */
+.category-card {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-
-  openModal(updateModal);
-  // Store the latest version as seen
-  localStorage.setItem(LAST_SEEN_UPDATE_VERSION_KEY, latestVersion);
-  // Reset checkbox state every time modal is shown
-  if (dontShowAgainCheckbox) {
-    dontShowAgainCheckbox.checked = false;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-// Safe close for update modal (normal close only, no dispersion effect)
-function closeUpdateModalSafely() {
-  // Apply cooldown if checkbox is checked at the moment of closing
-  if (dontShowAgainCheckbox && dontShowAgainCheckbox.checked) {
-    localStorage.setItem(UPDATE_MODAL_COOLDOWN_KEY, new Date().getTime().toString());
-  } else {
-    localStorage.removeItem(UPDATE_MODAL_COOLDOWN_KEY);
-  }
-
-  // Remove from stack
-  modalStack = modalStack.filter(m => m !== updateModal);
-
-  // Normal close animation
-  gsap.to(updateModal, {
-    duration: 0.3,
-    opacity: 0,
-    ease: "power2.in",
-    onComplete: () => {
-      gsap.set(updateModal, { display: "none" });
-      updateModal.style.transform = "";
-      updateModal.setAttribute("aria-hidden", "true");
-    }
-  });
-  gsap.to(overlay, {
-    duration: 0.25,
-    opacity: 0,
-    ease: "power2.in",
-    onComplete: () => {
-      gsap.set(overlay, { display: "none" });
-      overlay.setAttribute("aria-hidden", "true");
-      overlay.style.pointerEvents = "none";
-    }
-  });
+/* Soft transition for all effects */
+.category-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-// ---------- New: Dispersion Effect with Three.js ----------
-let scene, camera, renderer, mesh, material, geometry;
-let uniforms;
-let animationFrameId;
-
-function initDispersionEffectWithTexture(canvasTextureSource, width, height, x, y) {
-    // Set canvas size and position
-    dispersionCanvas.width = window.innerWidth;
-    dispersionCanvas.height = window.innerHeight;
-    dispersionCanvas.style.display = 'block'; // Show canvas
-
-    // Scene
-    scene = new THREE.Scene();
-
-    // Camera
-    camera = new THREE.OrthographicCamera(
-        -window.innerWidth / 2, window.innerWidth / 2,
-        window.innerHeight / 2, -window.innerHeight / 2,
-        1, 1000
-    );
-    camera.position.z = 1;
-
-    // Renderer
-    renderer = new THREE.WebGLRenderer({ canvas: dispersionCanvas, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-
-    const texture = new THREE.CanvasTexture(canvasTextureSource);
-
-    // Shader Uniforms
-    uniforms = {
-        u_texture: { value: texture },
-        u_progress: { value: 0.0 },
-        u_resolution: { value: new THREE.Vector2(width, height) },
-        u_mouse: { value: new THREE.Vector2(x + width / 2, window.innerHeight - (y + height / 2)) }, // Center of modal
-        u_time: { value: 0.0 }
-    };
-
-    // Shader Material
-    material = new THREE.ShaderMaterial({
-        uniforms: uniforms,
-        vertexShader: `
-            varying vec2 vUv;
-            void main() {
-                vUv = uv;
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-        `,
-        fragmentShader: `
-            uniform sampler2D u_texture;
-            uniform float u_progress;
-            uniform vec2 u_resolution;
-            uniform vec2 u_mouse;
-            uniform float u_time;
-            varying vec2 vUv;
-
-            void main() {
-                vec2 uv = vUv;
-                vec2 mouse_uv = u_mouse / u_resolution; // Mouse position in UV space
-
-                // Simple dispersion based on distance from mouse/center
-                float dist = distance(uv, mouse_uv);
-                float strength = smoothstep(0.0, 0.5, dist) * u_progress; // Dispersion strength increases with progress
-
-                vec2 displaced_uv = uv + normalize(uv - mouse_uv) * strength * 0.1; // Displace UVs
-
-                // Add some noise for a more organic look
-                float noise = fract(sin(dot(uv * 100.0, vec2(12.9898, 78.233))) * 43758.5453);
-                displaced_uv += noise * strength * 0.05;
-
-                vec4 color = texture2D(u_texture, displaced_uv);
-
-                // Fade out effect
-                color.a *= (1.0 - u_progress);
-
-                gl_FragColor = color;
-            }
-        `,
-        transparent: true
-    });
-
-    // Plane Geometry (covering the modal area)
-    geometry = new THREE.PlaneGeometry(width, height);
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x + width / 2 - window.innerWidth / 2, window.innerHeight / 2 - (y + height / 2), 0); // Position in orthographic camera space
-    scene.add(mesh);
-
-    animateDispersion();
+body.dark .bg-gray-50,
+body.dark .bg-gray-100 {
+  background: #475569 !important;
+  color: #e2e8f0;
 }
 
-function animateDispersion() {
-    uniforms.u_time.value += 0.05;
-    uniforms.u_progress.value += 0.02; // Increase progress for dispersion
-    if (uniforms.u_progress.value < 1.0) {
-        renderer.render(scene, camera);
-        animationFrameId = requestAnimationFrame(animateDispersion);
-    } else {
-        cancelAnimationFrame(animationFrameId);
-        dispersionCanvas.style.display = 'none'; // Hide canvas after animation
-        // Clean up Three.js resources
-        if (mesh) scene.remove(mesh);
-        if (geometry) geometry.dispose();
-        if (material) material.dispose();
-        if (uniforms.u_texture.value) uniforms.u_texture.value.dispose();
-        scene = null;
-        camera = null;
-        renderer = null;
-        mesh = null;
-        material = null;
-        geometry = null;
-        uniforms = null;
-    }
+body.dark .text-gray-500,
+body.dark .text-gray-600 {
+  color: #94a3b8 !important;
 }
 
-function startDispersionEffect(modalElement) {
-    // Temporarily show the modal to capture its content
-    // Ensure modal is visible for html2canvas to capture it correctly
-    modalElement.style.display = 'block';
-    modalElement.setAttribute("aria-hidden", "false");
-    modalElement.style.opacity = '1'; // Ensure it's fully opaque for capture
-    modalElement.style.transform = 'translate(-50%, -50%) scale(1)'; // Ensure it's at its final size for capture
+body.dark .text-gray-800,
+body.dark .text-gray-900 {
+  color: #e2e8f0 !important;
+}
 
-    html2canvas(modalElement, {
-        backgroundColor: null, // Important for transparency
-        useCORS: true // If there are images from other domains
-    }).then(canvas => {
-        // Hide the original HTML modal after capturing the image
-        modalElement.style.display = 'none';
-        modalElement.setAttribute("aria-hidden", "true");
-        modalElement.style.opacity = '0'; // Reset opacity
-        modalElement.style.transform = 'translate(-50%, -50%) scale(0.8)'; // Reset transform
+body.dark .bg-gray-200 {
+  background: #64748b !important;
+  color: #e2e8f0 !important;
+}
 
-        // Get the bounding box of the modal from the original element for screen positioning
-        const rect = modalElement.getBoundingClientRect();
-        const width = canvas.width; // Use canvas dimensions for texture
-        const height = canvas.height;
-        const x = rect.left;
-        const y = rect.top;
+body.dark .border {
+  border-color: #64748b !important;
+}
 
-        // Initialize Three.js with the captured canvas as a texture
-        initDispersionEffectWithTexture(canvas, width, height, x, y);
+body.dark .info-left {
+  color: #e2e8f0 !important;
+}
 
-        // Ensure overlay is also closed after dispersion starts
-        gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
-            gsap.set(overlay, { display: "none" });
-            overlay.setAttribute("aria-hidden", "true");
-            overlay.style.pointerEvents = "none";
-        }});
+body.dark .copy-btn {
+  background: #64748b;
+  border-color: #475569;
+  color: #e2e8f0;
+}
 
-    }).catch(error => {
-        console.error("Error capturing modal with html2canvas:", error);
-        // Fallback: Directly hide the modal if capture fails
-        modalElement.style.display = 'none';
-        modalElement.setAttribute("aria-hidden", "true");
-        // Ensure overlay is also closed
-        gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
-            gsap.set(overlay, { display: "none" });
-            overlay.setAttribute("aria-hidden", "true");
-            overlay.style.pointerEvents = "none";
-        }});
-    });
+body.dark .copy-btn:hover {
+  background: #475569;
+}
+
+/* Contrast improvements */
+body.dark .text-orange-500 {
+  color: #fb923c !important; /* orange-400 for better contrast in dark mode */
+}
+
+body.dark .bg-orange-500 {
+  background-color: #fb923c !important;
+}
+
+/* Wishlist button style */
+.btn-wishlist {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  border: 2px solid transparent; /* Add transparent border for animation */
+}
+
+.btn-wishlist:not(.wishlist-active) {
+  background-color: transparent;
+  color: #ec4899;
+}
+
+.btn-wishlist.wishlist-active {
+  background-color: #ec4899;
+  color: white;
+}
+
+body.dark .btn-wishlist:not(.wishlist-active) {
+  color: #fff;
+}
+
+body.dark .btn-wishlist.wishlist-active {
+  background-color: #be185d;
+}
+
+/* Hover effect for wishlist button */
+.btn-wishlist:hover {
+  border-color: #ec4899; /* Pink border on hover for light mode */
+  box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.2); /* Soft glow */
+}
+
+body.dark .btn-wishlist:hover {
+  border-color: #fff; /* White border on hover for dark mode */
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2); /* Soft glow */
+}
+
+/* Info content styles */
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+body.dark .info-item {
+  background: #475569;
+}
+
+.info-left {
+  font-weight: 500;
+  color: #374151;
+}
+
+.info-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: monospace;
+  font-weight: 600;
 }
 
 
-// ---------- Event Listeners ----------
-document.addEventListener('DOMContentLoaded', () => {
-  // Load data from localStorage
-  loadCartFromLocalStorage();
-  loadWishlistFromLocalStorage();
-  loadUsedPromoCodes(); // New: Load used promo codes (this is for the global `usedPromoCodes` set, not the `promoUsage` object)
-  loadPromoUsage(); // New: Load promo usage data
+/* SOLUSI LENGKAP UNTUK SWIPER BANNER "COMING SOON" */
 
-  // Generate a new transaction ID on page load
-  currentTransactionId = Date.now().toString();
+/* Fix container swiper agar tidak bocor */
+.banner-section {
+  width: 100%;
+  max-width: 100%;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  overflow: hidden; /* Penting untuk mencegah bocor */
+  position: relative;
+}
 
-  // Register ScrollToPlugin
-  gsap.registerPlugin(ScrollToPlugin);
+/* Swiper container fix */
+.swiper {
+  width: 100%;
+  height: 100%; /* Tinggi tetap agar konsisten */
+  border-radius: 1.5rem;
+  overflow: hidden; /* Mencegah slide bocor keluar */
+  position: relative;
+}
 
-  // Dark mode initialization
-  let currentTheme = 'light';
-  try {
-    currentTheme = localStorage.getItem('theme') || 'light';
-    if (currentTheme === 'dark') {
-      document.body.classList.add('dark');
-      darkModeIcon.classList.remove('fa-moon');
-      darkModeIcon.classList.add('fa-sun');
-    } else {
-      document.body.classList.remove('dark');
-      darkModeIcon.classList.remove('fa-sun');
-      darkModeIcon.classList.add('fa-moon');
-    }
-  } catch (e) {
-    darkModeIcon.classList.add('fa-moon');
+.mySwiper {
+  margin: 0; /* Remove margins */
+  padding: 0; /* Remove padding */
+}
+
+.swiper-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.swiper-slide {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 2rem;
+  border-radius: 1.5rem;
+  text-align: center;
+  height: 100%;
+  width: 100%; /* Pastikan slide mengambil lebar penuh */
+  flex-shrink: 0; /* Mencegah slide menyusut */
+  transition: background-color 0.3s ease;
+}
+
+.swiper-slide h2 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  transition: color 0.3s ease;
+}
+
+.swiper-slide p {
+  font-size: 1.1rem;
+  padding: 0.6rem 1.5rem;
+  border-radius: 2rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Navigation Arrows - Desain yang bagus */
+.swiper-button-next,
+.swiper-button-prev {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  margin-top: 0;
+  /* Mengubah background menjadi transparan */
+  background: rgba(255, 255, 255, 0.1); /* Lebih transparan */
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background: rgba(255, 255, 255, 0.2); /* Sedikit lebih solid saat hover */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.swiper-button-next {
+  right: 20px;
+}
+
+.swiper-button-prev {
+  left: 20px;
+}
+
+/* Custom Arrow Icons */
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: 18px;
+  color: #374151;
+  transition: color 0.3s ease;
+}
+
+.swiper-button-next::after {
+  content: '\f054'; /* fa-chevron-right */
+}
+
+.swiper-button-prev::after {
+  content: '\f053'; /* fa-chevron-left */
+}
+
+.swiper-button-next:hover::after,
+.swiper-button-prev:hover::after {
+  color: #f97316; /* Orange saat hover */
+}
+
+/* Dark mode untuk navigation */
+body.dark .swiper-button-next,
+body.dark .swiper-button-prev {
+  background: rgba(31, 41, 55, 0.1); /* Lebih transparan di dark mode */
+  border: 1px solid rgba(156, 163, 175, 0.2);
+}
+
+body.dark .swiper-button-next:hover,
+body.dark .swiper-button-prev:hover {
+  background: rgba(31, 41, 55, 0.2); /* Sedikit lebih solid saat hover di dark mode */
+}
+
+body.dark .swiper-button-next::after,
+body.dark .swiper-button-prev::after {
+  color: #f3f4f6;
+}
+
+body.dark .swiper-button-next:hover::after,
+body.dark .swiper-button-prev:hover::after {
+  color: #f97316;
+}
+
+/* Pagination bullets styling yang lebih bagus */
+.swiper-pagination {
+  bottom: 20px !important;
+  text-align: center;
+}
+
+.swiper-pagination-bullet {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 1;
+  margin: 0 6px;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.swiper-pagination-bullet-active {
+  background: #f97316;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  transform: scale(1.2);
+}
+
+/* Dark mode pagination */
+body.dark .swiper-pagination-bullet {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+body.dark .swiper-pagination-bullet-active {
+  background: #f97316;
+  border: 2px solid rgba(31, 41, 55, 0.8);
+}
+
+/* Light mode banner colors - Fix overflow */
+.swiper-slide.bg-lime-300 {
+  background-color: #a7f3d0;
+}
+.swiper-slide.bg-teal-300 {
+  background-color: #99f6e4;
+}
+.swiper-slide.bg-orange-300 {
+  background-color: #fed7aa;
+}
+
+.swiper-slide h2 {
+  color: #374151;
+}
+
+.swiper-slide p {
+  background-color: white;
+  color: #10b981;
+}
+
+/* Dark Mode Banner Colors */
+body.dark .bg-lime-300 {
+  background: #064e3b !important;
+}
+
+body.dark .bg-lime-300 h2 {
+  color: #34d399 !important;
+}
+
+body.dark .bg-lime-300 p {
+  background: #059669 !important;
+  color: #ecfdf5 !important;
+}
+
+body.dark .bg-teal-300 {
+  background: #0f766e !important;
+}
+
+body.dark .bg-teal-300 h2 {
+  color: #5eead4 !important;
+}
+
+body.dark .bg-teal-300 p {
+  background: #0d9488 !important;
+  color: #ecfdf5 !important;
+}
+
+body.dark .bg-orange-300 {
+  background: #9a3412 !important;
+}
+
+body.dark .bg-orange-300 h2 {
+  color: #fdba74 !important;
+}
+
+body.dark .bg-orange-300 p {
+  background: #c2410c !important;
+  color: #ecf5 !important;
+}
+
+/* Responsive untuk mobile */
+@media (max-width: 768px) {
+  .swiper {
+    height: 250px;
   }
 
-  // Search handlers
-  document.getElementById("search-trigger").addEventListener("click", () => {
-    openModal(searchModal);
-    searchInput.value = "";
-    setTimeout(() => searchInput.focus(), 100);
-  });
-
-  searchInput.addEventListener("input", () => {
-    const query = searchInput.value.trim().toLowerCase();
-    if (!query) {
-      renderMenu();
-    } else {
-      const filtered = productList.filter(item =>
-        item.name.toLowerCase().includes(query)
-      );
-      displayProducts(filtered);
-    }
-  });
-
-  doSearchBtn.addEventListener("click", () => {
-    const query = searchInput.value.trim().toLowerCase();
-    if (!query) {
-      renderMenu();
-    } else {
-      const filtered = productList.filter(item =>
-        item.name.toLowerCase().includes(query)
-      );
-      displayProducts(filtered);
-    }
-    closeAllModals(); // Close search modal after search
-  });
-
-  searchInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") doSearchBtn.click();
-  });
-
-  // Category buttons
-  kategoriButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      kategoriButtons.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      renderMenu(btn.dataset.kategori);
-    });
-  });
-
-  // Cart button - FIXED: Reset promo state properly when opening cart
-  document.getElementById("cart-btn").addEventListener("click", () => {
-    // Reset promo input and message when opening cart
-    promoCodeInput.value = '';
-    promoMessage.classList.add('hidden');
-    promoApplied = false; // Reset promo status completely when opening cart
-    updateCartTotal(); // Ensure total is recalculated without any promo
-
-    if (Object.keys(cart).length === 0) {
-      showNotif("Keranjang kosong");
-      return; // Do not open modal if cart is empty
-    }
-    renderCart();
-    openModal(cartModal);
-  });
-
-  // Promo code handlers
-  applyPromoBtn.addEventListener('click', applyPromoCode);
-  promoCodeInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      applyPromoCode();
-    }
-  });
-
-  // Wishlist button
-  document.getElementById("wishlist-btn").addEventListener("click", () => {
-    renderWishlist();
-    openModal(wishlistModal);
-  });
-
-  // Edit cart handlers
-  document.getElementById("edit-minus-btn").addEventListener("click", () => {
-    if (currentEditItem && cart[currentEditItem] && cart[currentEditItem].qty > 1) {
-      cart[currentEditItem].qty--;
-      document.getElementById("edit-qty-display").textContent = cart[currentEditItem].qty;
-      updateEditButtons(cart[currentEditItem].qty);
-      showNotif(`Jumlah ${cart[currentEditItem].name} berkurang`);
-      updateCartTotal(); // Update total after quantity change
-    }
-  });
-
-  document.getElementById("edit-plus-btn").addEventListener("click", () => {
-    if (currentEditItem && cart[currentEditItem]) {
-      cart[currentEditItem].qty++;
-      document.getElementById("edit-qty-display").textContent = cart[currentEditItem].qty;
-      updateEditButtons(cart[currentEditItem].qty);
-      showNotif(`Jumlah ${cart[currentEditItem].name} bertambah`);
-      updateCartTotal(); // Update total after quantity change
-    }
-  });
-
-  document.getElementById("save-edit-cart").addEventListener("click", () => {
-    updateCartCount();
-    updateCartTotal();
-    renderCart();
-    showNotif("Perubahan disimpan");
-    // Kembali ke cart (hapus edit dari stack, tampilkan cart)
-    goBackToPreviousModal();
-  });
-
-  // Clear cart and confirm delete handlers
-  document.getElementById("clear-cart-btn").addEventListener("click", () => {
-    currentDeleteType = 'all';
-    document.getElementById("confirm-delete-message").textContent = "Hapus semua item dari keranjang?";
-
-    // Sembunyikan cart, buka konfirmasi (cart tetap di stack)
-    gsap.to(cartModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
-      gsap.set(cartModal, { display: "none" });
-      cartModal.style.transform = "";
-      cartModal.setAttribute("aria-hidden", "true");
-      openModal(confirmDeleteModal);
-    }});
-  });
-
-  document.getElementById("confirm-delete-yes").addEventListener("click", () => {
-    if (currentDeleteType === 'item' && currentDeleteItem) {
-      delete cart[currentDeleteItem];
-      showNotif(`${currentDeleteItem} dihapus dari keranjang`);
-      currentDeleteItem = null;
-    } else if (currentDeleteType === 'all') {
-      Object.keys(cart).forEach(key => delete cart[key]);
-      showNotif("Semua item berhasil dihapus");
-    }
-
-    updateCartCount();
-    updateCartTotal();
-    renderCart();
-    currentDeleteType = null;
-    // Kembali ke cart
-    goBackToPreviousModal();
-  });
-
-  // Checkout handler
-  document.getElementById("checkout-btn").addEventListener("click", () => {
-    if (Object.keys(cart).length === 0) {
-      showNotif("Keranjang kosong");
-      closeModal(cartModal);
-      return;
-    }
-
-    // Sembunyikan cart, buka payment (cart tetap di stack agar Kembali bisa kembali)
-    gsap.to(cartModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
-      gsap.set(cartModal, { display: "none" });
-      cartModal.style.transform = "";
-      cartModal.setAttribute("aria-hidden", "true");
-      // Reset sub-pilihan bank
-      const bo = document.getElementById("bank-options");
-      if (bo) bo.classList.add("hidden");
-      ["pay-cash","pay-dana","pay-transfer","pay-qris"].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.remove("hidden");
-      });
-      const title = document.getElementById("payment-title");
-      if (title) title.textContent = "Pilih Metode Pembayaran";
-      openModal(paymentModal);
-    }});
-  });
-
-  // Payment method handlers
-  document.getElementById("pay-cash").addEventListener("click", () => {
-    currentPaymentMethod = "Tunai";
-    currentOrderData = {
-      method: "cash",
-      info: "Pembayaran tunai saat pengambilan pesanan"
-    };
-
-    document.getElementById("info-title").textContent = "Pembayaran Tunai";
-    document.getElementById("info-content").innerHTML = `
-
-      <div class="text-center py-4">
-        <div class="text-6xl mb-3">
-          <i class="fas fa-money-bill-wave text-green-500"></i>
-        </div>
-        <p class="info-hint mb-2">Siapkan uang tunai saat pengambilan pesanan</p>
-        <p class="font-semibold text-lg">Total: Rp ${finalDiscountedPrice.toLocaleString('id-ID')}</p>
-      </div>
-    `;
-    // Hide QR code for cash payment
-    danaQrCodeImg.classList.add('hidden');
-    danaQrCodeImg.src = '';
-
-    // Close payment modal first, then open info modal
-    gsap.to(paymentModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
-      gsap.set(paymentModal, { display: "none" });
-      paymentModal.style.transform = "";
-      paymentModal.setAttribute("aria-hidden", "true");
-      openModal(infoModal);
-    }});
-  });
-
-  document.getElementById("pay-dana").addEventListener("click", () => {
-    currentPaymentMethod = "DANA";
-    currentOrderData = {
-      method: "dana",
-      number: DANA_NUMBER,
-      name: DANA_NAME
-    };
-
-    document.getElementById("info-title").textContent = "Pembayaran DANA";
-    document.getElementById("info-content").innerHTML = `
-      <div class="space-y-3">
-        <div class="info-item">
-          <span class="info-left">Nomor DANA:</span>
-          <span class="info-right">
-            ${DANA_NUMBER}
-            <button class="copy-btn-inline" onclick="copyToClipboard(\`${DANA_NUMBER}\`)">
-              <i class="fas fa-copy"></i>
-            </button>
-          </span>
-        </div>
-        <div class="info-item">
-          <span class="info-left">Atas Nama:</span>
-          <span class="info-right">${DANA_NAME}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-left">Total Bayar:</span>
-          <span class="info-right">Rp ${finalDiscountedPrice.toLocaleString('id-ID')}</span>
-        </div>
-        <p class="info-hint text-sm text-center">Silakan scan QR Code atau transfer ke nomor DANA di atas, lalu klik "Kirim WA" untuk konfirmasi pesanan</p>
-      </div>
-    `;
-    // Show QR code for DANA payment
-    danaQrCodeImg.src = DANA_QR_CODE_PATH;
-    danaQrCodeImg.classList.remove('hidden');
-
-    // Close payment modal first, then open info modal
-    gsap.to(paymentModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
-      gsap.set(paymentModal, { display: "none" });
-      paymentModal.style.transform = "";
-      paymentModal.setAttribute("aria-hidden", "true");
-      openModal(infoModal);
-    }});
-  });
-
-  // Helper: tampilkan / sembunyikan sub-pilihan bank
-  const bankOptionsEl = document.getElementById("bank-options");
-  const mainPayButtons = [
-    document.getElementById("pay-cash"),
-    document.getElementById("pay-dana"),
-    document.getElementById("pay-transfer"),
-    document.getElementById("pay-qris")
-  ];
-
-  function showBankOptions() {
-    mainPayButtons.forEach(btn => { if (btn) btn.classList.add("hidden"); });
-    if (bankOptionsEl) bankOptionsEl.classList.remove("hidden");
-    document.getElementById("payment-title").textContent = "Pilih Bank";
+  .swiper-slide h2 {
+    font-size: 2rem;
   }
 
-  function hideBankOptions() {
-    mainPayButtons.forEach(btn => { if (btn) btn.classList.remove("hidden"); });
-    if (bankOptionsEl) bankOptionsEl.classList.add("hidden");
-    document.getElementById("payment-title").textContent = "Pilih Metode Pembayaran";
+  .swiper-button-next,
+  .swiper-button-prev {
+    width: 40px;
+    height: 40px;
   }
 
-  // Klik Transfer Bank → tampilkan 3 pilihan bank
-  document.getElementById("pay-transfer").addEventListener("click", () => {
-    showBankOptions();
-  });
-
-  // Helper: buka info modal untuk transfer bank
-  function openBankTransferInfo(bankKey) {
-    const bank = BANKS[bankKey];
-    if (!bank) return;
-
-    currentPaymentMethod = bank.label;
-    currentOrderData = {
-      method: "transfer",
-      bank: bank.label,
-      number: bank.number,
-      name: bank.name
-    };
-
-    document.getElementById("info-title").textContent = `Pembayaran ${bank.label}`;
-    document.getElementById("info-content").innerHTML = `
-      <div class="space-y-3">
-        <div class="info-item">
-          <span class="info-left">Bank:</span>
-          <span class="info-right">${bank.label}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-left">No. Rekening:</span>
-          <span class="info-right">
-            ${bank.number}
-            <button class="copy-btn-inline" onclick="copyToClipboard(\`${bank.number}\`)">
-              <i class="fas fa-copy"></i>
-            </button>
-          </span>
-        </div>
-        <div class="info-item">
-          <span class="info-left">Atas Nama:</span>
-          <span class="info-right">${bank.name}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-left">Total Bayar:</span>
-          <span class="info-right">Rp ${finalDiscountedPrice.toLocaleString('id-ID')}</span>
-        </div>
-        <p class="info-hint text-sm text-center">Silakan transfer ke rekening di atas, lalu klik "Kirim WA" untuk konfirmasi pesanan</p>
-      </div>
-    `;
-    danaQrCodeImg.classList.add('hidden');
-    danaQrCodeImg.src = '';
-
-    // Reset bank options sebelum tutup
-    hideBankOptions();
-
-    gsap.to(paymentModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
-      gsap.set(paymentModal, { display: "none" });
-      paymentModal.style.transform = "";
-      paymentModal.setAttribute("aria-hidden", "true");
-      // Hapus payment modal dari stack karena kita ganti ke info modal
-      openModal(infoModal);
-    }});
+  .swiper-button-next::after,
+  .swiper-button-prev::after {
+    font-size: 14px;
   }
 
-  document.getElementById("pay-sinarmas").addEventListener("click", () => openBankTransferInfo("sinarmas"));
-  document.getElementById("pay-bca").addEventListener("click", () => openBankTransferInfo("bca"));
-  document.getElementById("pay-bni").addEventListener("click", () => openBankTransferInfo("bni"));
-
-  document.getElementById("pay-qris").addEventListener("click", () => {
-    currentPaymentMethod = "QRIS";
-    currentOrderData = {
-      method: "qris",
-      name: "KEDAI MAS HARIS"
-    };
-
-    document.getElementById("info-title").textContent = "Pembayaran QRIS";
-    document.getElementById("info-content").innerHTML = `
-      <div class="space-y-3">
-        <div class="info-item">
-          <span class="info-left">Nama Toko:</span>
-          <span class="info-right">KEDAI MAS HARIS</span>
-        </div>
-        <div class="info-item">
-          <span class="info-left">Total Bayar:</span>
-          <span class="info-right">Rp ${finalDiscountedPrice.toLocaleString('id-ID')}</span>
-        </div>
-        <p class="info-hint text-sm text-center mt-2 mb-3">Scan QR Code di bawah ini untuk melakukan pembayaran</p>
-      </div>
-    `;
-
-    // Re-append the QR image (because innerHTML removed it) and show it
-    const infoContent = document.getElementById("info-content");
-    danaQrCodeImg.src = DANA_QR_CODE_PATH;
-    danaQrCodeImg.classList.remove('hidden');
-    danaQrCodeImg.alt = "QR Code QRIS KEDAI MAS HARIS";
-    infoContent.appendChild(danaQrCodeImg);
-
-    // Add the important note below the QR
-    const noteEl = document.createElement("p");
-    noteEl.className = "info-hint text-sm text-center mt-4 px-1";
-    noteEl.innerHTML = `⚠️ Jika sudah melakukan pembayaran, harap melampirkan <strong>bukti pembayaran berhasil</strong> ke WhatsApp.`;
-    infoContent.appendChild(noteEl);
-
-    // Add hint text above QR so users know they can enlarge
-    const enlargeHint = document.createElement("p");
-    enlargeHint.className = "text-xs text-center text-orange-500 dark:text-orange-400 mb-2 font-medium";
-    enlargeHint.innerHTML = `<i class="fas fa-search-plus mr-1"></i> Ketuk gambar QR untuk memperbesar agar mudah di-scan`;
-    infoContent.insertBefore(enlargeHint, danaQrCodeImg);
-
-    // Close payment modal first, then open info modal
-    gsap.to(paymentModal, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
-      gsap.set(paymentModal, { display: "none" });
-      paymentModal.style.transform = "";
-      paymentModal.setAttribute("aria-hidden", "true");
-      openModal(infoModal);
-    }});
-  });
-
-  // ---------- QR Code Enlarge Feature ----------
-  const qrEnlargeOverlay = document.getElementById("qr-enlarge-overlay");
-  const qrEnlargeImg = document.getElementById("qr-enlarge-img");
-  const qrEnlargeClose = document.getElementById("qr-enlarge-close");
-
-  function openQrEnlarge(src) {
-    if (!src || !qrEnlargeOverlay) return;
-    qrEnlargeImg.src = src;
-    qrEnlargeOverlay.classList.remove("hidden");
-    // Force reflow then show
-    void qrEnlargeOverlay.offsetWidth;
-    qrEnlargeOverlay.classList.add("show");
-    qrEnlargeOverlay.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
-  }
-  // Expose globally agar bisa dipanggil dari openProductDetailModal
-  window.openQrEnlarge = openQrEnlarge;
-
-  function closeQrEnlarge() {
-    if (!qrEnlargeOverlay) return;
-    qrEnlargeOverlay.classList.remove("show");
-    setTimeout(() => {
-      qrEnlargeOverlay.classList.add("hidden");
-      qrEnlargeImg.src = "";
-      qrEnlargeOverlay.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }, 250);
-  }
-  window.closeQrEnlarge = closeQrEnlarge;
-
-  // Click on QR image to enlarge
-  if (danaQrCodeImg) {
-    danaQrCodeImg.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (!danaQrCodeImg.classList.contains("hidden") && danaQrCodeImg.src) {
-        openQrEnlarge(danaQrCodeImg.src);
-      }
-    });
+  .swiper-button-next {
+    right: 10px;
   }
 
-  // Close enlarge overlay
-  if (qrEnlargeClose) {
-    qrEnlargeClose.addEventListener("click", (e) => {
-      e.stopPropagation();
-      closeQrEnlarge();
-    });
+  .swiper-button-prev {
+    left: 10px;
   }
-  if (qrEnlargeOverlay) {
-    qrEnlargeOverlay.addEventListener("click", (e) => {
-      // Close only if clicking the dark background (not the image itself)
-      if (e.target === qrEnlargeOverlay) {
-        closeQrEnlarge();
-      }
-    });
+}
+
+.copy-btn-inline {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.copy-btn-inline:hover {
+  background: #e5e7eb;
+}
+body.dark .copy-btn-inline {
+  background: #64748b;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+body.dark .copy-btn-inline:hover {
+  background: #475569;
+}
+
+/* Light mode: kontainer menu transparan */
+body:not(.dark) #menu-container {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  margin-top: -8px !important; /* tarik grid lebih dekat ke judul */
+  padding-top: 0 !important;
+}
+
+body:not(.dark) #menu-container .product-card {
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+/* Mini Search Bar Trigger */
+.search-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #f1f5f9;
+  border: 1px solid #d1d5db; /* light mode background */
+  color: #6b7280;
+  padding: 0.4rem 0.8rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  /* FIX: Remove transform from here to prevent layout shift */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  min-width: 200px; /* Lebar pendek */
+  flex-grow: 1; /* Memungkinkan untuk tumbuh di tengah */
+  max-width: 400px; /* Batasi lebar maksimum */
+  justify-content: center; /* Pusatkan teks di dalamnya */
+}
+
+/* FIX: Add a wrapper for the scale animation to prevent layout shift */
+.search-trigger-wrapper {
+  display: inline-block; /* Or block, depending on parent flex/grid */
+  transition: transform 0.3s ease; /* Apply transform here */
+}
+
+.search-trigger-wrapper:hover {
+  transform: scale(1.01); /* Apply scale here */
+}
+
+
+.search-trigger i {
+  font-size: 0.9rem;
+}
+
+body.dark .search-trigger {
+  background-color: #374151; /* dark mode background */
+  color: #d1d5db;
+  border-color: #4b5563;
+}
+
+.search-trigger:hover {
+  background-color: #F1F0E4;
+  color: #2a313e;
+  border: 2px solid #2a313e;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  /* FIX: Remove transform from here */
+}
+
+body.dark .search-trigger:hover {
+  background-color: #0E2148;
+  color: #EEEEEE;
+  border: 2px solid #58A0C8;
+  box-shadow: 0 0 10px rgba(10,20,10,0.3);
+  /* FIX: Remove transform from here */
+}
+
+/* Tombol hamburger hanya muncul di <768px */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 18px;
+  cursor: pointer;
+  position: relative; /* Added for X animation */
+  z-index: 1100; /* Above mobile menu overlay */
+}
+.hamburger span {
+  display: block;
+  height: 3px;
+  background: #1f2937;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+body.dark .hamburger span {
+  background: #f97316; /* Ikut warna body dark mode */
+}
+
+/* Hamburger X animation */
+.hamburger.open span:nth-child(1) {
+  transform: translateY(7.5px) rotate(45deg);
+}
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-7.5px) rotate(-45deg);
+}
+
+/* Specific breakpoints for hamburger and header elements */
+/* Default: Desktop (>= 1024px) */
+.header-nav-desktop { display: flex; gap: 1.5rem; } /* Added gap for spacing */
+.wishlist-desktop { display: block; }
+.dark-mode-desktop { display: block; }
+.cart-desktop { display: block; }
+.hamburger { display: none; }
+.logo-desktop { display: flex; }
+.search-trigger span { display: inline; } /* Teks search trigger terlihat */
+.search-trigger {
+  min-width: 200px;
+  max-width: 400px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+}
+.search-trigger i { font-size: 0.9rem; }
+.search-container {
+  flex-grow: 1;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Tablet/Laptop Kecil (max-width: 1023px) */
+@media (max-width: 1023px) {
+  .header-nav-desktop { display: none; } /* Navigasi masuk hamburger */
+  .hamburger { display: flex; } /* Hamburger muncul */
+  /* Elemen lain di header tetap terlihat */
+  .logo-desktop { display: flex; }
+  .wishlist-desktop { display: none !important; } /* Wishlist masuk hamburger */
+  .dark-mode-desktop { display: block; }
+  .cart-desktop { display: block; }
+  .search-trigger span { display: inline; }
+  .search-trigger {
+    min-width: 200px;
+    max-width: 400px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
   }
-  // ESC key to close
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && qrEnlargeOverlay && qrEnlargeOverlay.classList.contains("show")) {
-      closeQrEnlarge();
-    }
-  });
-
-  // Info modal handlers
-  document.getElementById("send-wa").addEventListener("click", sendToWhatsApp);
-
-  // Validasi form pengantaran → aktifkan/nonaktifkan tombol Kirim WA
-  const checkoutNameInput = document.getElementById("checkout-name");
-  const checkoutAddressInput = document.getElementById("checkout-address");
-  if (checkoutNameInput) {
-    checkoutNameInput.addEventListener("input", updateSendWaButtonState);
+  .search-trigger i { font-size: 0.9rem; }
+  .search-container {
+    flex-grow: 1;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
   }
-  if (checkoutAddressInput) {
-    checkoutAddressInput.addEventListener("input", updateSendWaButtonState);
+  /* Adjust header actions for smaller screens */
+  .header-actions-desktop {
+    gap: 0.75rem; /* Jarak antar item di kanan */
+    margin-left: auto; /* Dorong ke kanan */
   }
-  // Pastikan tombol WA disabled saat awal
-  updateSendWaButtonState();
-
-  // Dark mode toggle (Desktop)
-  darkToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark');
-    const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
-    if (theme === 'dark') {
-      darkModeIcon.classList.remove('fa-moon');
-      darkModeIcon.classList.add('fa-sun');
-    } else {
-      document.body.classList.remove('dark');
-      darkModeIcon.classList.remove('fa-sun');
-      darkModeIcon.classList.add('fa-moon');
-    }
-    try {
-      localStorage.setItem('theme', theme);
-    } catch (e) {
-      // If localStorage is not available, continue without saving
-    }
-    updateWishlistButtonsState(); // Update wishlist button colors on theme change
-  });
-
-  // Overlay click handler
-  overlay.addEventListener("click", () => {
-    const currentTopModal = modalStack[modalStack.length - 1];
-    if (mobileMenuOpen) {
-      hamburger.click();
-    } else if (currentTopModal) {
-      // If the top modal is the update modal, use safe close
-      if (currentTopModal === updateModal) {
-        closeUpdateModalSafely();
-      } else {
-        closeAllModals(); // Close all modals when clicking overlay
-      }
-    }
-  });
-
-  // Dynamic product buttons (for quick add to cart from menu grid)
-  container.addEventListener("click", (e) => {
-    const target = e.target;
-    const orderButton = target.closest('.btn-pesan');
-    const wishlistButton = target.closest('.btn-wishlist');
-    const productCard = target.closest('.product-card'); // For opening detail modal
-
-    if (orderButton) {
-      const name = orderButton.dataset.name;
-      const product = productList.find(p => p.name === name);
-      if (!product) return;
-
-      // If product has variants or toppings, open detail modal instead of direct add to cart
-      if ((product.variants && product.variants.length > 0) || (product.toppings && product.toppings.length > 0)) {
-        openProductDetailModal(name);
-        return;
-      }
-
-      const itemKey = product.name;
-      if (cart[itemKey]) {
-        cart[itemKey].qty++;
-      } else {
-        cart[itemKey] = {
-          name: product.name,
-          price: product.price,
-          qty: 1,
-          images: product.images ? product.images : []
-        };
-      }
-      updateCartCount();
-      showNotif(`${name} ditambahkan ke keranjang`);
-    }
-
-    if (wishlistButton) {
-      const name = wishlistButton.dataset.name;
-      const product = productList.find(p => p.name === name);
-      if (!product) return;
-
-      if (wishlist[name]) {
-        delete wishlist[name];
-        showNotif(`${name} dihapus dari wishlist`);
-      } else {
-        wishlist[name] = {
-          name: product.name,
-          price: product.price,
-          kategori: product.kategori,
-          images: product.images ? product.images : []
-        };
-        showNotif(`${name} ditambahkan ke wishlist`);
-      }
-      updateWishlistCount();
-      updateWishlistButtonsState();
-    }
-
-    // Open product detail modal when clicking on the card itself (excluding buttons)
-    if (productCard && !orderButton && !wishlistButton) {
-      const name = productCard.dataset.name;
-      openProductDetailModal(name);
-    }
-  });
-
-  // Product Detail Modal Event Listeners (New)
-  detailMinusBtn.addEventListener("click", () => {
-    if (currentProductDetailQty > 1) {
-      currentProductDetailQty--;
-      detailQtyDisplay.textContent = currentProductDetailQty;
-      updateDetailButtons(currentProductDetailQty);
-    }
-  });
-
-  detailPlusBtn.addEventListener("click", () => {
-    currentProductDetailQty++;
-    detailQtyDisplay.textContent = currentProductDetailQty;
-    updateDetailButtons(currentProductDetailQty);
-  });
-
-  addToCartDetailBtn.addEventListener("click", () => {
-    if (!currentProductDetail) return;
-
-    let itemPrice = currentProductDetail.price;
-    let itemName = currentProductDetail.name;
-    let itemVariant = null;
-    let itemToppings = []; // Array to store selected topping objects {name, qty, price}
-    let itemToppingsPrice = 0;
-
-    if (currentProductDetail.variants && selectedVariant) {
-      itemPrice += selectedVariant.priceOffset;
-      itemVariant = selectedVariant.name;
-    }
-
-    // Calculate topping price and prepare topping array for cart
-    for (const toppingName in selectedToppings) {
-      const toppingData = selectedToppings[toppingName];
-      if (toppingData.qty > 0) {
-        itemToppings.push({ name: toppingName, qty: toppingData.qty, price: toppingData.price });
-        itemToppingsPrice += toppingData.price * toppingData.qty;
-      }
-    }
-    itemPrice += itemToppingsPrice;
-
-    // Construct a unique key for the cart item, including variant and toppings
-    let itemKey = currentProductDetail.name;
-    if (itemVariant) itemKey += `-${itemVariant}`;
-    if (itemToppings.length > 0) {
-      // Sort toppings by name for consistent key generation
-      const sortedToppings = [...itemToppings].sort((a, b) => a.name.localeCompare(b.name));
-      itemKey += `-${sortedToppings.map(t => `${t.name}_${t.qty}`).join('-')}`;
-    }
-
-    if (cart[itemKey]) {
-      cart[itemKey].qty += currentProductDetailQty;
-    } else {
-      cart[itemKey] = {
-        name: currentProductDetail.name,
-        price: itemPrice, // This price now includes variant and topping prices
-        qty: currentProductDetailQty,
-        images: currentProductDetail.images ? currentProductDetail.images : [],
-        variant: itemVariant,
-        toppings: itemToppings // Store selected topping objects
-      };
-    }
-    updateCartCount();
-    let notifText = `${currentProductDetail.name}`;
-    if (itemVariant) notifText += ` (${itemVariant})`;
-    if (itemToppings.length > 0) {
-      const toppingStrings = itemToppings.map(t => `${t.name} (${t.qty})`);
-      notifText += ` + ${toppingStrings.join(', ')}`;
-    }
-    notifText += ` ditambahkan ke keranjang`;
-    showNotif(notifText);
-    closeModal(productDetailModal);
-  });
-
-  addToWishlistDetailBtn.addEventListener("click", () => {
-    if (!currentProductDetail) return;
-
-    const name = currentProductDetail.name;
-    if (wishlist[name]) {
-      delete wishlist[name];
-      showNotif(`${name} dihapus dari wishlist`);
-    } else {
-      wishlist[name] = {
-        name: currentProductDetail.name,
-        price: currentProductDetail.price,
-        kategori: currentProductDetail.kategori,
-        images: currentProductDetail.images ? currentProductDetail.images : []
-      };
-      showNotif(`${name} ditambahkan ke wishlist`);
-    }
-    updateWishlistCount();
-    updateWishlistButtonsState();
-  });
-
-
-  // Initialize Swiper
-  const swiper = new Swiper(".mySwiper", {
-    loop: true,
-    pagination: {
-      el: ".swiper-pagination",
-      clickable: true,
-    },
-    autoplay: {
-      delay: 2500,
-      disableOnInteraction: false,
-    },
-    navigation: {
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev',
-    },
-  });
-
-  // Fungsi Hamburger
-  const hamburger = document.getElementById('hamburger');
-  const mobileMenu = document.getElementById('mobileMenu');
-  let mobileMenuOpen = false;
-
-  hamburger.addEventListener('click', () => {
-    mobileMenuOpen = !mobileMenuOpen;
-    hamburger.classList.toggle('open', mobileMenuOpen);
-
-    if (mobileMenuOpen) {
-      gsap.set(mobileMenu, { display: 'block', y: -20, opacity: 0 }); // Set initial state
-      gsap.to(mobileMenu, { y: 0, opacity: 1, duration: 0.3, ease: 'power2.out' });
-    } else {
-      gsap.to(mobileMenu, {
-        y: -20, opacity: 0, duration: 0.25, ease: 'power2.in',
-        onComplete: () => {
-          gsap.set(mobileMenu, { display: 'none' }); // Hide completely after animation
-        }
-      });
-    }
-  });
-
-  // Sinkronisasi badge
-  const cartCountMobile = document.getElementById('cart-count-mobile');
-  const wishlistCountMobile = document.getElementById('wishlist-count-mobile');
-  function syncMobileCounts() {
-    if (cartCountMobile) {
-      cartCountMobile.textContent = document.getElementById('cart-count').textContent;
-    }
-    if (wishlistCountMobile) {
-      wishlistCountMobile.textContent = document.getElementById('wishlist-count').textContent;
-    }
-  }
-  syncMobileCounts();
-
-
-// Auto-close mobile menu when resizing to desktop
-window.addEventListener('resize', () => {
-  if (window.innerWidth >= 1024 && mobileMenuOpen) {
-    mobileMenuOpen = false;
-    hamburger.classList.remove('open');
-    gsap.set(mobileMenu, { display: 'none', y: -100, opacity: 0 }); // Ensure it's hidden
-  }
-  // Ensure mobile menu items are removed/added based on screen size
-  updateMobileMenuItems();
-});
-
-setInterval(syncMobileCounts, 500);
-
-  // Mobile menu navigation
-  document.getElementById('mobile-wishlist').addEventListener('click', () => {
-    renderWishlist();
-    openModal(wishlistModal);
-    hamburger.click(); // Close hamburger menu after opening modal
-  });
-
-  document.querySelectorAll('.mobile-menu a.nav-link-mobile').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      e.preventDefault();
-      const target = this.getAttribute('href');
-      smoothScrollTo(target);
-      hamburger.click(); // Close hamburger menu after navigation
-    });
-  });
-
-  const headerEl = document.querySelector("header");
-
-  function updateHeaderOnScroll() {
-    if (window.scrollY > 0) {
-      headerEl.classList.add("scrolled");
-      headerEl.classList.remove("top");
-    } else {
-      headerEl.classList.add("top");
-      headerEl.classList.remove("scrolled");
-    }
+  .hamburger {
+    margin-left: 0.5rem; /* Sedikit jarak dari item sebelumnya */
   }
 
-  window.addEventListener("scroll", updateHeaderOnScroll);
-  window.addEventListener("load", updateHeaderOnScroll);
+  /* REVISI: Tombol pesan di bawah tombol wishlist untuk layar <= 1023px */
+  .product-actions {
+    flex-direction: column; /* Stack buttons vertically */
+    align-items: stretch; /* Make buttons take full width */
+  }
+  .product-actions button {
+    width: 100%; /* Ensure buttons take full width */
+  }
+}
 
-  renderMenu(); // Initial render of menu and related products
+/* Mobile Portrait (max-width: 519px) - Changed from 427px to 519px */
+@media (max-width: 519px) { /* New breakpoint for 520px */
+  .logo-desktop { display: flex !important; } /* Logo tetap ada */
+  .wishlist-desktop { display: none !important; } /* Pastikan wishlist tersembunyi */
+  .dark-mode-desktop { display: block !important; }
+  .cart-desktop { display: block !important; }
 
-  function smoothScrollTo(target) {
-    const targetElement = document.querySelector(target);
-    if (!targetElement) return;
+  /* Search trigger menyesuaikan ukuran dan tanpa teks */
+  .search-trigger {
+    min-width: unset;
+    max-width: 150px; /* Lebih kecil */
+    padding: 0.3rem 0.6rem; /* Padding lebih kecil */
+    font-size: 0.75rem; /* Font lebih kecil */
+  }
+  .search-trigger i {
+    font-size: 0.8rem; /* Icon lebih kecil */
+  }
+  .search-trigger span {
+    display: none; /* Sembunyikan teks "Cari produk anda..." */
+  }
+  .search-container {
+    flex-grow: 1;
+    justify-content: flex-start; /* Rata kiri */
+    margin-left: 0;
+    margin-right: 0.5rem;
+  }
+  .header-actions-desktop {
+    gap: 0.5rem; /* Jarak antar item lebih kecil */
+  }
+}
 
-    const headerHeight = document.querySelector('header').offsetHeight;
-    const offsetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - headerHeight;
 
-    gsap.to(window, {
-      duration: 1, // Durasi animasi scroll
-      scrollTo: {
-        y: offsetPosition,
-        autoKill: true
-      },
-      ease: "power2.inOut", // Animasi smooth
-    });
+/* Mobile menu overlay */
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 60px; /* tinggi header */
+  left: 0;
+  width: 100%;
+  background: white;
+  z-index: 1000;
+  border-top: 1px solid #e5e7eb;
+  padding-bottom: 1rem; /* Tambahkan padding bawah */
+  transform: translateY(-100%); /* Start off-screen */
+  transition: transform 0.3s ease-out;
+}
+.mobile-menu.open {
+  transform: translateY(0); /* Slide in */
+}
+body.dark .mobile-menu {
+  background: #334155;
+  border-color: #475569;
+}
 
-    gsap.fromTo(targetElement,
-      { backgroundColor: "rgba(249, 115, 22, 0.15)" },
-      {
-        backgroundColor: "transparent",
-        duration: 1.5,
-        ease: "power1.out",
-        clearProps: "backgroundColor"
-      }
-    );
+/* Menu items */
+.mobile-menu .menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background 0.3s ease;
+}
+.mobile-menu .menu-item:last-child { border-bottom: none; }
+
+/* Hover efek kebalikan */
+body:not(.dark) .mobile-menu .menu-item:hover {
+  background: #1f2937; /* gelap untuk light mode */
+  color: white;
+}
+body:not(.dark) .mobile-menu .menu-item:hover i {
+  color: white;
+}
+
+body.dark .mobile-menu .menu-item:hover {
+  background: #f3f4f6; /* terang untuk dark mode */
+  color: #1f2937;
+}
+body.dark .mobile-menu .menu-item:hover i {
+  color: #1f2937;
+}
+
+@media (max-width: 767px) {
+  .header-actions {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    position: absolute;
+    pointer-events: none;
+  }
+}
+@media (min-width: 768px) {
+  .header-actions {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    position: static;
+    pointer-events: auto;
+  }
+}
+
+/* Grid Daftar Menu - Glassmorphism */
+.menu-grid {
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+/* Contact */
+#contact-section {
+  background: transparent !important; /* Gunakan !important jika ada konflik */
+  box-shadow: none !important; /* Jika ada shadow yang tidak diinginkan */
+  border: none !important; /* Jika ada border yang tidak diinginkan */
+}
+
+/* New styles for contact section */
+.contact-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 16px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.contact-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 3px 25px rgba(0, 0, 0, 0.2);
+}
+
+body.dark .contact-card {
+  background: rgba(51, 65, 85, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+body.dark .contact-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+}
+
+.contact-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.contact-button.whatsapp {
+  background: linear-gradient(135deg, #25d366, #1da851);
+  color: white;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+}
+
+.contact-button.whatsapp:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+}
+
+.contact-button.email {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.contact-button.email:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+}
+
+.contact-button.request-design {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.contact-button.request-design:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
+
+.footer-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+body.dark .footer-text {
+  color: #9ca3af;
+}
+
+/* Dropdown for contact buttons */
+.contact-dropdown {
+  position: relative;
+  width: 100%; /* Ensure it takes full width of its parent */
+}
+
+/* --- START: PERBAIKAN DROPDOWN EMAIL --- */
+.contact-dropdown-content {
+  display: none; /* Default hidden */
+  position: fixed; /* Change to fixed for overlay behavior */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center the dropdown */
+  background-color: #f9fafb; /* Light mode background */
+  width: 90vw; /* Take 90% of viewport width */
+  max-width: 300px; /* Max width for larger screens */
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1001; /* Higher than overlay (999) and modals (1000) */
+  border-radius: 0.75rem; /* Match button border-radius */
+  overflow: hidden; /* For rounded corners */
+  max-height: 80vh; /* Max height for scrollable content */
+  overflow-y: auto; /* Enable vertical scroll */
+  opacity: 0; /* Start hidden for animation */
+  pointer-events: none; /* Disable interaction when hidden */
+  transition: opacity 0.3s ease, transform 0.3s ease; /* Smooth transition */
+}
+
+.contact-dropdown-content.show {
+  display: block; /* Show when 'show' class is present */
+  opacity: 1; /* Fade in */
+  pointer-events: auto; /* Enable interaction */
+  transform: translate(-50%, -50%) scale(1); /* Ensure scale is 1 */
+}
+
+body.dark .contact-dropdown-content {
+  background-color: #334155; /* Dark mode background */
+}
+
+.contact-dropdown-content a {
+  color: #374151; /* Light mode text color */
+  padding: 0.75rem 1.25rem;
+  text-decoration: none;
+  display: block;
+  font-weight: 500;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+body.dark .contact-dropdown-content a {
+  color: #e2e8f0; /* Dark mode text color */
+}
+
+.contact-dropdown-content a:hover {
+  background-color: #e5e7eb; /* Light mode hover */
+  color: #1f2937;
+}
+
+body.dark .contact-dropdown-content a:hover {
+  background-color: #475569; /* Dark mode hover */
+  color: #e2e8f0;
+}
+/* --- END: PERBAIKAN DROPDOWN EMAIL --- */
+
+
+/* Date picker styling */
+input[type="date"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: white;
+  border: 1px solid #d1d5db;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  color: #1f2937;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="date"]:focus {
+  outline: none;
+  border-color: #f97316;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+}
+
+body.dark input[type="date"]:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.3);
+}
+
+/* Placeholder color for date input */
+input[type="date"]::-webkit-input-placeholder { color: #9ca3af; }
+input[type="date"]::-moz-placeholder { color: #9ca3af; }
+input[type="date"]:-ms-input-placeholder { color: #9ca3af; }
+input[type="date"]::placeholder { color: #9ca3af; }
+
+/* Date picker icon styling (optional, depends on browser) */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5); /* Adjust for dark mode */
+}
+
+body.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1); /* Make icon white in dark mode */
+}
+
+/* Login success animation */
+.login-success-badge {
+  position: fixed;
+  top: 180px; /* Below other badges */
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: 999px;
+  background-color: #22c55e; /* Green for success */
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 1400;
+  opacity: 0;
+  pointer-events: none;
+  display: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+
+
+/* === NAVBAR VISIBILITY RULES — canonical === */
+@media (min-width: 1024px) {
+  .header-nav-desktop { display: flex !important; }
+  .hamburger { display: none !important; }
+}
+@media (max-width: 1023px) {
+  .header-nav-desktop { display: none !important; }
+  .hamburger { display: flex !important; }
+}
+@media (max-width: 767px) {
+  .header-nav-desktop { display: none !important; }
+  .hamburger { display: flex !important; }
+}
+@media (max-width: 519px) {
+  .header-nav-desktop { display: none !important; }
+  .hamburger { display: flex !important; }
+}
+
+.product-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+  transition: all 0.3s ease;
+  /* Order the buttons */
+  flex-direction: row; /* Ensure row direction */
+  justify-content: space-between; /* Space out the buttons */
+}
+.product-actions .btn-wishlist {
+  order: 1; /* Wishlist first */
+}
+.product-actions .btn-pesan {
+  order: 2; /* Pesan second */
+  flex-grow: 1; /* Allow pesan button to grow */
+}
+
+/* REVISI: Tombol pesan di bawah tombol wishlist untuk layar <= 1023px */
+@media (max-width: 1023px) {
+  .product-actions {
+    flex-direction: column; /* Stack buttons vertically */
+    align-items: stretch; /* Make buttons take full width */
+  }
+  .product-actions button {
+    width: 100%; /* Ensure buttons take full width */
+  }
+}
+
+@media (max-width: 519px) {
+  .product-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .product-actions button {
+    width: 100%;
+  }
+}
+/* Tombol Back to Top */
+.back-to-top-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #f97316, #ea580c); /* Orange gradient */
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+  cursor: pointer;
+  opacity: 0; /* Hidden by default */
+  visibility: hidden; /* Hidden by default */
+  transition: all 0.3s ease; /* Smooth transition for all properties */
+  z-index: 998; /* Di bawah overlay modal */
+}
+
+.back-to-top-btn:hover {
+  background: linear-gradient(135deg, #ea580c, #f97316); /* Reverse gradient on hover */
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+}
+
+/* Dark mode for Back to Top button */
+body.dark .back-to-top-btn {
+  background: linear-gradient(135deg, #fb923c, #f97316); /* Darker orange gradient */
+  box-shadow: 0 4px 15px rgba(251, 146, 60, 0.4);
+}
+
+body.dark .back-to-top-btn:hover {
+  background: linear-gradient(135deg, #f97316, #fb923c);
+  box-shadow: 0 6px 20px rgba(251, 146, 60, 0.5);
+}
+
+/* State for showing the button */
+.back-to-top-btn.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Tambahkan di style.css */
+.cart-desktop {
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.cart-desktop:hover {
+  transform: rotate(-15deg) scale(1.1);
+}
+
+#cart-count {
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.cart-bounce {
+  animation: cartBounce 0.5s ease;
+}
+
+@keyframes cartBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* New: Update Notification Modal Styles */
+#update-modal {
+  max-width: 500px; /* Larger modal for updates */
+  padding: 2rem;
+}
+
+#update-modal h3 {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #f97316; /* Orange color for title */
+}
+
+#update-modal .update-item {
+  background-color: #f3f4f6;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+body.dark #update-modal .update-item {
+  background-color: #475569;
+}
+
+#update-modal .update-item h4 {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+body.dark #update-modal .update-item h4 {
+  color: #e2e8f0;
+}
+
+#update-modal .update-item p {
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+body.dark #update-modal .update-item p {
+  color: #cbd5e1;
+}
+
+#update-modal .update-item .update-date {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-top: 0.5rem;
+  text-align: right;
+}
+
+body.dark #update-modal .update-item .update-date {
+  color: #94a3b8;
+}
+
+#update-modal #promo-content {
+  margin-top: 1.5rem;
+}
+
+#update-modal #close-update-modal {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.5rem;
+  color: #6b7280;
+  transition: color 0.2s ease;
+}
+
+#update-modal #close-update-modal:hover {
+  color: #1f2937;
+}
+
+body.dark #update-modal #close-update-modal:hover {
+  color: #e2e8f0;
+}
+
+/* Ensure update modal is hidden by default */
+#update-modal {
+  display: none;
+}
+
+/* Gaya untuk input promo code */
+.promo-input-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.promo-input-container input {
+  flex-grow: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  color: #1f2937;
+  transition: all 0.3s ease;
+}
+
+body.dark .promo-input-container input {
+  background-color: #1f2937;
+  border-color: #4b5563;
+  color: #e2e8f0;
+}
+
+.promo-input-container input::placeholder {
+  color: #9ca3af;
+}
+
+.promo-input-container button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background-color: #f97316;
+  color: white;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.promo-input-container button:hover {
+  background-color: #ea580c;
+}
+
+/* Gaya untuk teks promo yang diterapkan */
+.promo-applied-text {
+  font-size: 0.875rem;
+  color: #22c55e; /* Green for success */
+  font-weight: 600;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+body.dark .promo-applied-text {
+  color: #4ade80;
+}
+
+/* Kontras untuk checkbox label di update modal */
+#update-modal label {
+  color: #4b5563; /* Default light mode color */
+}
+
+body.dark #update-modal label {
+  color: #cbd5e1; /* Dark mode color */
+}
+
+/* Product Detail Modal Styles */
+#product-detail-modal {
+  max-width: 500px; /* Larger modal for updates */
+  padding: 1.5rem;
+}
+
+#product-detail-modal .product-detail-content {
+  margin-bottom: 1.5rem;
+}
+
+/* Swiper for Product Detail Images */
+.product-detail-swiper {
+  width: 100%;
+  height: 240px;
+  /* Sudut lebih lembut, tidak terlalu lancip */
+  border-radius: 1.25rem;
+  overflow: hidden;
+  position: relative;
+  background: #f3f4f6;
+}
+
+body.dark .product-detail-swiper {
+  background: #1f2937;
+}
+
+.product-detail-swiper .swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  /* Sudut lembut mengikuti kontainer */
+  border-radius: 1.25rem;
+  overflow: hidden;
+}
+
+.product-detail-swiper .swiper-slide img,
+.product-detail-main-img {
+  width: 100%;
+  height: 100%;
+  /* cover = isi penuh kontainer (vertikal + horizontal) */
+  object-fit: cover;
+  object-position: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  background: transparent;
+  /* Sudut gambar ikut membulat */
+  border-radius: 1.25rem;
+}
+
+.product-detail-swiper .swiper-slide img:hover {
+  transform: scale(1.02);
+}
+
+@media (min-width: 480px) {
+  .product-detail-swiper {
+    height: 280px;
+  }
+}
+
+/* Nav arrows product detail */
+.product-detail-swiper .swiper-button-prev,
+.product-detail-swiper .swiper-button-next {
+  color: #f97316;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.product-detail-swiper .swiper-button-prev:after,
+.product-detail-swiper .swiper-button-next:after {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+body.dark .product-detail-swiper .swiper-button-prev,
+body.dark .product-detail-swiper .swiper-button-next {
+  background: rgba(30, 41, 59, 0.9);
+  color: #fb923c;
+}
+
+.product-detail-swiper .swiper-button-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Custom Pagination for Product Detail Swiper (mini images) */
+.product-detail-pagination {
+  position: static !important;
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.product-detail-pagination .swiper-pagination-bullet {
+  width: 52px;
+  height: 52px;
+  border-radius: 0.5rem;
+  background-color: #e5e7eb;
+  opacity: 1;
+  transition: all 0.25s ease;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+  margin: 0 !important;
+  cursor: pointer;
+}
+
+body.dark .product-detail-pagination .swiper-pagination-bullet {
+  background-color: #475569;
+}
+
+.product-detail-pagination .swiper-pagination-bullet img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.35rem;
+  pointer-events: none;
+}
+
+.product-detail-pagination .swiper-pagination-bullet-active {
+  border-color: #f97316;
+  transform: scale(1.08);
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.25);
+}
+
+.product-img-enlarge-hint {
+  margin-top: 0.25rem;
+}
+
+/* Product Variants Styling */
+#product-variants-options label {
+  cursor: pointer;
+}
+
+#product-variants-options input[type="radio"] {
+  /* Custom radio button styling */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #d1d5db;
+  border-radius: 50%;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.dark #product-variants-options input[type="radio"] {
+  border-color: #64748b;
+}
+
+#product-variants-options input[type="radio"]:checked {
+  background-color: #f97316; /* Orange when checked */
+  border-color: #f97316;
+}
+
+#product-variants-options input[type="radio"]:checked::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: white;
+  display: block;
+}
+
+/* Product Toppings Styling */
+#product-toppings-options label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: #f3f4f6; /* Light mode background for topping item */
+  color: #1f2937; /* Light mode text color for topping */
+  transition: all 0.2s ease;
+}
+
+body.dark #product-toppings-options label {
+  background-color: #475569; /* Dark mode background for topping item */
+  color: #e2e8f0; /* Dark mode text color for topping */
+}
+
+#product-toppings-options label:hover {
+  background-color: #e5e7eb; /* Light mode hover */
+}
+
+body.dark #product-toppings-options label:hover {
+  background-color: #334155; /* Dark mode hover */
+}
+
+#product-toppings-options input[type="checkbox"] {
+  /* Custom checkbox styling */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #d1d5db;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.dark #product-toppings-options input[type="checkbox"] {
+  border-color: #64748b;
+}
+
+#product-toppings-options input[type="checkbox"]:checked {
+  background-color: #f97316; /* Orange when checked */
+  border-color: #f97316;
+}
+
+#product-toppings-options input[type="checkbox"]:checked::before {
+  content: '\f00c'; /* Font Awesome check icon */
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: 12px;
+  color: white;
+  display: block;
+}
+
+/* Related Products in Modal */
+/* Changed to use product-card style */
+#related-products-modal-list .product-card {
+  padding: 1rem; /* Adjust padding for smaller cards in modal */
+  min-height: unset; /* Remove min-height constraint */
+  background-color: #ffffff; /* Light mode background */
+  border: 1px solid #e5e7eb; /* Light border for contrast */
+  border-radius: 0.75rem; /* Rounded corners */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5); /* Soft shadow */
+}
+
+#related-products-modal-list .product-card img {
+  height: 80px; /* Adjust image height for smaller cards */
+}
+
+#related-products-modal-list .product-card h4 {
+  font-size: 0.9rem; /* Adjust font size for smaller cards */
+}
+
+#related-products-modal-list .product-card p {
+  font-size: 0.75rem; /* Adjust font size for smaller cards */
+}
+
+/* Ensure related products section on main page is hidden by default */
+#related-products-section {
+  display: none;
+}
+
+/* Perbaikan warna teks di modal produk untuk light/dark mode */
+#product-detail-modal #product-detail-description {
+  color: #4b5563; /* Default light mode color */
+}
+
+body.dark #product-detail-modal #product-detail-description {
+  color: #cbd5e1; /* Dark mode color */
+}
+
+#product-detail-modal #product-detail-price {
+  color: #1f2937; /* Default light mode color */
+}
+
+body.dark #product-detail-modal #product-detail-price {
+  color: #e2e8f0; /* Dark mode color */
+}
+
+#product-detail-modal #product-variants-container h4,
+#product-detail-modal #product-toppings-container h4 {
+  color: #1f2937; /* Default light mode color */
+}
+
+body.dark #product-detail-modal #product-variants-container h4,
+body.dark #product-detail-modal #product-toppings-container h4 {
+  color: #e2e8f0; /* Dark mode color */
+}
+
+#product-detail-modal #product-variants-options span {
+  color: #1f2937; /* Default light mode color */
+}
+
+body.dark #product-detail-modal #product-variants-options span {
+  color: #e2e8f0; /* Dark mode color */
+}
+
+/* Promo Price Display colors */
+#promo-price-display .promo-original-price {
+  color: #ef4444; /* Red for original price */
+  text-decoration: line-through;
+}
+
+body.dark #promo-price-display .promo-original-price {
+  color: #f87171; /* Lighter red for dark mode */
+}
+
+#promo-price-display .promo-discounted-price {
+  color: #22c55e; /* Green for discounted price */
+}
+
+body.dark #promo-price-display .promo-discounted-price {
+  color: #4ade80;
+}
+
+/* Custom Scrollbar Styles for Modals */
+.modal::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 5px; /* Rounded corners for the scrollbar track */
+}
+
+.modal::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1); /* Light transparent track for light mode */
+  border-radius: 5px;
+}
+
+.modal::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3); /* Darker transparent thumb for light mode */
+  border-radius: 5px;
+}
+
+.modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+body.dark .modal::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1); /* Dark transparent track for dark mode */
+}
+
+body.dark .modal::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3); /* Lighter transparent thumb for dark mode */
+}
+
+body.dark .modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Product Detail Swiper Pagination Text */
+.product-detail-pagination .swiper-pagination-bullet span {
+  color: #1f2937; /* Default light mode text color */
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+body.dark .product-detail-pagination .swiper-pagination-bullet span {
+  color: #e2e8f0; /* Dark mode text color */
+}
+
+.product-detail-pagination .swiper-pagination-bullet-active span {
+  color: #f97316; /* Orange for active text */
+}
+
+/* Ensure text in promo content is readable */
+#promo-content p {
+  color: inherit; /* Inherit color from parent to ensure dark mode text is visible */
+}
+
+/* Ensure text in info-item is readable */
+.info-item .info-left,
+.info-item .info-right {
+  color: inherit; /* Inherit color from parent to ensure dark mode text is visible */
+}
+
+/* Petunjuk di modal info pembayaran — kontras jelas di light & dark mode */
+#info-modal .info-hint {
+  color: #374151 !important; /* gray-700 — mudah dibaca di light mode */
+}
+body.dark #info-modal .info-hint {
+  color: #d1d5db !important; /* gray-300 — mudah dibaca di dark mode */
+}
+
+/* Ensure text in order event modal labels is readable */
+#order-event-modal label,
+#report-bug-modal label {
+  color: #374151; /* Default light mode color */
+}
+
+body.dark #order-event-modal label,
+body.dark #report-bug-modal label {
+  color: #e2e8f0; /* Dark mode color */
+}
+
+/* Ensure input fields have good contrast */
+#order-event-modal input,
+#order-event-modal textarea,
+#report-bug-modal input,
+#report-bug-modal textarea,
+#info-modal #checkout-name,
+#info-modal #checkout-address {
+  background-color: white;
+  color: #1f2937;
+  border-color: #d1d5db;
+}
+
+body.dark #order-event-modal input,
+body.dark #order-event-modal textarea,
+body.dark #report-bug-modal input,
+body.dark #report-bug-modal textarea,
+body.dark #info-modal #checkout-name,
+body.dark #info-modal #checkout-address {
+  background-color: #1f2937;
+  color: #e2e8f0;
+  border-color: #4b5563;
+}
+
+/* Placeholder color for inputs in modals */
+#order-event-modal input::placeholder,
+#order-event-modal textarea::placeholder,
+#report-bug-modal input::placeholder,
+#report-bug-modal textarea::placeholder,
+#info-modal #checkout-name::placeholder,
+#info-modal #checkout-address::placeholder {
+  color: #9ca3af;
+}
+
+body.dark #order-event-modal input::placeholder,
+body.dark #order-event-modal textarea::placeholder,
+body.dark #report-bug-modal input::placeholder,
+body.dark #report-bug-modal textarea::placeholder,
+body.dark #info-modal #checkout-name::placeholder,
+body.dark #info-modal #checkout-address::placeholder {
+  color: #6b7280;
+}
+
+/* Label form pengantaran di info modal */
+#info-modal #delivery-form label {
+  color: #374151;
+}
+body.dark #info-modal #delivery-form label {
+  color: #e2e8f0;
+}
+body.dark #info-modal #delivery-form p {
+  color: #e2e8f0;
+}
+
+/* Ensure text in confirm delete modal is readable */
+#confirm-delete-modal p {
+  color: #4b5563; /* Default light mode color */
+}
+
+body.dark #confirm-delete-modal p {
+  color: #cbd5e1; /* Dark mode color */
+}
+
+/* Ensure text in wishlist modal is readable */
+#wishlist-modal .bg-gray-50 p {
+  color: #374151; /* Default light mode color */
+}
+
+body.dark #wishlist-modal .bg-gray-50 p {
+  color: #e2e8f0; /* Dark mode color */
+}
+
+#wishlist-modal .bg-gray-50 .text-gray-500 {
+  color: #6b7280; /* Default light mode color */
+}
+
+body.dark #wishlist-modal .bg-gray-50 .text-gray-500 {
+  color: #94a3b8; /* Dark mode color */
+}
+
+/* Ensure text in cart modal is readable */
+#cart-modal .bg-gray-50 p {
+  color: #374151; /* Default light mode color */
+}
+
+body.dark #cart-modal .bg-gray-50 p {
+  color: #e2e8f0; /* Dark mode color */
+}
+
+#cart-modal .bg-gray-50 .text-gray-500 {
+  color: #6b7280; /* Default light mode color */
+}
+
+body.dark #cart-modal .bg-gray-50 .text-gray-500 {
+  color: #94a3b8; /* Dark mode color */
+}
+
+/* Ensure edit cart modal text is readable */
+#edit-cart-modal p {
+  color: #374151; /* Default light mode color */
+}
+
+body.dark #edit-cart-modal p {
+  color: #e2e8f0; /* Dark mode color */
+}
+
+#edit-cart-modal .text-gray-500 {
+  color: #6b7280; /* Default light mode color */
+}
+
+body.dark #edit-cart-modal .text-gray-500 {
+  color: #94a3b8; /* Dark mode color */
+}
+
+/* Ensure search modal text is readable */
+#search-modal input {
+  color: #1f2937; /* Default light mode color */
+  background-color: white;
+  border-color: #d1d5db;
+}
+
+body.dark #search-modal input {
+  color: #e2e8f0; /* Dark mode color */
+  background-color: #1f2937;
+  border-color: #4b5563;
+}
+
+/* New: Modal Close Button (X) */
+.modal-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6b7280; /* Default color for light mode */
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+  z-index: 10; /* Ensure it's above other modal content */
+}
+
+.modal-close-btn:hover {
+  color: #1f2937; /* Darker on hover for light mode */
+  transform: rotate(90deg);
+}
+
+body.dark .modal-close-btn {
+  color: #9ca3af; /* Default color for dark mode */
+}
+
+body.dark .modal-close-btn:hover {
+  color: #e2e8f0; /* Lighter on hover for dark mode */
+}
+
+/* New: Modal Back Button */
+.modal-back-btn {
+  background: #e5e7eb; /* Light gray for light mode */
+  color: #374151; /* Dark text for light mode */
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: fit-content; /* Adjust width to content */
+  margin-left: auto; /* Push to right */
+}
+
+.modal-back-btn:hover {
+  background: #d1d5db; /* Darker gray on hover for light mode */
+  transform: translateY(-1px);
+}
+
+body.dark .modal-back-btn {
+  background: #475569; /* Darker gray for dark mode */
+  color: #e2e8f0; /* Light text for dark mode */
+}
+
+body.dark .modal-back-btn:hover {
+  background: #334155; /* Even darker gray on hover for dark mode */
+}
+
+/* Responsive adjustments for buttons */
+@media (max-width: 640px) {
+  .modal-back-btn {
+    width: 100%; /* Full width on small screens */
+    margin-left: 0;
+  }
+}
+
+/* Responsive promo input container */
+@media (max-width: 768px) {
+  .promo-input-container {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      e.preventDefault();
-      const target = this.getAttribute('href');
-
-      if(mobileMenuOpen) {
-        hamburger.click(); // Close mobile menu
-        // Add a small delay if needed for the menu to close before scrolling
-        setTimeout(() => smoothScrollTo(target), 300);
-      } else {
-        smoothScrollTo(target);
-      }
-    });
-  });
-
-  if(window.location.hash) {
-    setTimeout(() => {
-      smoothScrollTo(window.location.hash);
-    }, 100);
+  .promo-input-container input {
+    width: 100%;
+    margin-bottom: 0.5rem; /* Space between input and button */
   }
 
-  let isScrolling;
-  window.addEventListener('scroll', () => {
-    window.clearTimeout(isScrolling);
-    isScrolling = setTimeout(() => {
-      updateHeaderOnScroll();
-    }, 100);
-  }, false);
-
-  // --- New Contact Modals Logic ---
-
-  // Toggle dropdowns
-  whatsappContactBtn.addEventListener('click', function(event) {
-    event.stopPropagation(); // Prevent click from closing immediately
-    whatsappDropdownContent.style.display = whatsappDropdownContent.style.display === 'block' ? 'none' : 'block';
-    emailDropdownContent.style.display = 'none'; // Close other dropdown
-  });
-
-  emailContactBtn.addEventListener('click', function(event) {
-    event.stopPropagation(); // Prevent click from closing immediately
-    emailDropdownContent.style.display = emailDropdownContent.style.display === 'block' ? 'none' : 'block';
-    whatsappDropdownContent.style.display = 'none'; // Close other dropdown
-  });
-
-  // Close dropdowns when clicking outside
-  document.addEventListener('click', function(event) {
-    if (!whatsappContactBtn.contains(event.target) && !whatsappDropdownContent.contains(event.target)) {
-      whatsappDropdownContent.style.display = 'none';
-    }
-    if (!emailContactBtn.contains(event.target) && !emailDropdownContent.contains(event.target)) {
-      emailDropdownContent.style.display = 'none';
-    }
-  });
-
-  // Handle dropdown item clicks
-  document.querySelectorAll('.contact-dropdown-content a').forEach(link => {
-    link.addEventListener('click', function(e) {
-      e.preventDefault();
-      const action = this.dataset.action;
-
-      // Close all dropdowns
-      whatsappDropdownContent.style.display = 'none';
-      emailDropdownContent.style.display = 'none';
-
-      if (action === 'order-event-wa') {
-        currentContactActionType = 'whatsapp';
-        currentContactAction = 'order-event';
-        openModal(orderEventModal);
-        resetOrderEventForm();
-      } else if (action === 'report-bug-wa') {
-        currentContactActionType = 'whatsapp';
-        currentContactAction = 'report-bug';
-        openModal(reportBugModal);
-        resetReportBugForm();
-      } else if (action === 'order-event-email') {
-        currentContactActionType = 'email';
-        currentContactAction = 'order-event';
-        // Simulate Google login success
-        showBadge(loginSuccessBadge, "Berhasil Login!");
-        setTimeout(() => {
-          openModal(orderEventModal);
-          resetOrderEventForm();
-        }, 1000); // Delay to show login success badge
-      } else if (action === 'report-bug-email') {
-        currentContactActionType = 'email';
-        currentContactAction = 'report-bug';
-        // Simulate Google login success
-        showBadge(loginSuccessBadge, "Berhasil Login!");
-        setTimeout(() => {
-          openModal(reportBugModal);
-          resetReportBugForm(); // Fixed: should be resetReportBugForm
-        }, 1000); // Delay to show login success badge
-      }
-    });
-  });
-
-  // Order Event Modal Logic
-  submitOrderEventBtn.addEventListener('click', () => {
-    const name = orderNameInput.value.trim();
-    const wa = orderWaInput.value.trim();
-    const eventName = orderEventNameInput.value.trim();
-    const date = orderDateInput.value;
-    const address = orderAddressInput.value.trim();
-
-    if (!name || !wa || !eventName || !date || !address) {
-      showNotif("Harap lengkapi semua kolom!");
-      return;
-    }
-
-    const formattedDate = new Date(date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-    if (currentContactActionType === 'whatsapp') {
-      const message = `Halo Kedai Mas Haris, saya ingin memesan untuk acara:\n\n` +
-                      `Nama Pemesan: ${name}\n` +
-                      `No. WA: ${wa}\n` +
-                      `Acara: ${eventName}\n` +
-                      `Dipesan untuk Tanggal: ${formattedDate}\n` +
-                      `Alamat Dituju: ${address}\n\n` +
-                      `Mohon konfirmasi pesanan ini. Terima kasih!`;
-      const encodedMessage = encodeURIComponent(message);
-      window.open(`https://wa.me/${WA_PHONE}?text=${encodedMessage}`, '_blank');
-      showBadge(sentBadge, "Pesanan acara terkirim!");
-    } else if (currentContactActionType === 'email') {
-      const subject = `Order Acara: ${eventName} oleh ${name}`;
-      const body = `Yth. Kedai Mas Haris,\n\n` +
-                   `Saya ingin memesan produk untuk acara berikut:\n\n` +
-                   `Nama Pemesan: ${name}\n` +
-                   `No. WA: ${wa}\n` +
-                   `Acara: ${eventName}\n` +
-                   `Dipesan untuk Tanggal: ${formattedDate}\n` +
-                   `Alamat Dituju: ${address}\n\n` +
-                   `Mohon konfirmasi pesanan ini. Terima kasih.\n\n` +
-                   `Hormat saya,\n[Nama Anda (opsional)]`;
-
-      // Simulate sending email via mailto with CC
-      const mailtoLink = `mailto:${MY_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}&cc=${encodeURIComponent(CC_EMAIL)}`;
-      window.location.href = mailtoLink; // This will open the user's default email client
-      showBadge(sentBadge, "Email pesanan terkirim!");
-    }
-    closeAllModals();
-  });
-
-  function resetOrderEventForm() {
-    orderNameInput.value = '';
-    orderWaInput.value = '';
-    orderEventNameInput.value = '';
-    orderDateInput.value = '';
-    orderAddressInput.value = '';
+  .promo-input-container button {
+    width: 100%;
   }
+}
 
-  // Report Bug Modal Logic
-  bugDescriptionInput.addEventListener('input', () => {
-    const currentLength = bugDescriptionInput.value.length;
-    bugCharCount.textContent = `${currentLength}/500`;
-  });
+/* --- START: REVISI UNTUK TOMBOL HAPUS SEMUA DI MODAL KERANJANG --- */
+/* Container untuk judul dan tombol hapus semua */
+#cart-modal .modal-header-cart {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  align-items: center; /* Center horizontally */
+  margin-bottom: 1rem; /* Space below header */
+  position: relative; /* For positioning the close button */
+}
 
-  submitReportBugBtn.addEventListener('click', () => {
-    const title = bugTitleInput.value.trim();
-    const description = bugDescriptionInput.value.trim();
+#cart-modal .modal-header-cart h3 {
+  margin-bottom: 0.5rem; /* Space between title and clear button */
+  text-align: center;
+  font-size: large; /* Center the title */
+}
 
-    if (!title || !description) {
-      showNotif("Judul dan Deskripsi bug harus diisi!");
-      return;
-    }
+#cart-modal .clear-cart-btn {
+  /* Existing styles for clear-cart-btn */
+  background: none;
+  border: none;
+  color: #ef4444; /* Red color for delete icon */
+  font-size: 0.9rem; /* Adjust font size if needed */
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 0.25rem 0.5rem; /* Add some padding */
+  border-radius: 0.375rem; /* Slightly rounded corners */
+}
 
-    if (currentContactActionType === 'whatsapp') {
-      const message = `Laporan Bug:\n\n` +
-                      `Judul: ${title}\n` +
-                      `Deskripsi: ${description}\n\n` +
-                      `Terima kasih atas perhatiannya.`;
-      const encodedMessage = encodeURIComponent(message);
-      window.open(`https://wa.me/${WA_PHONE}?text=${encodedMessage}`, '_blank');
-      showBadge(sentBadge, "Laporan bug terkirim!");
-    } else if (currentContactActionType === 'email') {
-      const subject = `Laporan Bug: ${title}`;
-      const body = `Yth. Admin Kedai Mas Haris,\n\n` +
-                   `Saya ingin melaporkan bug yang saya temukan:\n\n` +
-                   `Judul Bug: ${title}\n` +
-                   `Deskripsi Bug:\n${description}\n\n` +
-                   `Mohon segera ditindaklanjuti. Terima kasih.\n\n` +
-                   `Hormat saya,\n[Nama Anda (opsional)]`;
+#cart-modal .clear-cart-btn:hover {
+  color: #dc2626; /* Darker red on hover */
+  background-color: rgba(239, 68, 68, 0.1); /* Light red background on hover */
+}
 
-      const mailtoLink = `mailto:${MY_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}&cc=${encodeURIComponent(CC_EMAIL)}`;
-      window.location.href = mailtoLink;
-      showBadge(sentBadge, "Email laporan bug terkirim!");
-    }
-    closeAllModals();
-  });
+body.dark #cart-modal .clear-cart-btn {
+  color: #f87171; /* Lighter red for dark mode */
+}
 
-  function resetReportBugForm() {
-    bugTitleInput.value = '';
-    bugDescriptionInput.value = '';
-    bugCharCount.textContent = '0/500';
+body.dark #cart-modal .clear-cart-btn:hover {
+  color: #ef4444; /* Darker red on hover in dark mode */
+  background-color: rgba(248, 113, 113, 0.1); /* Light red background on hover in dark mode */
+}
+
+/* Pastikan tombol close (X) tetap di kanan atas */
+#cart-modal .modal-close-btn {
+  position: absolute;
+  top: 0.5rem; /* Adjust as needed */
+  right: 0.5rem; /* Adjust as needed */
+  z-index: 11; /* Ensure it's above the header content */
+}
+/* --- END: REVISI UNTUK TOMBOL HAPUS SEMUA DI MODAL KERANJANG --- */
+
+/* New: Product Info Details (Rating & Sales) */
+.product-info-details {
+  display: flex;
+  justify-content: flex-end; /* Align to end (right) */
+  align-items: center;
+  margin-bottom: 0.75rem; /* Space between info and buttons */
+  font-size: 0.875rem; /* Small font size for info */
+}
+
+/* Removed .product-rating styles */
+
+.product-sales {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #ef4444; /* Red for sales icon */
+  font-weight: 600;
+}
+
+.product-sales .sales-icon {
+  font-size: 0.9rem; /* Adjust sales icon size */
+}
+
+/* Dark mode adjustments for rating and sales */
+body.dark .product-sales {
+  color: #f87171; /* Lighter red for dark mode */
+}
+
+/* Responsive adjustments for product info details */
+@media (max-width: 768px) {
+  .product-info-details {
+    flex-direction: row; /* Keep as row */
+    justify-content: flex-end; /* Keep aligned to right */
+    align-items: center;
+    gap: 0.25rem;
   }
+}
 
-  // Function to update mobile menu items based on screen size
-  function updateMobileMenuItems() {
-    // This function is intentionally left empty or minimal based on previous instructions
-    // to remove search, cart, and dark mode from the mobile menu.
-    // If you wish to re-add them conditionally, this is where the logic would go.
+@media (max-width: 520px) {
+  .product-info-details {
+    flex-direction: row; /* Keep as row */
+    justify-content: flex-end; /* Keep aligned to right */
+    align-items: center;
+    font-size: 0.75rem;
   }
-
-  // Initial call to set up mobile menu items
-  updateMobileMenuItems();
-
-  // Back to Top button logic
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 200) { // Show button after scrolling 200px
-      backToTopBtn.classList.add('show');
-    } else {
-      backToTopBtn.classList.remove('show');
-    }
-  });
-
-  backToTopBtn.addEventListener('click', () => {
-    gsap.to(window, {
-      duration: 1, // Durasi animasi scroll
-      scrollTo: {
-        y: 0, // Scroll ke paling atas
-        autoKill: true
-      },
-      ease: "power2.inOut" // Animasi smooth
-    });
-  });
-
-  // New: Update Notification Modal Logic
-  // Checkbox event listener
-  dontShowAgainCheckbox.addEventListener('change', () => {
-    if (dontShowAgainCheckbox.checked) {
-      // Set cooldown timestamp in localStorage
-      localStorage.setItem(UPDATE_MODAL_COOLDOWN_KEY, new Date().getTime().toString());
-    } else {
-      // Remove cooldown timestamp from localStorage
-      localStorage.removeItem(UPDATE_MODAL_COOLDOWN_KEY);
-    }
-  });
-
-  // Initial call to show update modal on page load
-  // Added a small delay to ensure all DOM elements are rendered and GSAP is ready
-  setTimeout(showUpdateModal, 1000);
-
-  // Initial update of cart and wishlist counts
-  updateCartCount();
-  updateWishlistCount();
-});
-
-document.addEventListener("DOMContentLoaded", function() {
-  const headerOffset = document.querySelector('header')?.offsetHeight || 60;
-  function scrollToSection(selector) {
-    const target = document.querySelector(selector);
-    if (target) {
-      gsap.to(window, {
-        duration: 1,
-        scrollTo: { y: target, offsetY: headerOffset },
-        ease: "power2.inOut"
-      });
-    }
+  .product-sales .sales-icon {
+    font-size: 0.7rem; /* Even smaller on mobile */
   }
-  document.querySelectorAll('a[href^="#"]').forEach(link => {
-    const href = link.getAttribute('href');
-    if (href && href.startsWith("#")) {
-      link.addEventListener('click', function(e) {
-        const targetEl = document.querySelector(href);
-        if (targetEl) {
-          e.preventDefault();
-          scrollToSection(href);
-        }
-      });
-    }
-  });
+}
 
-  // --- New: Universal Modal Close and Back Buttons ---
-  // Get all modals
-  const allModals = document.querySelectorAll('.modal');
+/* New: Product Rating Styles */
+.product-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #f97316; /* Yellow for stars */
+  font-weight: 600;
+  margin-right: auto; /* Push to the left */
+  opacity: 1; /* Always visible */
+  transform: translateX(0); /* Always in position */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
 
-  allModals.forEach(modal => {
-    // Add event listener for the "X" close button
-    const closeBtn = modal.querySelector('.modal-close-btn');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
-        // Special handling for updateModal – always use safe close
-        if (modal.id === 'update-modal') {
-          closeUpdateModalSafely();
-        } else {
-          closeAllModals(); // Close all modals
-        }
-      });
-    }
+/* Container for the 5 empty stars */
+.stars-outer {
+  position: relative;
+  display: inline-block;
+  font-family: 'Font Awesome 6 Free'; /* Use Font Awesome */
+  font-weight: 900; /* For solid stars */
+  font-size: 1rem; /* Base size for stars */
+  line-height: 1; /* Prevent extra space */
+  white-space: nowrap; /* Keep stars on one line */
+}
 
-    // Add event listener for the "Kembali" back button
-    const backBtn = modal.querySelector('.modal-back-btn');
-    if (backBtn) {
-      backBtn.addEventListener('click', () => {
-        if (modal.id === 'update-modal') {
-          closeUpdateModalSafely();
-        } else if (modal.id === 'payment-modal') {
-          // Jika sedang di sub-pilihan bank, kembali ke metode pembayaran
-          const bankOpts = document.getElementById("bank-options");
-          if (bankOpts && !bankOpts.classList.contains("hidden")) {
-            bankOpts.classList.add("hidden");
-            ["pay-cash","pay-dana","pay-transfer","pay-qris"].forEach(id => {
-              const el = document.getElementById(id);
-              if (el) el.classList.remove("hidden");
-            });
-            document.getElementById("payment-title").textContent = "Pilih Metode Pembayaran";
-          } else {
-            goBackToPreviousModal();
-          }
-        } else {
-          goBackToPreviousModal();
-        }
-      });
-    }
-  });
-});
+.stars-outer::before {
+  content: '\f005 \f005 \f005 \f005 \f005'; /* 5 empty stars */
+  color: #d1d5db; /* Light gray for empty stars */
+}
+
+/* Filled stars container */
+.stars-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 0%; /* Controlled by JS */
+}
+
+.stars-inner::before {
+  content: '\f005 \f005 \f005 \f005 \f005'; /* 5 filled stars */
+  color: #f97316; /* Yellow for filled stars */
+}
+
+/* Responsive star sizing */
+@media (max-width: 768px) {
+  .stars-outer {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .stars-outer {
+    font-size: 0.8rem;
+  }
+}
+
+/* Removed: Show rating on product card hover */
+/* .product-card:hover .product-rating {
+  opacity: 1;
+  transform: translateX(0);
+} */
+
+/* Dark mode adjustments for rating */
+body.dark .product-rating {
+  color: #fde047; /* Lighter yellow for dark mode */
+}
+
+body.dark .stars-outer::before {
+  color: #6b7280; /* Darker gray for empty stars in dark mode */
+}
+
+body.dark .stars-inner::before {
+  color: #fde047; /* Lighter yellow for filled stars in dark mode */
+}
+
+/* QR Code Enlarge Feature */
+#dana-qr-code.qr-enlargeable {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 2px solid transparent;
+}
+
+#dana-qr-code.qr-enlargeable:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  border-color: #f97316;
+}
+
+.qr-enlarge-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.qr-enlarge-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.qr-enlarge-overlay.hidden {
+  display: none !important;
+}
+
+.qr-enlarge-img {
+  max-width: min(90vw, 420px);
+  max-height: min(75vh, 420px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 1rem;
+  background: white;
+  padding: 0.75rem;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+.qr-enlarge-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  font-size: 2rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+  line-height: 1;
+  z-index: 2001;
+}
+
+.qr-enlarge-close:hover {
+  background: rgba(255,255,255,0.3);
+  transform: scale(1.1);
+}
+
+.qr-enlarge-hint {
+  color: rgba(255,255,255,0.75);
+  font-size: 0.85rem;
+  margin-top: 1.25rem;
+  text-align: center;
+}
+
+body.dark .qr-enlarge-img {
+  background: #1f2937;
+}
