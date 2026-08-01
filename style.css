@@ -434,16 +434,16 @@ body.dark .category-card.active {
   box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
 }
 
-/* Gorengan kategori */
-.category-card[data-kategori="Gorengan"] {
+/* Asin kategori (sebelumnya Gorengan) */
+.category-card[data-kategori="Asin"] {
   background-image: linear-gradient(45deg, #eab308, #ca8a04);
 }
 
-.category-card[data-kategori="Gorengan"]:hover {
+.category-card[data-kategori="Asin"]:hover {
   box-shadow: 0 10px 20px rgba(234, 179, 8, 0.2);
 }
 
-.category-card[data-kategori="Gorengan"].active {
+.category-card[data-kategori="Asin"].active {
   border: 3px solid #a16207;
   box-shadow: 0 8px 25px rgba(234, 179, 8, 0.3);
 }
@@ -925,11 +925,11 @@ body.dark .category-card[data-kategori="Karbohidrat"].active {
   box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
 }
 
-body.dark .category-card[data-kategori="Gorengan"] {
+body.dark .category-card[data-kategori="Asin"] {
   background-image: linear-gradient(45deg, #ca8a04, #a16207);
 }
 
-body.dark .category-card[data-kategori="Gorengan"].active {
+body.dark .category-card[data-kategori="Asin"].active {
   border: 3px solid #fbbf24;
   box-shadow: 0 8px 25px rgba(234, 179, 8, 0.4);
 }
@@ -2150,9 +2150,9 @@ body.dark #update-modal label {
 /* Swiper for Product Detail Images */
 .product-detail-swiper {
   width: 100%;
-  /* Tinggi cukup agar gambar horizontal hampir full terlihat tanpa crop */
-  height: 260px;
-  border-radius: 0.75rem;
+  height: 240px;
+  /* Sudut lebih lembut, tidak terlalu lancip */
+  border-radius: 1.25rem;
   overflow: hidden;
   position: relative;
   background: #f3f4f6;
@@ -2167,28 +2167,32 @@ body.dark .product-detail-swiper {
   align-items: center;
   justify-content: center;
   height: 100%;
+  /* Sudut lembut mengikuti kontainer */
+  border-radius: 1.25rem;
+  overflow: hidden;
 }
 
 .product-detail-swiper .swiper-slide img,
 .product-detail-main-img {
   width: 100%;
   height: 100%;
-  /* contain = seluruh gambar terlihat (cocok landscape & portrait) */
-  object-fit: contain;
+  /* cover = isi penuh kontainer (vertikal + horizontal) */
+  object-fit: cover;
   object-position: center;
   cursor: pointer;
   transition: transform 0.2s ease;
   background: transparent;
+  /* Sudut gambar ikut membulat */
+  border-radius: 1.25rem;
 }
 
 .product-detail-swiper .swiper-slide img:hover {
   transform: scale(1.02);
 }
 
-/* Responsive: sedikit lebih tinggi di layar lebar */
 @media (min-width: 480px) {
   .product-detail-swiper {
-    height: 300px;
+    height: 280px;
   }
 }
 
