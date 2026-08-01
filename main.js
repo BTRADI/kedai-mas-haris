@@ -129,7 +129,7 @@ const productList = [
   {
     name: "Sosis Solo",
     price: 3500,
-    kategori: "Gorengan",
+    kategori: "Asin",
     description: "Sosis Solo dengan isian daging ayam cincang yang lezat, dibalut kulit tipis nan lembut.",
     images: ["Soslo1.PNG", "Soslo2.png", "Soslo3.png"]
   },
@@ -150,21 +150,21 @@ const productList = [
   {
     name: "Risol Mayonais",
     price: 3500,
-    kategori: "Gorengan",
+    kategori: "Asin",
     description: "Risol renyah dengan isian sosis, telur, dan mayonais creamy.",
     images: ["https://via.placeholder.com/120?text=Risol+Mayonais+1", "https://via.placeholder.com/120?text=Risol+Mayonais+2", "https://via.placeholder.com/120?text=Risol+Mayonais+3"]
   },
   {
     name: "Pastel Bihun",
     price: 3500,
-    kategori: "Gorengan",
+    kategori: "Asin",
     description: "Pastel gurih dengan isian bihun dan sayuran.",
     images: ["https://via.placeholder.com/120?text=Pastel+Bihun+1", "https://via.placeholder.com/120?text=Pastel+Bihun+2", "https://via.placeholder.com/120?text=Pastel+Bihun+3"]
   },
   {
     name: "Pastel Mayonais",
     price: 3500,
-    kategori: "Gorengan",
+    kategori: "Asin",
     description: "Pastel renyah dengan isian sayur, sosis, dan mayonais creamy yang lezat.",
     images: ["https://via.placeholder.com/120?text=Pastel+Mayonais+1", "https://via.placeholder.com/120?text=Pastel+Mayonais+2", "https://via.placeholder.com/120?text=Pastel+Mayonais+3"]
   },
