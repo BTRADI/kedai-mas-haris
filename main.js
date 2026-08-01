@@ -184,7 +184,7 @@ const productList = [
   },
   {
     name: "Nasi Uduk",
-    price: 3500,
+    price: 10000,
     kategori: "Karbohidrat",
     description: "Nasi uduk gurih dengan aroma rempah khas, cocok untuk sarapan atau makan siang.",
     images: ["https://via.placeholder.com/120?text=Nasi+Uduk+1", "https://via.placeholder.com/120?text=Nasi+Uduk+2", "https://via.placeholder.com/120?text=Nasi+Uduk+3"],
@@ -203,7 +203,7 @@ const productList = [
   },
   {
     name: "Nasi Kuning",
-    price: 3500,
+    price: 10000,
     kategori: "Karbohidrat",
     description: "Nasi kuning harum dengan lauk pelengkap, hidangan istimewa untuk berbagai acara.",
     images: ["https://via.placeholder.com/120?text=Nasi+Kuning+1", "https://via.placeholder.com/120?text=Nasi+Kuning+2", "https://via.placeholder.com/120?text=Nasi+Kuning+3"],
