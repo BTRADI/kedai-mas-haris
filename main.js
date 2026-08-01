@@ -131,7 +131,7 @@ const productList = [
     price: 3500,
     kategori: "Gorengan",
     description: "Sosis Solo dengan isian daging ayam cincang yang lezat, dibalut kulit tipis nan lembut.",
-    images: ["https://via.placeholder.com/120?text=Sosis+Solo+1", "https://via.placeholder.com/120?text=Sosis+Solo+2", "https://via.placeholder.com/120?text=Sosis+Solo+3"]
+    images: ["Soslo1.PNG", "Soslo2.png", "Soslo3.png"]
   },
   {
     name: "Sus",
@@ -184,7 +184,7 @@ const productList = [
   },
   {
     name: "Nasi Uduk",
-    price: 10000,
+    price: 3500,
     kategori: "Karbohidrat",
     description: "Nasi uduk gurih dengan aroma rempah khas, cocok untuk sarapan atau makan siang.",
     images: ["https://via.placeholder.com/120?text=Nasi+Uduk+1", "https://via.placeholder.com/120?text=Nasi+Uduk+2", "https://via.placeholder.com/120?text=Nasi+Uduk+3"],
@@ -203,7 +203,7 @@ const productList = [
   },
   {
     name: "Nasi Kuning",
-    price: 10000,
+    price: 3500,
     kategori: "Karbohidrat",
     description: "Nasi kuning harum dengan lauk pelengkap, hidangan istimewa untuk berbagai acara.",
     images: ["https://via.placeholder.com/120?text=Nasi+Kuning+1", "https://via.placeholder.com/120?text=Nasi+Kuning+2", "https://via.placeholder.com/120?text=Nasi+Kuning+3"],
@@ -954,36 +954,61 @@ function openProductDetailModal(itemName) {
   detailQtyDisplay.textContent = currentProductDetailQty;
   updateDetailButtons(currentProductDetailQty);
 
-  // Render images for Swiper
+  // Render images for Swiper (gambar asli)
   productDetailImagesContainer.innerHTML = '';
-  product.images.forEach((imgSrc, index) => {
+  const productImages = (product.images && product.images.length > 0)
+    ? product.images
+    : [`https://via.placeholder.com/400?text=${encodeURIComponent(product.name)}`];
+
+  productImages.forEach((imgSrc, index) => {
     const slide = document.createElement('div');
     slide.className = 'swiper-slide';
-    // Placeholder text for images
-    // Changed background to white for light mode, and #1F2937 for dark mode
-    slide.innerHTML = `<div class="flex items-center justify-center w-full h-48 bg-white dark:bg-gray-900 rounded-lg text-gray-600 dark:text-gray-300 text-lg font-semibold">Gambar ${index + 1}</div>`;
+    slide.innerHTML = `
+      <img src="${imgSrc}"
+           alt="${product.name} ${index + 1}"
+           class="product-detail-main-img w-full h-full object-cover rounded-lg cursor-pointer"
+           data-full-src="${imgSrc}"
+           loading="lazy"
+           onerror="this.src='https://via.placeholder.com/400?text=${encodeURIComponent(product.name)}'" />
+    `;
     productDetailImagesContainer.appendChild(slide);
   });
 
-  // Initialize Swiper for product detail images
-  // Destroy existing Swiper instance if it exists
+  // Initialize Swiper: no loop, navigation, thumbnail bullets
   if (productDetailModal.swiper) {
     productDetailModal.swiper.destroy(true, true);
+    productDetailModal.swiper = null;
   }
   productDetailModal.swiper = new Swiper(".product-detail-swiper", {
-    loop: true,
-    autoplay: {
-      delay: 2500, // Auto-scroll every 2.5 seconds
-      disableOnInteraction: false, // Keep auto-scrolling even after user interaction
+    loop: false,
+    autoplay: false,
+    spaceBetween: 8,
+    navigation: {
+      nextEl: ".product-detail-swiper .swiper-button-next",
+      prevEl: ".product-detail-swiper .swiper-button-prev",
     },
     pagination: {
       el: ".product-detail-pagination",
       clickable: true,
       renderBullet: function (index, className) {
-        // Use text "Gambar X" as bullets
-        return `<span class="${className} flex items-center justify-center"><span class="text-sm">Gambar ${index + 1}</span></span>`;
+        const thumbSrc = productImages[index] || "";
+        return `<span class="${className}" role="button" aria-label="Gambar ${index + 1}">
+          <img src="${thumbSrc}" alt="Thumb ${index + 1}" loading="lazy"
+               onerror="this.style.display='none'" />
+        </span>`;
       },
     },
+  });
+
+  // Klik gambar besar → perbesar (reuse enlarge overlay)
+  productDetailImagesContainer.querySelectorAll(".product-detail-main-img").forEach(img => {
+    img.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const src = img.getAttribute("data-full-src") || img.src;
+      if (typeof window.openQrEnlarge === "function") {
+        window.openQrEnlarge(src);
+      }
+    });
   });
 
   // Handle variants
@@ -2005,6 +2030,8 @@ document.addEventListener('DOMContentLoaded', () => {
     qrEnlargeOverlay.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
   }
+  // Expose globally agar bisa dipanggil dari openProductDetailModal
+  window.openQrEnlarge = openQrEnlarge;
 
   function closeQrEnlarge() {
     if (!qrEnlargeOverlay) return;
@@ -2016,6 +2043,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.style.overflow = "";
     }, 250);
   }
+  window.closeQrEnlarge = closeQrEnlarge;
 
   // Click on QR image to enlarge
   if (danaQrCodeImg) {
