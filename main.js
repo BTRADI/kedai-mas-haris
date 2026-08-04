@@ -225,6 +225,19 @@ const productList = [
 // New: Update Log Data
 const updateLog = [
   {
+    version: "1.1.0",
+    date: "2026-08-01",
+    changes: [
+      "Rebuilt website ke versi terbaru 1.1.0 (1 Agustus 2026).",
+      "Penyesuaian harga menu mengikuti kenaikan harga bahan global.",
+      "Update menu Kue Talam.",
+      "Kode promo baru: HIDUPINDO81 (diskon 10%, 5–31 Agustus 2026).",
+      "Perbaikan bug menyeluruh (modal, checkout, QRIS, WA).",
+      "Rapikan kontras teks mode terang & gelap.",
+      "Haluskan UX tombol X dan Kembali pada alur modal."
+    ]
+  },
+  {
     version: "1.0.3",
     date: "2025-08-25",
     changes: [
@@ -266,12 +279,12 @@ const updateLog = [
 ];
 
 const currentPromo = {
-  code: "DISKON10", // Kode promo yang Anda inginkan
+  code: "HIDUPINDO81",
   discountPercentage: 0.10, // 10% diskon
   minPurchase: 20000, // Minimal pembelian Rp 20.000
-  startDate: new Date("2025-08-21T20:00:00"), // Kamis, 21 Agustus 2025 pukul 20.00
-  endDate: new Date("2025-08-29T17:00:00"), // Selasa, 29 Agustus 2025 pukul 17.00
-  text: "Dapatkan diskon 10% untuk pembelian minimal Rp 20.000! Diperpanjang berlaku hingga 29 Agustus 2025 pukul 17.00 dengan kode promo: DISKON10."
+  startDate: new Date("2026-08-05T00:00:00"), // 5 Agustus 2026
+  endDate: new Date("2026-08-31T23:59:59"), // 31 Agustus 2026
+  text: "Dapatkan diskon 10% untuk pembelian minimal Rp 20.000! Berlaku 5–31 Agustus 2026 dengan kode promo: HIDUPINDO81."
 };
 
 // Cart & Wishlist state
@@ -292,7 +305,7 @@ let finalDiscountedPrice = 0; // New: To store the final price after discount
 // New: Promo usage tracking per user (stored in localStorage)
 const PROMO_USAGE_KEY = 'promoUsage';
 const MAX_PROMO_USAGE = 3; // Max 3 times per user
-let promoUsage = {}; // { 'DISKON10': { count: 0, currentTransactionId: null } }
+let promoUsage = {}; // { 'HIDUPINDO81': { count: 0, currentTransactionId: null } }
 
 // New: Unique ID for current transaction (to track promo usage within a single transaction)
 let currentTransactionId = null;
@@ -493,6 +506,61 @@ function closeAllModals() {
 // ---------- Persistensi Data (New) ----------
 function saveCartToLocalStorage() {
   localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+function recalculateCartItemUnitPrice(item) {
+  const product = productList.find(p => p.name === item.name);
+  if (!product) return item.price;
+
+  // Hitung ulang dari harga katalog saat ini + variant/topping
+  let unit = product.price;
+  if (item.variant && product.variants) {
+    const v = product.variants.find(x => x.name === item.variant);
+    if (v) unit += (v.price || 0);
+  }
+  if (item.toppings && item.toppings.length > 0 && product.toppings) {
+    item.toppings.forEach(t => {
+      const tp = product.toppings.find(x => x.name === t.name);
+      if (tp) unit += (tp.price || 0) * (t.qty || 1);
+    });
+  }
+  return unit;
+}
+
+function migrateStoredPrices() {
+  let cartChanged = false;
+  Object.keys(cart).forEach(key => {
+    const item = cart[key];
+    if (!item || !item.name) return;
+    // Sinkronkan harga Nasi (dan item lain) ke harga katalog terbaru
+    if (item.name === "Nasi Uduk" || item.name === "Nasi Kuning") {
+      const newPrice = recalculateCartItemUnitPrice(item);
+      if (item.price !== newPrice) {
+        item.price = newPrice;
+        cartChanged = true;
+      }
+    } else {
+      // Produk sederhana tanpa variant/topping: ikut harga katalog
+      const product = productList.find(p => p.name === item.name);
+      if (product && !item.variant && (!item.toppings || item.toppings.length === 0) && item.price !== product.price) {
+        item.price = product.price;
+        cartChanged = true;
+      }
+    }
+  });
+  if (cartChanged) saveCartToLocalStorage();
+
+  let wishlistChanged = false;
+  Object.keys(wishlist).forEach(key => {
+    const item = wishlist[key];
+    if (!item || !item.name) return;
+    const product = productList.find(p => p.name === item.name);
+    if (product && item.price !== product.price) {
+      item.price = product.price;
+      wishlistChanged = true;
+    }
+  });
+  if (wishlistChanged) saveWishlistToLocalStorage();
 }
 
 function loadCartFromLocalStorage() {
@@ -917,7 +985,9 @@ function displayProducts(list, targetContainer = container) {
 
     const orderButton = document.createElement("button");
     orderButton.className = "btn-pesan bg-orange-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-orange-600 transition-all flex-1";
-    orderButton.textContent = "Pesan";
+    // Produk dengan variant/topping: label "Pilih" (buka detail), lainnya "Pesan"
+    const needsConfig = (item.variants && item.variants.length > 0) || (item.toppings && item.toppings.length > 0);
+    orderButton.textContent = needsConfig ? "Pilih" : "Pesan";
     orderButton.setAttribute("data-name", item.name);
 
     buttonContainer.append(wishlistButton, orderButton);
@@ -1621,6 +1691,8 @@ document.addEventListener('DOMContentLoaded', () => {
   loadWishlistFromLocalStorage();
   loadUsedPromoCodes(); // New: Load used promo codes (this is for the global `usedPromoCodes` set, not the `promoUsage` object)
   loadPromoUsage(); // New: Load promo usage data
+  // Sinkronkan harga lama (mis. Nasi 3.500 → 10.000) ke katalog terbaru
+  migrateStoredPrices();
 
   // Generate a new transaction ID on page load
   currentTransactionId = Date.now().toString();
@@ -2131,6 +2203,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Debounce anti double-tap tombol Pesan (mobile)
+  let lastPesanClickAt = 0;
+  const PESAN_DEBOUNCE_MS = 500;
+
   // Dynamic product buttons (for quick add to cart from menu grid)
   container.addEventListener("click", (e) => {
     const target = e.target;
@@ -2148,6 +2224,11 @@ document.addEventListener('DOMContentLoaded', () => {
         openProductDetailModal(name);
         return;
       }
+
+      // Debounce: cegah qty dobel dari double-tap
+      const now = Date.now();
+      if (now - lastPesanClickAt < PESAN_DEBOUNCE_MS) return;
+      lastPesanClickAt = now;
 
       const itemKey = product.name;
       if (cart[itemKey]) {
@@ -2694,8 +2775,24 @@ document.addEventListener("DOMContentLoaded", function() {
         // Special handling for updateModal – always use safe close
         if (modal.id === 'update-modal') {
           closeUpdateModalSafely();
+        } else if (modalStack.length > 1) {
+          // Modal bertingkat: X = kembali satu tingkat (sama seperti Kembali)
+          if (modal.id === 'payment-modal') {
+            const bankOpts = document.getElementById("bank-options");
+            if (bankOpts && !bankOpts.classList.contains("hidden")) {
+              bankOpts.classList.add("hidden");
+              ["pay-cash","pay-dana","pay-transfer","pay-qris"].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove("hidden");
+              });
+              document.getElementById("payment-title").textContent = "Pilih Metode Pembayaran";
+              return;
+            }
+          }
+          goBackToPreviousModal();
         } else {
-          closeAllModals(); // Close all modals
+          // Modal root: tutup semua
+          closeAllModals();
         }
       });
     }
