@@ -2118,14 +2118,75 @@ body.dark .promo-input-container input {
 /* Gaya untuk teks promo yang diterapkan */
 .promo-applied-text {
   font-size: 0.875rem;
-  color: #22c55e; /* Green for success */
   font-weight: 600;
   margin-top: 0.5rem;
   text-align: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
 }
 
-body.dark .promo-applied-text {
-  color: #4ade80;
+.promo-msg--success {
+  color: #15803d;
+  background: #dcfce7;
+}
+body.dark .promo-msg--success {
+  color: #86efac;
+  background: rgba(22, 163, 74, 0.2);
+}
+
+.promo-msg--error {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+body.dark .promo-msg--error {
+  color: #fca5a5;
+  background: rgba(220, 38, 38, 0.2);
+}
+
+.promo-msg--info {
+  color: #a16207;
+  background: #fef3c7;
+}
+body.dark .promo-msg--info {
+  color: #fcd34d;
+  background: rgba(202, 138, 4, 0.2);
+}
+
+/* Empty state — keranjang/wishlist/search/rekomendasi kosong */
+.empty-state-text {
+  color: #4b5563 !important;
+}
+body.dark .empty-state-text {
+  color: #cbd5e1 !important;
+}
+.empty-state-text small {
+  color: inherit;
+  opacity: 0.85;
+}
+
+/* Teks sekunder (harga satuan, label kecil) */
+.muted-text {
+  color: #4b5563 !important;
+}
+body.dark .muted-text {
+  color: #94a3b8 !important;
+}
+
+/* Harga di kartu produk */
+.product-price {
+  color: #16a34a !important;
+  font-weight: 600;
+}
+body.dark .product-price {
+  color: #4ade80 !important;
+}
+
+/* Paragraf body di modal (konfirmasi hapus, dll.) */
+.modal-body-text {
+  color: #374151 !important;
+}
+body.dark .modal-body-text {
+  color: #e2e8f0 !important;
 }
 
 /* Kontras untuk checkbox label di update modal */
