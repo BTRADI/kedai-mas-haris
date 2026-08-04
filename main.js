@@ -580,7 +580,7 @@ function renderCart() {
 
   if (Object.keys(cart).length === 0) {
     cartItemsContainer.innerHTML = `
-      <div class="text-center text-gray-500 py-8">
+      <div class="empty-state-text text-center py-8">
         Keranjang kosong 🛒<br>
         <small>Silakan tambahkan produk!</small>
       </div>`;
@@ -611,7 +611,7 @@ function renderCart() {
              class="w-10 h-10 object-cover rounded-lg">
         <div>
           <p class="font-medium text-sm">${itemDetails}</p>
-          <p class="text-xs text-gray-500">Rp ${item.price.toLocaleString("id-ID")} x ${item.qty}</p>
+          <p class="text-xs muted-text">Rp ${item.price.toLocaleString("id-ID")} x ${item.qty}</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
@@ -692,6 +692,12 @@ function deleteCartItem(itemKey) { // itemKey now includes variant if applicable
 }
 
 // ---------- Fixed Promo Logic ----------
+function showPromoMessage(text, type = "info") {
+  if (!promoMessage) return;
+  promoMessage.textContent = text;
+  promoMessage.className = `promo-applied-text promo-msg--${type}`;
+}
+
 function applyPromoCode() {
   const inputCode = promoCodeInput.value.trim().toUpperCase();
   
@@ -723,35 +729,30 @@ function applyPromoCode() {
       // Scenario 2: Promo usage limit reached
       if (remainingUses <= 0) {
           promoApplied = false;
-          promoMessage.textContent = `Maaf kode promo yang anda masukkan sudah mencapai limit. Terima kasih 🙏`;
-          promoMessage.classList.remove('hidden');
+          showPromoMessage(`Maaf kode promo yang anda masukkan sudah mencapai limit. Terima kasih 🙏`, "error");
           updateCartTotal();
           return;
       }
 
       // Scenario 3: Promo not yet active
       if (today < currentPromo.startDate) {
-          promoMessage.textContent = "Kode promo belum aktif.";
-          promoMessage.classList.remove('hidden');
+          showPromoMessage("Kode promo belum aktif.", "error");
           promoApplied = false;
       }
       // Scenario 4: Promo expired
       else if (today > currentPromo.endDate) {
-          promoMessage.textContent = "Maaf, kode promo sudah kadaluarsa.";
-          promoMessage.classList.remove('hidden');
+          showPromoMessage("Maaf, kode promo sudah kadaluarsa.", "error");
           promoApplied = false;
       }
       // Scenario 5: Minimum purchase not met
       else if (totalPriceInCart < currentPromo.minPurchase) {
-          promoMessage.textContent = `Promo "${inputCode}" belum memenuhi syarat (minimal pembelian Rp ${currentPromo.minPurchase.toLocaleString("id-ID")}).`;
-          promoMessage.classList.remove('hidden');
+          showPromoMessage(`Promo "${inputCode}" belum memenuhi syarat (minimal pembelian Rp ${currentPromo.minPurchase.toLocaleString("id-ID")}).`, "info");
           promoApplied = false;
       }
       // Scenario 6: Promo successfully applied
       else {
           promoApplied = true;
-          promoMessage.textContent = `Kode promo berhasil diterapkan! Anda mendapatkan diskon 10%! 🎉 (Sisa penggunaan: ${remainingUses})`;
-          promoMessage.classList.remove('hidden');
+          showPromoMessage(`Kode promo berhasil diterapkan! Anda mendapatkan diskon 10%! 🎉 (Sisa penggunaan: ${remainingUses})`, "success");
 
           // Mark promo as used for this transaction
           promoData.currentTransactionId = currentTransactionId;
@@ -760,8 +761,7 @@ function applyPromoCode() {
       }
   } else {
       // Scenario 7: Invalid promo code
-      promoMessage.textContent = "Kode promo tidak valid.";
-      promoMessage.classList.remove('hidden');
+      showPromoMessage("Kode promo tidak valid.", "error");
       promoApplied = false;
   }
   updateCartTotal();
@@ -809,7 +809,7 @@ function renderWishlist() {
 
   if (Object.keys(wishlist).length === 0) {
     wishlistItemsContainer.innerHTML = `
-      <div class="text-center text-gray-500 py-8">
+      <div class="empty-state-text text-center py-8">
         Wishlist kosong 😔<br>
         <small>Tambahkan produk favorit Anda!</small>
       </div>`;
@@ -825,8 +825,8 @@ function renderWishlist() {
            class="w-12 h-12 object-cover rounded-lg">
       <div class="flex-1">
         <p class="font-medium text-sm">${item.name}</p>
-        <p class="text-xs text-gray-500">Rp ${item.price.toLocaleString("id-ID")}</p>
-        <p class="text-xs text-blue-600">${item.kategori}</p>
+        <p class="text-xs muted-text">Rp ${item.price.toLocaleString("id-ID")}</p>
+        <p class="text-xs text-blue-600 dark:text-blue-400">${item.kategori}</p>
       </div>
       <div class="flex flex-col gap-1">
         <button onclick="addToCartFromWishlist('${item.name}')"
@@ -876,7 +876,7 @@ function displayProducts(list, targetContainer = container) {
   targetContainer.innerHTML = "";
   if (!list || !list.length) {
     const msg = document.createElement("div");
-    msg.className = "col-span-full text-center py-8 text-gray-500";
+    msg.className = "col-span-full text-center py-8 empty-state-text";
     msg.innerHTML = `Maaf yang anda cari tidak/belum tersedia. 😔`;
     targetContainer.appendChild(msg);
     gsap.fromTo(msg, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.36, ease: "power2.out" });
@@ -897,7 +897,7 @@ function displayProducts(list, targetContainer = container) {
     title.textContent = item.name;
 
     const price = document.createElement("p");
-    price.className = "text-sm text-green-600 mb-2";
+    price.className = "text-sm product-price mb-2";
     price.textContent = "Rp " + item.price.toLocaleString("id-ID");
 
     const buttonContainer = document.createElement("div");
@@ -1195,7 +1195,7 @@ function renderRelatedProductsInModal(currentProduct) {
         <img src="${item.images && item.images.length > 0 ? item.images[0] : `https://via.placeholder.com/120?text=${encodeURIComponent(item.name)}`}"
              class="w-full h-32 object-cover rounded-lg mb-3">
         <h4 class="font-semibold text-base mb-1">${item.name}</h4>
-        <p class="text-sm text-green-600 mb-2">Rp ${item.price.toLocaleString("id-ID")}</p>
+        <p class="text-sm product-price mb-2">Rp ${item.price.toLocaleString("id-ID")}</p>
       `;
       card.addEventListener('click', () => {
         closeModal(productDetailModal); // Close current modal
@@ -1204,7 +1204,7 @@ function renderRelatedProductsInModal(currentProduct) {
       relatedProductsModalList.appendChild(card);
     });
   } else {
-    relatedProductsModalList.innerHTML = '<p class="text-center text-gray-500 text-sm col-span-2">Tidak ada rekomendasi.</p>';
+    relatedProductsModalList.innerHTML = '<p class="empty-state-text text-center text-sm col-span-2">Tidak ada rekomendasi.</p>';
   }
 }
 
