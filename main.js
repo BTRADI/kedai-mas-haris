@@ -229,6 +229,16 @@ const productList = [
 // New: Update Log Data
 const updateLog = [
   {
+    version: "1.1.1",
+    date: "2026-08-05",
+    changes: [
+      "Konfirmasi sebelum membuka WhatsApp.",
+      "Qty +/− langsung di keranjang (tanpa modal edit).",
+      "Status operasional: PO H-1 setiap hari, batas order jam 19.00.",
+      "Banner status buka/tutup PO di halaman utama."
+    ]
+  },
+  {
     version: "1.1.0",
     date: "2026-08-01",
     changes: [
@@ -694,19 +704,21 @@ function renderCart() {
     }
 
     wrap.innerHTML = `
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 flex-1 min-w-0">
         <img src="${item.images ? item.images[0] : `https://via.placeholder.com/50?text=${encodeURIComponent(item.name)}`}"
-             class="w-10 h-10 object-cover rounded-lg">
-        <div>
-          <p class="font-medium text-sm">${itemDetails}</p>
-          <p class="text-xs muted-text">Rp ${item.price.toLocaleString("id-ID")} x ${item.qty}</p>
+             class="w-10 h-10 object-cover rounded-lg flex-shrink-0">
+        <div class="min-w-0">
+          <p class="font-medium text-sm truncate">${itemDetails}</p>
+          <p class="text-xs muted-text">Rp ${item.price.toLocaleString("id-ID")} · subtotal Rp ${(item.price * item.qty).toLocaleString("id-ID")}</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <button class="edit-cart-btn" onclick="openEditCartModal('${key}')">
-          <i class="fas fa-edit"></i>
-        </button>
-        <button class="delete-item-btn" onclick="deleteCartItem('${key}')">
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <div class="cart-qty-controls">
+          <button type="button" class="cart-qty-btn" onclick="changeCartQty('${key}', -1)" aria-label="Kurangi">−</button>
+          <span class="cart-qty-num">${item.qty}</span>
+          <button type="button" class="cart-qty-btn" onclick="changeCartQty('${key}', 1)" aria-label="Tambah">+</button>
+        </div>
+        <button class="delete-item-btn" onclick="deleteCartItem('${key}')" aria-label="Hapus">
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>
@@ -718,6 +730,29 @@ function renderCart() {
   // Update cart total after rendering items
   updateCartTotal();
 }
+
+function changeCartQty(itemKey, delta) {
+  if (!cart[itemKey]) return;
+  cart[itemKey].qty += delta;
+  if (cart[itemKey].qty <= 0) {
+    delete cart[itemKey];
+    showNotif("Item dihapus dari keranjang");
+  }
+  saveCartToLocalStorage();
+  updateCartCount();
+  // Jika qty berubah, cek ulang syarat promo
+  if (promoApplied) {
+    const totalPriceInCart = Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0);
+    if (totalPriceInCart < currentPromo.minPurchase) {
+      promoApplied = false;
+      if (promoMessage) {
+        showPromoMessage("Promo dibatalkan: total di bawah minimal pembelian.", "info");
+      }
+    }
+  }
+  renderCart();
+}
+window.changeCartQty = changeCartQty;
 
 function openEditCartModal(itemKey) { // itemKey now includes variant if applicable
   currentEditItem = itemKey;
@@ -1403,14 +1438,27 @@ function resetDeliveryForm() {
   updateSendWaButtonState();
 }
 
-function sendToWhatsApp() {
-  // Blokir jika data pengantaran belum lengkap
+function requestSendToWhatsApp() {
+  // Validasi form dulu, baru buka modal konfirmasi
   if (!isDeliveryFormValid()) {
     showNotif("Harap isi nama dan alamat pengantaran!");
     updateSendWaButtonState();
     const nameInput = document.getElementById("checkout-name");
     if (nameInput && !nameInput.value.trim()) nameInput.focus();
     else document.getElementById("checkout-address")?.focus();
+    return;
+  }
+  const confirmWaModal = document.getElementById("confirm-wa-modal");
+  if (confirmWaModal) {
+    openModal(confirmWaModal);
+  } else {
+    sendToWhatsApp();
+  }
+}
+
+function sendToWhatsApp() {
+  if (!isDeliveryFormValid()) {
+    showNotif("Harap isi nama dan alamat pengantaran!");
     return;
   }
 
@@ -1421,18 +1469,15 @@ function sendToWhatsApp() {
   // Buka WhatsApp DULU (harus langsung dari user click agar tidak diblokir browser)
   const waWindow = window.open(whatsappUrl, '_blank');
   if (!waWindow) {
-    // Fallback jika popup diblokir
     window.location.href = whatsappUrl;
   }
 
-  // Update promo usage count if promo was applied for this transaction
   if (promoApplied && promoUsage[currentPromo.code] && promoUsage[currentPromo.code].currentTransactionId === currentTransactionId) {
       promoUsage[currentPromo.code].count++;
       promoUsage[currentPromo.code].currentTransactionId = null;
       savePromoUsage();
   }
 
-  // Clear cart after sending order
   Object.keys(cart).forEach(key => delete cart[key]);
   updateCartCount();
 
@@ -1440,8 +1485,28 @@ function sendToWhatsApp() {
   resetDeliveryForm();
   closeAllModals();
 
-  // Generate a new transaction ID for the next potential transaction
   currentTransactionId = Date.now().toString();
+}
+
+function updatePoStatusBanner() {
+  const el = document.getElementById("po-status-banner");
+  if (!el) return;
+
+  // Waktu lokal perangkat user (real-time)
+  const now = new Date();
+  const minutes = now.getHours() * 60 + now.getMinutes();
+  const openAt = 8 * 60;   // 08.00 — tidak diumumkan di teks chip
+  const closeAt = 19 * 60; // 19.00
+
+  const isOpen = minutes >= openAt && minutes < closeAt;
+
+  if (isOpen) {
+    el.className = "po-chip po-open";
+    el.innerHTML = `<i class="fas fa-store po-chip-icon" aria-hidden="true"></i> PO H-1 · Buka · Batas 19.00 · Antar besok`;
+  } else {
+    el.className = "po-chip po-closed";
+    el.innerHTML = `<i class="fas fa-ban po-chip-icon" aria-hidden="true"></i> PO ditutup · Silahkan order hari besok`;
+  }
 }
 
 // ---------- New: Update Notification Modal Functions ----------
@@ -1709,7 +1774,7 @@ function startDispersionEffect(modalElement) {
 document.addEventListener('DOMContentLoaded', () => {
   // Tandai area harga di title (membantu bedakan 2 link)
   try {
-    document.title = `KEDAI MAS HARIS — ${AREA_LABEL}`;
+    document.title = "KEDAI MAS HARIS";
   } catch (e) {}
 
   // Load data from localStorage
@@ -2180,7 +2245,19 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Info modal handlers
-  document.getElementById("send-wa").addEventListener("click", sendToWhatsApp);
+  document.getElementById("send-wa").addEventListener("click", requestSendToWhatsApp);
+
+  const confirmWaYes = document.getElementById("confirm-wa-yes");
+  if (confirmWaYes) {
+    confirmWaYes.addEventListener("click", () => {
+      sendToWhatsApp();
+    });
+  }
+
+  // Status PO H-1
+  updatePoStatusBanner();
+  // Refresh status setiap menit (jika lewat jam 19.00)
+  setInterval(updatePoStatusBanner, 60000);
 
   // Validasi form pengantaran → aktifkan/nonaktifkan tombol Kirim WA
   const checkoutNameInput = document.getElementById("checkout-name");
