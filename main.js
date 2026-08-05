@@ -117,6 +117,10 @@ let selectedVariant = null;
 let selectedToppings = {};
 
 
+// ---------- Area: Kantor/Umum (Sus/Pie/Talam/Cente = Rp 3.000) ----------
+const currentArea = "umum";
+const AREA_LABEL = "Kantor/Umum";
+
 // ---------- Data ----------
 const productList = [
   {
@@ -135,14 +139,14 @@ const productList = [
   },
   {
     name: "Sus",
-    price: 3500,
+    price: 3000,
     kategori: "Manis",
     description: "Kue sus lembut dengan isian vla manis dan creamy.",
     images: ["https://via.placeholder.com/120?text=Sus+1", "https://via.placeholder.com/120?text=Sus+2", "https://via.placeholder.com/120?text=Sus+3"]
   },
   {
     name: "Pie Buah",
-    price: 3500,
+    price: 3000,
     kategori: "Manis",
     description: "Pie renyah dengan vla lembut dan topping buah-buahan segar.",
     images: ["https://via.placeholder.com/120?text=Pie+Buah+1", "https://via.placeholder.com/120?text=Pie+Buah+2", "https://via.placeholder.com/120?text=Pie+Buah+3"]
@@ -170,14 +174,14 @@ const productList = [
   },
   {
     name: "Cente Manis / Hunkwe",
-    price: 3500,
+    price: 3000,
     kategori: "Manis",
     description: "Kue tradisional Cente Manis atau Hunkwe, kenyal dan manis.",
     images: ["https://via.placeholder.com/120?text=Cente+Manis+1", "https://via.placeholder.com/120?text=Cente+Manis+2", "https://via.placeholder.com/120?text=Cente+Manis+3"]
   },
   {
     name: "Talam",
-    price: 3500,
+    price: 3000,
     kategori: "Manis",
     description: "Kue talam tradisional lembut dengan rasa manis legit khas, cocok sebagai camilan.",
     images: ["https://via.placeholder.com/120?text=Talam+1", "https://via.placeholder.com/120?text=Talam+2", "https://via.placeholder.com/120?text=Talam+3"]
@@ -504,8 +508,15 @@ function closeAllModals() {
 }
 
 // ---------- Persistensi Data (New) ----------
+function getCartStorageKey() {
+  return `cart_${currentArea}`;
+}
+function getWishlistStorageKey() {
+  return `wishlist_${currentArea}`;
+}
+
 function saveCartToLocalStorage() {
-  localStorage.setItem('cart', JSON.stringify(cart));
+  localStorage.setItem(getCartStorageKey(), JSON.stringify(cart));
 }
 
 function recalculateCartItemUnitPrice(item) {
@@ -564,20 +575,29 @@ function migrateStoredPrices() {
 }
 
 function loadCartFromLocalStorage() {
-  const storedCart = localStorage.getItem('cart');
+  // Prioritas key per-area; fallback ke 'cart' lama lalu migrasi
+  let storedCart = localStorage.getItem(getCartStorageKey());
+  if (!storedCart && currentArea === "socia") {
+    storedCart = localStorage.getItem('cart');
+  }
   if (storedCart) {
     cart = JSON.parse(storedCart);
+    saveCartToLocalStorage();
   }
 }
 
 function saveWishlistToLocalStorage() {
-  localStorage.setItem('wishlist', JSON.stringify(wishlist));
+  localStorage.setItem(getWishlistStorageKey(), JSON.stringify(wishlist));
 }
 
 function loadWishlistFromLocalStorage() {
-  const storedWishlist = localStorage.getItem('wishlist');
+  let storedWishlist = localStorage.getItem(getWishlistStorageKey());
+  if (!storedWishlist && currentArea === "socia") {
+    storedWishlist = localStorage.getItem('wishlist');
+  }
   if (storedWishlist) {
     wishlist = JSON.parse(storedWishlist);
+    saveWishlistToLocalStorage();
   }
 }
 
@@ -1290,6 +1310,7 @@ function generateOrderMessage() {
 
   let message = `🛒 *PESANAN BARU*\n\n`;
   message += `📍 *KEDAI MAS HARIS*\n`;
+  message += `🏘️ Area: *${AREA_LABEL}*\n`;
   message += `⏰ ${new Date().toLocaleString('id-ID')}\n\n`;
 
   message += `👤 *Data Pemesan:*\n`;
@@ -1686,6 +1707,11 @@ function startDispersionEffect(modalElement) {
 
 // ---------- Event Listeners ----------
 document.addEventListener('DOMContentLoaded', () => {
+  // Tandai area harga di title (membantu bedakan 2 link)
+  try {
+    document.title = `KEDAI MAS HARIS — ${AREA_LABEL}`;
+  } catch (e) {}
+
   // Load data from localStorage
   loadCartFromLocalStorage();
   loadWishlistFromLocalStorage();
