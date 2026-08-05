@@ -117,9 +117,9 @@ let selectedVariant = null;
 let selectedToppings = {};
 
 
-// ---------- Area: Kantor/Umum (Sus/Pie/Talam/Cente = Rp 3.000) ----------
-const currentArea = "umum";
-const AREA_LABEL = "Kantor/Umum";
+// ---------- Area: Socia Garden (Sus/Pie/Talam/Cente = Rp 3.500) ----------
+const currentArea = "socia";
+const AREA_LABEL = "Socia Garden";
 
 // ---------- Data ----------
 const productList = [
@@ -139,14 +139,14 @@ const productList = [
   },
   {
     name: "Sus",
-    price: 3000,
+    price: 3500,
     kategori: "Manis",
     description: "Kue sus lembut dengan isian vla manis dan creamy.",
     images: ["https://via.placeholder.com/120?text=Sus+1", "https://via.placeholder.com/120?text=Sus+2", "https://via.placeholder.com/120?text=Sus+3"]
   },
   {
     name: "Pie Buah",
-    price: 3000,
+    price: 3500,
     kategori: "Manis",
     description: "Pie renyah dengan vla lembut dan topping buah-buahan segar.",
     images: ["https://via.placeholder.com/120?text=Pie+Buah+1", "https://via.placeholder.com/120?text=Pie+Buah+2", "https://via.placeholder.com/120?text=Pie+Buah+3"]
@@ -174,14 +174,14 @@ const productList = [
   },
   {
     name: "Cente Manis / Hunkwe",
-    price: 3000,
+    price: 3500,
     kategori: "Manis",
     description: "Kue tradisional Cente Manis atau Hunkwe, kenyal dan manis.",
     images: ["https://via.placeholder.com/120?text=Cente+Manis+1", "https://via.placeholder.com/120?text=Cente+Manis+2", "https://via.placeholder.com/120?text=Cente+Manis+3"]
   },
   {
     name: "Talam",
-    price: 3000,
+    price: 3500,
     kategori: "Manis",
     description: "Kue talam tradisional lembut dengan rasa manis legit khas, cocok sebagai camilan.",
     images: ["https://via.placeholder.com/120?text=Talam+1", "https://via.placeholder.com/120?text=Talam+2", "https://via.placeholder.com/120?text=Talam+3"]
