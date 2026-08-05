@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KEDAI MAS HARIS — Socia Garden</title>
+  <title>KEDAI MAS HARIS</title>
   <link rel="icon" type="image/png" href="logo-kmh.png" />
   <link rel="apple-touch-icon" href="logo-kmh.png" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
@@ -112,9 +112,13 @@
 <!-- Main Content -->
 <main class="max-w-6xl mx-auto px-4 py-6 block">
   <!-- Judul Kedai -->
-  <h1 class="text-4xl font-extrabold text-center text-orange-500 mb-6 select-none" style="max-width:600px; margin-left:auto; margin-right:auto;">
+  <h1 class="text-4xl font-extrabold text-center text-orange-500 mb-3 select-none" style="max-width:600px; margin-left:auto; margin-right:auto;">
     KEDAI MAS HARIS
   </h1>
+  <!-- Chip status PO H-1 (ringkas, di bawah judul) -->
+  <div class="po-chip-wrap">
+    <div id="po-status-banner" class="po-chip po-open" role="status" aria-live="polite">Memuat…</div>
+  </div>
 
   <!-- Home Section -->
   <section id="home-section" class="w-5/6 mx-auto rounded-2xl shadow-md mb-6">
@@ -423,6 +427,24 @@
     </button>
     <button class="modal-back-btn" data-modal-id="info-modal">
       <i class="fas fa-arrow-left"></i> Kembali
+    </button>
+  </div>
+</div>
+
+<!-- Modal Konfirmasi Kirim WA -->
+<div id="confirm-wa-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="confirm-wa-title" tabindex="-1">
+  <button class="modal-close-btn" data-modal-id="confirm-wa-modal"><i class="fas fa-times"></i></button>
+  <h3 id="confirm-wa-title" class="mb-3 text-center">Kirim ke WhatsApp?</h3>
+  <div class="text-center mb-4">
+    <div class="text-4xl mb-2 text-green-500"><i class="fab fa-whatsapp"></i></div>
+    <p class="modal-body-text text-sm">Pesanan akan dibuka di WhatsApp untuk dikirim ke admin Kedai Mas Haris. Pastikan data dan total sudah benar.</p>
+  </div>
+  <div class="flex flex-col gap-3 mt-4">
+    <button id="confirm-wa-yes" class="flex-1 bg-green-500 text-white py-2 rounded-xl font-semibold hover:bg-green-600">
+      <i class="fab fa-whatsapp mr-2"></i>Ya, Kirim WA
+    </button>
+    <button class="modal-back-btn" data-modal-id="confirm-wa-modal">
+      <i class="fas fa-times mr-1"></i> Batal
     </button>
   </div>
 </div>
