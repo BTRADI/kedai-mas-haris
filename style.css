@@ -3277,13 +3277,18 @@ body.dark .po-chip.po-closed .po-chip-icon {
   pointer-events: auto !important;
 }
 .confirm-wa-summary {
+  display: block !important;
+  visibility: visible !important;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 0.85rem;
   padding: 0.75rem 0.9rem;
   text-align: left;
-  max-height: 180px;
+  max-height: 200px;
+  min-height: 3rem;
   overflow-y: auto;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 body.dark .confirm-wa-summary {
   background: #1e293b;
