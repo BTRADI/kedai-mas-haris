@@ -529,6 +529,244 @@ function getCartStorageKey() {
 function getWishlistStorageKey() {
   return `wishlist_${currentArea}`;
 }
+function getOrderHistoryKey() {
+  return `orderHistory_${currentArea}`;
+}
+
+let cartPanelMode = "cart"; // "cart" | "history"
+let historySearchQuery = "";
+
+function loadOrderHistory() {
+  try {
+    const raw = localStorage.getItem(getOrderHistoryKey());
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveOrderHistoryList(list) {
+  try {
+    // Simpan semua riwayat (tanpa potong) — batasi hanya jika storage penuh
+    localStorage.setItem(getOrderHistoryKey(), JSON.stringify(list));
+  } catch (e) {
+    // Fallback: jika storage penuh, simpan tanpa 20% data terlama
+    try {
+      const trimmed = list.slice(0, Math.max(1, Math.floor(list.length * 0.8)));
+      localStorage.setItem(getOrderHistoryKey(), JSON.stringify(trimmed));
+    } catch (e2) {}
+  }
+}
+
+function saveCurrentOrderToHistory() {
+  if (!Object.keys(cart).length) return;
+
+  const entryItems = {};
+  Object.entries(cart).forEach(([key, item]) => {
+    entryItems[key] = {
+      name: item.name,
+      price: item.price,
+      qty: item.qty,
+      variant: item.variant || null,
+      toppings: item.toppings ? JSON.parse(JSON.stringify(item.toppings)) : [],
+      images: item.images ? [...item.images] : []
+    };
+  });
+
+  const customerName = (document.getElementById("checkout-name")?.value || "").trim();
+  const customerAddress = (document.getElementById("checkout-address")?.value || "").trim();
+
+  const history = loadOrderHistory();
+  history.unshift({
+    id: Date.now().toString(),
+    date: new Date().toISOString(),
+    customerName: customerName || "Tanpa nama",
+    customerAddress: customerAddress || "",
+    total: typeof finalDiscountedPrice === "number" ? finalDiscountedPrice : Object.values(cart).reduce((s, i) => s + i.qty * i.price, 0),
+    paymentMethod: currentPaymentMethod || "-",
+    area: AREA_LABEL,
+    items: entryItems
+  });
+  saveOrderHistoryList(history);
+}
+
+function setCartChromeVisible(visible) {
+  const promoBox = document.querySelector("#cart-modal .promo-input-container");
+  const promoMsg = document.getElementById("promo-message");
+  const totalRow = document.querySelector("#cart-modal .flex.justify-between.items-center.font-semibold");
+  const promoPrice = document.getElementById("promo-price-display");
+  const checkoutBtn = document.getElementById("checkout-btn");
+  const clearBtn = document.getElementById("clear-cart-btn");
+  const title = document.getElementById("cart-title");
+
+  if (promoBox) promoBox.style.display = visible ? "" : "none";
+  if (promoMsg && !visible) promoMsg.classList.add("hidden");
+  if (totalRow) totalRow.style.display = visible ? "" : "none";
+  if (promoPrice && !visible) promoPrice.classList.add("hidden");
+  if (checkoutBtn) checkoutBtn.style.display = visible ? "" : "none";
+  if (clearBtn) clearBtn.style.display = visible ? "" : "none";
+  if (title) title.textContent = visible ? "Keranjang" : "Riwayat Pesanan";
+}
+
+function showCartHistoryView() {
+  cartPanelMode = "history";
+  historySearchQuery = "";
+  setCartChromeVisible(false);
+  renderOrderHistoryPanel();
+}
+
+function showCartNormalView() {
+  cartPanelMode = "cart";
+  historySearchQuery = "";
+  setCartChromeVisible(true);
+  renderCart();
+}
+
+function formatHistoryDate(iso) {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString("id-ID", {
+      weekday: "short",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }) + " · " + d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+  } catch (e) {
+    return iso || "-";
+  }
+}
+
+function filterOrderHistory(history, query) {
+  const q = (query || "").trim().toLowerCase();
+  if (!q) return history;
+  return history.filter((order) => {
+    const name = (order.customerName || "").toLowerCase();
+    const addr = (order.customerAddress || "").toLowerCase();
+    const pay = (order.paymentMethod || "").toLowerCase();
+    const items = Object.values(order.items || {}).map((i) => (i.name || "").toLowerCase()).join(" ");
+    const dateStr = formatHistoryDate(order.date).toLowerCase();
+    return name.includes(q) || addr.includes(q) || pay.includes(q) || items.includes(q) || dateStr.includes(q);
+  });
+}
+
+function onHistorySearchInput(value) {
+  historySearchQuery = value || "";
+  renderOrderHistoryPanel(true);
+}
+window.onHistorySearchInput = onHistorySearchInput;
+
+function renderOrderHistoryPanel(keepSearchFocus) {
+  const cartItemsContainer = document.getElementById("cart-items");
+  if (!cartItemsContainer) return;
+  const history = loadOrderHistory();
+  const filtered = filterOrderHistory(history, historySearchQuery);
+  const prevScroll = cartItemsContainer.scrollTop;
+
+  if (!history.length) {
+    cartItemsContainer.innerHTML = `
+      <div class="cart-empty-state">
+        <div class="cart-empty-icon"><i class="fas fa-clock-rotate-left"></i></div>
+        <p class="cart-empty-title">Belum ada riwayat</p>
+        <p class="cart-empty-desc">Pesanan yang berhasil dikirim lewat WA akan muncul di sini, lengkap dengan nama pemesan.</p>
+        <button type="button" class="cart-empty-btn cart-empty-btn-secondary" onclick="showCartNormalView()">
+          <i class="fas fa-arrow-left"></i> Kembali ke keranjang
+        </button>
+      </div>`;
+    return;
+  }
+
+  const listHtml = filtered.length ? filtered.map((order) => {
+    const itemCount = Object.values(order.items || {}).reduce((s, i) => s + (i.qty || 0), 0);
+    const names = Object.values(order.items || {}).map((i) => {
+      let n = i.name;
+      if (i.qty > 1) n += ` ×${i.qty}`;
+      return n;
+    }).slice(0, 3).join(", ");
+    const more = Object.keys(order.items || {}).length > 3 ? "…" : "";
+    const dateStr = formatHistoryDate(order.date);
+    const cust = order.customerName || "Tanpa nama";
+    return `
+      <div class="history-card">
+        <div class="history-card-top">
+          <span class="history-customer"><i class="fas fa-user"></i> ${cust}</span>
+          <span class="history-total">Rp ${(order.total || 0).toLocaleString("id-ID")}</span>
+        </div>
+        <p class="history-date"><i class="far fa-calendar-alt"></i> ${dateStr}</p>
+        <p class="history-items-preview">${names}${more}</p>
+        <div class="history-card-meta">
+          <span>${itemCount} item · ${order.paymentMethod || "-"}</span>
+          <button type="button" class="history-reorder-btn" onclick="reorderFromHistory('${order.id}')">
+            <i class="fas fa-redo-alt"></i> Pesan lagi
+          </button>
+        </div>
+      </div>`;
+  }).join("") : `
+    <div class="history-no-result">
+      <i class="fas fa-search"></i>
+      <p>Tidak ada pesanan untuk “${historySearchQuery.replace(/</g, "")}”</p>
+    </div>`;
+
+  cartItemsContainer.innerHTML = `
+    <div class="history-panel">
+      <button type="button" class="history-back-link" onclick="showCartNormalView()">
+        <i class="fas fa-arrow-left"></i> Kembali ke keranjang
+      </button>
+      <div class="history-search-wrap">
+        <i class="fas fa-search history-search-icon"></i>
+        <input type="search" id="history-search-input" class="history-search-input"
+          placeholder="Cari nama pemesan, menu, tanggal…"
+          value="${(historySearchQuery || "").replace(/"/g, "&quot;")}"
+          oninput="onHistorySearchInput(this.value)" />
+      </div>
+      <p class="history-hint">${filtered.length} dari ${history.length} pesanan tersimpan di perangkat ini</p>
+      <div class="history-list">${listHtml}</div>
+    </div>`;
+
+  if (keepSearchFocus) {
+    const inp = document.getElementById("history-search-input");
+    if (inp) {
+      inp.focus();
+      const len = inp.value.length;
+      try { inp.setSelectionRange(len, len); } catch (e) {}
+    }
+    cartItemsContainer.scrollTop = prevScroll;
+  }
+}
+
+function reorderFromHistory(orderId) {
+  const history = loadOrderHistory();
+  const order = history.find((o) => o.id === orderId);
+  if (!order || !order.items) {
+    showNotif("Riwayat tidak ditemukan");
+    return;
+  }
+  Object.entries(order.items).forEach(([key, item]) => {
+    if (cart[key]) {
+      cart[key].qty += item.qty || 1;
+    } else {
+      cart[key] = {
+        name: item.name,
+        price: item.price,
+        qty: item.qty || 1,
+        variant: item.variant || null,
+        toppings: item.toppings || [],
+        images: item.images || []
+      };
+    }
+  });
+  try { migrateStoredPrices(); } catch (e) {}
+  saveCartToLocalStorage();
+  updateCartCount();
+  showCartNormalView();
+  const who = order.customerName ? ` (${order.customerName})` : "";
+  showNotif(`Pesanan${who} ditambahkan ke keranjang`);
+}
+
+window.showCartHistoryView = showCartHistoryView;
+window.showCartNormalView = showCartNormalView;
+window.reorderFromHistory = reorderFromHistory;
 
 function saveCartToLocalStorage() {
   localStorage.setItem(getCartStorageKey(), JSON.stringify(cart));
@@ -682,17 +920,38 @@ function renderCart() {
   cartItemsContainer.innerHTML = "";
 
   if (Object.keys(cart).length === 0) {
+    const historyCount = loadOrderHistory().length;
     cartItemsContainer.innerHTML = `
-      <div class="empty-state-text text-center py-8">
-        Keranjang kosong 🛒<br>
-        <small>Silakan tambahkan produk!</small>
+      <div class="cart-empty-state">
+        <div class="cart-empty-icon"><i class="fas fa-shopping-basket"></i></div>
+        <p class="cart-empty-title">Keranjangmu masih kosong</p>
+        <p class="cart-empty-desc">Yuk pilih camilan favorit, atau cek riwayat pesanan di perangkat ini.</p>
+        <div class="cart-empty-actions">
+          <button type="button" class="cart-empty-btn cart-empty-btn-primary" onclick="closeAllModals(); document.getElementById('menu-section')?.scrollIntoView({behavior:'smooth'})">
+            <i class="fas fa-utensils"></i> Lihat Menu
+          </button>
+          <button type="button" class="cart-empty-btn cart-empty-btn-secondary" onclick="showCartHistoryView()">
+            <i class="fas fa-clock-rotate-left"></i> Riwayat Pesanan${historyCount ? ` (${historyCount})` : ""}
+          </button>
+        </div>
       </div>`;
-    promoMessage.classList.add('hidden'); // Hide promo message if cart is empty
-    promoCodeInput.value = ''; // Clear promo input
-    promoApplied = false; // Reset promo status
-    updateCartTotal(); // Recalculate total
+    promoMessage.classList.add('hidden');
+    promoCodeInput.value = '';
+    promoApplied = false;
+    updateCartTotal();
+    // Sembunyikan promo & checkout saat kosong (tetap bisa buka riwayat)
+    const promoBox = document.querySelector("#cart-modal .promo-input-container");
+    const checkoutBtn = document.getElementById("checkout-btn");
+    const clearBtn = document.getElementById("clear-cart-btn");
+    if (promoBox) promoBox.style.display = "none";
+    if (checkoutBtn) checkoutBtn.style.display = "none";
+    if (clearBtn) clearBtn.style.display = "none";
     return;
   }
+
+  // Ada item: tampilkan chrome normal
+  setCartChromeVisible(true);
+  cartPanelMode = "cart";
 
   Object.entries(cart).forEach(([key, item]) => {
     const wrap = document.createElement("div");
@@ -1570,8 +1829,12 @@ function sendToWhatsApp() {
       savePromoUsage();
   }
 
+  // Simpan ke riwayat sebelum keranjang dikosongkan
+  try { saveCurrentOrderToHistory(); } catch (e) {}
+
   Object.keys(cart).forEach(key => delete cart[key]);
   updateCartCount();
+  saveCartToLocalStorage();
 
   showBadge(sentBadge, "Pesanan terkirim");
   resetDeliveryForm();
@@ -1945,18 +2208,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Cart button - FIXED: Reset promo state properly when opening cart
+  // Cart button — buka selalu (kosong = empty state + akses riwayat)
   document.getElementById("cart-btn").addEventListener("click", () => {
-    // Reset promo input and message when opening cart
     promoCodeInput.value = '';
     promoMessage.classList.add('hidden');
-    promoApplied = false; // Reset promo status completely when opening cart
-    updateCartTotal(); // Ensure total is recalculated without any promo
-
-    if (Object.keys(cart).length === 0) {
-      showNotif("Keranjang kosong");
-      return; // Do not open modal if cart is empty
-    }
+    promoApplied = false;
+    updateCartTotal();
+    cartPanelMode = "cart";
+    setCartChromeVisible(true);
     renderCart();
     openModal(cartModal);
   });
