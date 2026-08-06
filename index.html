@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KEDAI MAS HARIS — Kantor/Umum</title>
+  <title>KEDAI MAS HARIS</title>
   <link rel="icon" type="image/png" href="logo-kmh.png" />
   <link rel="apple-touch-icon" href="logo-kmh.png" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
@@ -432,14 +432,23 @@
 </div>
 
 <!-- Modal Konfirmasi Kirim WA -->
-<div id="confirm-wa-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="confirm-wa-title" tabindex="-1">
+<div id="confirm-wa-modal" class="modal confirm-wa-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="confirm-wa-title" tabindex="-1">
   <button class="modal-close-btn" data-modal-id="confirm-wa-modal"><i class="fas fa-times"></i></button>
-  <h3 id="confirm-wa-title" class="mb-3 text-center">Kirim ke WhatsApp?</h3>
-  <div class="text-center mb-4">
-    <div class="text-4xl mb-2 text-green-500"><i class="fab fa-whatsapp"></i></div>
-    <p class="modal-body-text text-sm">Pesanan akan dibuka di WhatsApp untuk dikirim ke admin Kedai Mas Haris. Pastikan data dan total sudah benar.</p>
+  <h3 id="confirm-wa-title" class="mb-2 text-center">Kirim ke WhatsApp?</h3>
+  <div class="text-center mb-3">
+    <div class="text-4xl mb-1 text-green-500"><i class="fab fa-whatsapp"></i></div>
+    <p class="modal-body-text text-sm">Pesanan akan dibuka di WhatsApp. Pastikan data sudah benar.</p>
   </div>
-  <div class="flex flex-col gap-3 mt-4">
+  <!-- Ringkasan pesanan (read-only) -->
+  <div id="confirm-wa-summary" class="confirm-wa-summary mb-3">
+    <p class="confirm-wa-summary-label">Pesanan Anda</p>
+    <ul id="confirm-wa-items" class="confirm-wa-items"></ul>
+    <div class="confirm-wa-total-row">
+      <span>Total</span>
+      <strong id="confirm-wa-total">Rp 0</strong>
+    </div>
+  </div>
+  <div class="flex flex-col gap-3 mt-2">
     <button id="confirm-wa-yes" class="flex-1 bg-green-500 text-white py-2 rounded-xl font-semibold hover:bg-green-600">
       <i class="fab fa-whatsapp mr-2"></i>Ya, Kirim WA
     </button>
