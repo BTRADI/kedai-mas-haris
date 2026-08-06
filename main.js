@@ -117,9 +117,9 @@ let selectedVariant = null;
 let selectedToppings = {};
 
 
-// ---------- Area: Kantor/Umum (Sus/Pie/Talam/Cente = Rp 3.000) ----------
-const currentArea = "umum";
-const AREA_LABEL = "Kantor/Umum";
+// ---------- Area: Socia Garden (Sus/Pie/Talam/Cente = Rp 3.500) ----------
+const currentArea = "socia";
+const AREA_LABEL = "Socia Garden";
 
 // ---------- Data ----------
 const productList = [
@@ -139,14 +139,14 @@ const productList = [
   },
   {
     name: "Sus",
-    price: 3000,
+    price: 3500,
     kategori: "Manis",
     description: "Kue sus lembut dengan isian vla manis dan creamy.",
     images: ["https://via.placeholder.com/120?text=Sus+1", "https://via.placeholder.com/120?text=Sus+2", "https://via.placeholder.com/120?text=Sus+3"]
   },
   {
     name: "Pie Buah",
-    price: 3000,
+    price: 3500,
     kategori: "Manis",
     description: "Pie renyah dengan vla lembut dan topping buah-buahan segar.",
     images: ["https://via.placeholder.com/120?text=Pie+Buah+1", "https://via.placeholder.com/120?text=Pie+Buah+2", "https://via.placeholder.com/120?text=Pie+Buah+3"]
@@ -174,14 +174,14 @@ const productList = [
   },
   {
     name: "Cente Manis / Hunkwe",
-    price: 3000,
+    price: 3500,
     kategori: "Manis",
     description: "Kue tradisional Cente Manis atau Hunkwe, kenyal dan manis.",
     images: ["https://via.placeholder.com/120?text=Cente+Manis+1", "https://via.placeholder.com/120?text=Cente+Manis+2", "https://via.placeholder.com/120?text=Cente+Manis+3"]
   },
   {
     name: "Talam",
-    price: 3000,
+    price: 3500,
     kategori: "Manis",
     description: "Kue talam tradisional lembut dengan rasa manis legit khas, cocok sebagai camilan.",
     images: ["https://via.placeholder.com/120?text=Talam+1", "https://via.placeholder.com/120?text=Talam+2", "https://via.placeholder.com/120?text=Talam+3"]
@@ -452,8 +452,8 @@ function goBackToPreviousModal() {
   }});
 
   // Hapus blur khusus konfirmasi WA
-  if (currentModal.id === 'confirm-wa-modal' && overlay) {
-    overlay.classList.remove("overlay-blur");
+  if (currentModal.id === "confirm-wa-modal") {
+    clearConfirmWaBackdrop();
   }
   // Hide QR code if going back from info modal
   if (currentModal.id === 'info-modal') {
@@ -493,7 +493,7 @@ function closeAllModals() {
     }});
   });
   modalStack = [];
-  if (overlay) overlay.classList.remove("overlay-blur");
+  clearConfirmWaBackdrop();
   gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
     gsap.set(overlay, { display: "none" });
     overlay.setAttribute("aria-hidden", "true");
@@ -1443,32 +1443,76 @@ function resetDeliveryForm() {
   updateSendWaButtonState();
 }
 
+function clearConfirmWaBackdrop() {
+  if (overlay) {
+    overlay.classList.remove("overlay-blur");
+    overlay.style.zIndex = "";
+  }
+  document.querySelectorAll(".modal.modal-behind-blur").forEach((m) => {
+    m.classList.remove("modal-behind-blur");
+  });
+}
+
+function applyConfirmWaBackdrop() {
+  // Overlay naik di atas modal sebelumnya, di bawah konfirmasi WA → blur terlihat
+  if (overlay) {
+    overlay.classList.add("overlay-blur", "show");
+    overlay.style.zIndex = "1050";
+    overlay.style.display = "block";
+    overlay.style.pointerEvents = "auto";
+    overlay.setAttribute("aria-hidden", "false");
+    gsap.set(overlay, { opacity: 1, display: "block" });
+  }
+  // Modal di belakang (info/payment/dll) diblur & tidak bisa diklik
+  modalStack.forEach((m) => {
+    if (m && m.id !== "confirm-wa-modal") {
+      m.classList.add("modal-behind-blur");
+    }
+  });
+}
+
 function fillConfirmWaSummary() {
   const listEl = document.getElementById("confirm-wa-items");
   const totalEl = document.getElementById("confirm-wa-total");
   if (!listEl || !totalEl) return;
 
+  // Pastikan total terbaru
+  try { updateCartTotal(); } catch (e) {}
+
   const items = Object.values(cart);
   listEl.innerHTML = "";
+
+  if (items.length === 0) {
+    listEl.innerHTML = `<li class="confirm-wa-item"><span class="confirm-wa-item-name">Keranjang kosong</span></li>`;
+    totalEl.textContent = "Rp 0";
+    return;
+  }
+
+  let computedTotal = 0;
   items.forEach((item) => {
-    let label = item.name;
+    let label = item.name || "Item";
     if (item.variant) label += ` (${item.variant})`;
     if (item.toppings && item.toppings.length > 0) {
-      label += " + " + item.toppings.map(t => `${t.name} (${t.qty})`).join(", ");
+      label += " + " + item.toppings.map((t) => `${t.name} (${t.qty})`).join(", ");
     }
+    const line = (item.price || 0) * (item.qty || 0);
+    computedTotal += line;
     const li = document.createElement("li");
     li.className = "confirm-wa-item";
     li.innerHTML = `
       <span class="confirm-wa-item-name">${label}</span>
-      <span class="confirm-wa-item-meta">${item.qty}× · Rp ${(item.price * item.qty).toLocaleString("id-ID")}</span>
+      <span class="confirm-wa-item-meta">${item.qty}× · Rp ${line.toLocaleString("id-ID")}</span>
     `;
     listEl.appendChild(li);
   });
-  totalEl.textContent = `Rp ${(finalDiscountedPrice || 0).toLocaleString("id-ID")}`;
+
+  const total = (typeof finalDiscountedPrice === "number" && finalDiscountedPrice > 0)
+    ? finalDiscountedPrice
+    : computedTotal;
+  totalEl.textContent = `Rp ${total.toLocaleString("id-ID")}`;
 }
 
 function requestSendToWhatsApp() {
-  // Validasi form dulu, baru buka modal konfirmasi
   if (!isDeliveryFormValid()) {
     showNotif("Harap isi nama dan alamat pengantaran!");
     updateSendWaButtonState();
@@ -1480,7 +1524,7 @@ function requestSendToWhatsApp() {
   const confirmWaModal = document.getElementById("confirm-wa-modal");
   if (confirmWaModal) {
     fillConfirmWaSummary();
-    if (overlay) overlay.classList.add("overlay-blur");
+    applyConfirmWaBackdrop();
     openModal(confirmWaModal);
   } else {
     sendToWhatsApp();
@@ -2327,13 +2371,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentTopModal = modalStack[modalStack.length - 1];
     if (mobileMenuOpen) {
       hamburger.click();
-    } else if (currentTopModal) {
-      // If the top modal is the update modal, use safe close
-      if (currentTopModal === updateModal) {
-        closeUpdateModalSafely();
-      } else {
-        closeAllModals(); // Close all modals when clicking overlay
-      }
+      return;
+    }
+    if (!currentTopModal) return;
+    // Konfirmasi WA: klik di luar dinonaktifkan (hanya X / Batal)
+    if (currentTopModal.id === "confirm-wa-modal") {
+      return;
+    }
+    if (currentTopModal === updateModal) {
+      closeUpdateModalSafely();
+    } else {
+      closeAllModals();
     }
   });
 
