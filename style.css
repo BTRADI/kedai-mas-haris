@@ -522,11 +522,21 @@ body.dark .category-card.active {
   opacity: 1;
 }
 
-/* Blur lebih kuat saat konfirmasi WA (modal menonjol) */
+/* Konfirmasi WA: overlay di atas modal lama, di bawah modal konfirmasi */
 #overlay.overlay-blur {
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1050 !important;
+}
+
+/* Modal di belakang konfirmasi WA */
+.modal.modal-behind-blur {
+  filter: blur(5px);
+  opacity: 0.55;
+  pointer-events: none !important;
+  user-select: none;
+  transition: filter 0.25s ease, opacity 0.25s ease;
 }
 
 /* Modal Base Styles */
@@ -3258,9 +3268,13 @@ body.dark .po-chip.po-closed .po-chip-icon {
 }
 
 /* ---- Konfirmasi WA: menonjol + ringkasan pesanan ---- */
-#confirm-wa-modal.confirm-wa-modal {
-  z-index: 1100;
+#confirm-wa-modal.confirm-wa-modal,
+#confirm-wa-modal {
+  z-index: 1100 !important;
   max-width: 380px;
+  filter: none !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 .confirm-wa-summary {
   background: #f8fafc;
