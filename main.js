@@ -1472,44 +1472,58 @@ function applyConfirmWaBackdrop() {
 }
 
 function fillConfirmWaSummary() {
+  const summaryBox = document.getElementById("confirm-wa-summary");
   const listEl = document.getElementById("confirm-wa-items");
   const totalEl = document.getElementById("confirm-wa-total");
-  if (!listEl || !totalEl) return;
 
-  // Pastikan total terbaru
+  // Pastikan total terbaru (jangan gagalkan fill jika elemen cart-total hilang)
   try { updateCartTotal(); } catch (e) {}
 
-  const items = Object.values(cart);
-  listEl.innerHTML = "";
-
-  if (items.length === 0) {
-    listEl.innerHTML = `<li class="confirm-wa-item"><span class="confirm-wa-item-name">Keranjang kosong</span></li>`;
-    totalEl.textContent = "Rp 0";
-    return;
-  }
-
+  const items = Object.values(cart || {});
   let computedTotal = 0;
-  items.forEach((item) => {
-    let label = item.name || "Item";
-    if (item.variant) label += ` (${item.variant})`;
-    if (item.toppings && item.toppings.length > 0) {
-      label += " + " + item.toppings.map((t) => `${t.name} (${t.qty})`).join(", ");
-    }
-    const line = (item.price || 0) * (item.qty || 0);
-    computedTotal += line;
-    const li = document.createElement("li");
-    li.className = "confirm-wa-item";
-    li.innerHTML = `
-      <span class="confirm-wa-item-name">${label}</span>
-      <span class="confirm-wa-item-meta">${item.qty}× · Rp ${line.toLocaleString("id-ID")}</span>
-    `;
-    listEl.appendChild(li);
-  });
+  let itemsHtml = "";
+
+  if (!items.length) {
+    itemsHtml = `<li class="confirm-wa-item"><span class="confirm-wa-item-name">Keranjang kosong</span></li>`;
+  } else {
+    items.forEach((item) => {
+      if (!item) return;
+      let label = item.name || "Item";
+      if (item.variant) label += ` (${item.variant})`;
+      if (item.toppings && item.toppings.length > 0) {
+        label += " + " + item.toppings.map((t) => `${t.name} (${t.qty})`).join(", ");
+      }
+      const qty = Number(item.qty) || 0;
+      const price = Number(item.price) || 0;
+      const line = price * qty;
+      computedTotal += line;
+      itemsHtml += `
+        <li class="confirm-wa-item">
+          <span class="confirm-wa-item-name">${label}</span>
+          <span class="confirm-wa-item-meta">${qty}× · Rp ${line.toLocaleString("id-ID")}</span>
+        </li>`;
+    });
+  }
 
   const total = (typeof finalDiscountedPrice === "number" && finalDiscountedPrice > 0)
     ? finalDiscountedPrice
     : computedTotal;
-  totalEl.textContent = `Rp ${total.toLocaleString("id-ID")}`;
+
+  // Rebuild struktur ringkasan agar selalu tampil
+  if (summaryBox) {
+    summaryBox.style.display = "block";
+    summaryBox.hidden = false;
+    summaryBox.innerHTML = `
+      <p class="confirm-wa-summary-label">Pesanan Anda</p>
+      <ul id="confirm-wa-items" class="confirm-wa-items">${itemsHtml}</ul>
+      <div class="confirm-wa-total-row">
+        <span>Total</span>
+        <strong id="confirm-wa-total">Rp ${total.toLocaleString("id-ID")}</strong>
+      </div>`;
+  } else if (listEl && totalEl) {
+    listEl.innerHTML = itemsHtml;
+    totalEl.textContent = `Rp ${total.toLocaleString("id-ID")}`;
+  }
 }
 
 function requestSendToWhatsApp() {
@@ -1526,10 +1540,13 @@ function requestSendToWhatsApp() {
     fillConfirmWaSummary();
     applyConfirmWaBackdrop();
     openModal(confirmWaModal);
+    requestAnimationFrame(() => fillConfirmWaSummary());
+    setTimeout(() => fillConfirmWaSummary(), 50);
   } else {
     sendToWhatsApp();
   }
 }
+
 
 function sendToWhatsApp() {
   if (!isDeliveryFormValid()) {
