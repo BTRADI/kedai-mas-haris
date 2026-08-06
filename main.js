@@ -670,9 +670,6 @@ function renderOrderHistoryPanel(keepSearchFocus) {
         <div class="cart-empty-icon"><i class="fas fa-clock-rotate-left"></i></div>
         <p class="cart-empty-title">Belum ada riwayat</p>
         <p class="cart-empty-desc">Pesanan yang berhasil dikirim lewat WA akan muncul di sini, lengkap dengan nama pemesan.</p>
-        <button type="button" class="cart-empty-btn cart-empty-btn-secondary" onclick="showCartNormalView()">
-          <i class="fas fa-arrow-left"></i> Kembali ke keranjang
-        </button>
       </div>`;
     return;
   }
@@ -710,9 +707,6 @@ function renderOrderHistoryPanel(keepSearchFocus) {
 
   cartItemsContainer.innerHTML = `
     <div class="history-panel">
-      <button type="button" class="history-back-link" onclick="showCartNormalView()">
-        <i class="fas fa-arrow-left"></i> Kembali ke keranjang
-      </button>
       <div class="history-search-wrap">
         <i class="fas fa-search history-search-icon"></i>
         <input type="search" id="history-search-input" class="history-search-input"
@@ -3274,6 +3268,9 @@ document.addEventListener("DOMContentLoaded", function() {
           } else {
             goBackToPreviousModal();
           }
+        } else if (modal.id === 'cart-modal' && cartPanelMode === 'history') {
+          // Dari riwayat → kembali ke tampilan keranjang (bukan tutup modal)
+          showCartNormalView();
         } else {
           goBackToPreviousModal();
         }
