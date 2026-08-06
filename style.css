@@ -2727,37 +2727,63 @@ body.dark #search-modal input {
   border-color: #4b5563;
 }
 
-/* New: Modal Close Button (X) */
+/* Modal Close Button (X) — ukuran tetap agar hover tidak geser layout/scrollbar */
 .modal-close-btn {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
   border: none;
-  font-size: 1.5rem;
-  color: #6b7280; /* Default color for light mode */
+  border-radius: 999px;
+  font-size: 1.15rem;
+  line-height: 1;
+  color: #6b7280;
   cursor: pointer;
-  transition: color 0.2s ease, transform 0.2s ease;
-  z-index: 10; /* Ensure it's above other modal content */
+  z-index: 20;
+  overflow: hidden;
+  flex-shrink: 0;
+  /* Hanya warna + background — TANPA transform di tombol (hindari reflow modal) */
+  transition: color 0.2s ease, background-color 0.2s ease;
 }
-
+.modal-close-btn i {
+  display: block;
+  line-height: 1;
+  transition: transform 0.25s ease;
+  pointer-events: none;
+}
 .modal-close-btn:hover {
-  color: #1f2937; /* Darker on hover for light mode */
+  color: #1f2937;
+  background-color: rgba(0, 0, 0, 0.06);
+  transform: none; /* jangan rotate/geser tombol */
+}
+.modal-close-btn:hover i {
   transform: rotate(90deg);
+}
+.modal-close-btn:active {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 body.dark .modal-close-btn {
-  color: #9ca3af; /* Default color for dark mode */
+  color: #9ca3af;
 }
-
 body.dark .modal-close-btn:hover {
-  color: #e2e8f0; /* Lighter on hover for dark mode */
+  color: #f1f5f9;
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: none;
 }
 
-/* Modal Back / Batal — fill merah dari bawah (setengah lingkaran → penuh) */
+/* Modal Back / Batal — fill merah dari bawah; teks/ikon putih kontras di hover */
 .modal-back-btn {
   position: relative;
   overflow: hidden;
+  isolation: isolate;
   z-index: 0;
   background: #e5e7eb;
   color: #374151;
@@ -2772,41 +2798,37 @@ body.dark .modal-close-btn:hover {
   width: fit-content;
   margin-left: auto;
   cursor: pointer;
-  transition: color 0.35s ease, transform 0.25s ease;
+  /* tanpa translateY — hindari “loncat” layout */
+  transition: color 0.3s ease;
 }
 .modal-back-btn > * {
   position: relative;
   z-index: 1;
+  transition: color 0.3s ease;
 }
 .modal-back-btn::before {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: -10%;
-  width: 140%;
+  bottom: 0;
+  width: 150%;
   height: 0;
   background: #dc2626;
-  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  border-radius: 50% 50% 0 0;
   transform: translateX(-50%);
-  transition: height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-              border-radius 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-              bottom 0.45s ease;
-  z-index: 0;
+  transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
   pointer-events: none;
 }
 .modal-back-btn:hover {
-  color: #fff;
-  transform: translateY(-1px);
+  color: #ffffff !important;
+}
+.modal-back-btn:hover > *,
+.modal-back-btn:hover i {
+  color: #ffffff !important;
 }
 .modal-back-btn:hover::before {
-  height: 280%;
-  bottom: -40%;
-  border-radius: 40% 40% 0 0 / 30% 30% 0 0;
-}
-.modal-back-btn:not(:hover)::before {
-  transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-              border-radius 0.4s ease,
-              bottom 0.4s ease;
+  height: 320%;
 }
 
 body.dark .modal-back-btn {
@@ -2814,7 +2836,11 @@ body.dark .modal-back-btn {
   color: #e2e8f0;
 }
 body.dark .modal-back-btn:hover {
-  color: #fff;
+  color: #ffffff !important;
+}
+body.dark .modal-back-btn:hover > *,
+body.dark .modal-back-btn:hover i {
+  color: #ffffff !important;
 }
 body.dark .modal-back-btn::before {
   background: #ef4444;
@@ -2891,12 +2917,12 @@ body.dark #cart-modal .clear-cart-btn:hover {
   background-color: rgba(248, 113, 113, 0.1); /* Light red background on hover in dark mode */
 }
 
-/* Pastikan tombol close (X) tetap di kanan atas */
+/* Cart: X tetap kanan atas, ukuran tetap (ikut rule global) */
 #cart-modal .modal-close-btn {
   position: absolute;
-  top: 0.5rem; /* Adjust as needed */
-  right: 0.5rem; /* Adjust as needed */
-  z-index: 11; /* Ensure it's above the header content */
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 21;
 }
 /* --- END: REVISI UNTUK TOMBOL HAPUS SEMUA DI MODAL KERANJANG --- */
 
