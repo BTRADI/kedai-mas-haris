@@ -117,9 +117,9 @@ let selectedVariant = null;
 let selectedToppings = {};
 
 
-// ---------- Area: Socia Garden (Sus/Pie/Talam/Cente = Rp 3.500) ----------
-const currentArea = "socia";
-const AREA_LABEL = "Socia Garden";
+// ---------- Area: Kantor/Umum (Sus/Pie/Talam/Cente = Rp 3.000) ----------
+const currentArea = "umum";
+const AREA_LABEL = "Kantor/Umum";
 
 // ---------- Data ----------
 const productList = [
@@ -139,14 +139,14 @@ const productList = [
   },
   {
     name: "Sus",
-    price: 3500,
+    price: 3000,
     kategori: "Manis",
     description: "Kue sus lembut dengan isian vla manis dan creamy.",
     images: ["https://via.placeholder.com/120?text=Sus+1", "https://via.placeholder.com/120?text=Sus+2", "https://via.placeholder.com/120?text=Sus+3"]
   },
   {
     name: "Pie Buah",
-    price: 3500,
+    price: 3000,
     kategori: "Manis",
     description: "Pie renyah dengan vla lembut dan topping buah-buahan segar.",
     images: ["https://via.placeholder.com/120?text=Pie+Buah+1", "https://via.placeholder.com/120?text=Pie+Buah+2", "https://via.placeholder.com/120?text=Pie+Buah+3"]
@@ -174,14 +174,14 @@ const productList = [
   },
   {
     name: "Cente Manis / Hunkwe",
-    price: 3500,
+    price: 3000,
     kategori: "Manis",
     description: "Kue tradisional Cente Manis atau Hunkwe, kenyal dan manis.",
     images: ["https://via.placeholder.com/120?text=Cente+Manis+1", "https://via.placeholder.com/120?text=Cente+Manis+2", "https://via.placeholder.com/120?text=Cente+Manis+3"]
   },
   {
     name: "Talam",
-    price: 3500,
+    price: 3000,
     kategori: "Manis",
     description: "Kue talam tradisional lembut dengan rasa manis legit khas, cocok sebagai camilan.",
     images: ["https://via.placeholder.com/120?text=Talam+1", "https://via.placeholder.com/120?text=Talam+2", "https://via.placeholder.com/120?text=Talam+3"]
@@ -451,6 +451,10 @@ function goBackToPreviousModal() {
     }});
   }});
 
+  // Hapus blur khusus konfirmasi WA
+  if (currentModal.id === 'confirm-wa-modal' && overlay) {
+    overlay.classList.remove("overlay-blur");
+  }
   // Hide QR code if going back from info modal
   if (currentModal.id === 'info-modal') {
     danaQrCodeImg.classList.add('hidden');
@@ -489,6 +493,7 @@ function closeAllModals() {
     }});
   });
   modalStack = [];
+  if (overlay) overlay.classList.remove("overlay-blur");
   gsap.to(overlay, { duration: 0.25, opacity: 0, ease: "power2.in", onComplete: () => {
     gsap.set(overlay, { display: "none" });
     overlay.setAttribute("aria-hidden", "true");
@@ -1438,6 +1443,30 @@ function resetDeliveryForm() {
   updateSendWaButtonState();
 }
 
+function fillConfirmWaSummary() {
+  const listEl = document.getElementById("confirm-wa-items");
+  const totalEl = document.getElementById("confirm-wa-total");
+  if (!listEl || !totalEl) return;
+
+  const items = Object.values(cart);
+  listEl.innerHTML = "";
+  items.forEach((item) => {
+    let label = item.name;
+    if (item.variant) label += ` (${item.variant})`;
+    if (item.toppings && item.toppings.length > 0) {
+      label += " + " + item.toppings.map(t => `${t.name} (${t.qty})`).join(", ");
+    }
+    const li = document.createElement("li");
+    li.className = "confirm-wa-item";
+    li.innerHTML = `
+      <span class="confirm-wa-item-name">${label}</span>
+      <span class="confirm-wa-item-meta">${item.qty}× · Rp ${(item.price * item.qty).toLocaleString("id-ID")}</span>
+    `;
+    listEl.appendChild(li);
+  });
+  totalEl.textContent = `Rp ${(finalDiscountedPrice || 0).toLocaleString("id-ID")}`;
+}
+
 function requestSendToWhatsApp() {
   // Validasi form dulu, baru buka modal konfirmasi
   if (!isDeliveryFormValid()) {
@@ -1450,6 +1479,8 @@ function requestSendToWhatsApp() {
   }
   const confirmWaModal = document.getElementById("confirm-wa-modal");
   if (confirmWaModal) {
+    fillConfirmWaSummary();
+    if (overlay) overlay.classList.add("overlay-blur");
     openModal(confirmWaModal);
   } else {
     sendToWhatsApp();
