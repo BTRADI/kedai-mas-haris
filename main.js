@@ -166,11 +166,11 @@ const productList = [
     images: ["https://via.placeholder.com/120?text=Pastel+Bihun+1", "https://via.placeholder.com/120?text=Pastel+Bihun+2", "https://via.placeholder.com/120?text=Pastel+Bihun+3"]
   },
   {
-    name: "Pastel Mayonais",
+    name: "Pastel Sayur Telor",
     price: 3500,
     kategori: "Asin",
     description: "Pastel renyah dengan isian sayur, sosis, dan mayonais creamy yang lezat.",
-    images: ["https://via.placeholder.com/120?text=Pastel+Mayonais+1", "https://via.placeholder.com/120?text=Pastel+Mayonais+2", "https://via.placeholder.com/120?text=Pastel+Mayonais+3"]
+    images: ["https://via.placeholder.com/120?text=Pastel+Sayur+Telor+1", "https://via.placeholder.com/120?text=Pastel+Sayur+Telor+2", "https://via.placeholder.com/120?text=Pastel+Sayur+Telor+3"]
   },
   {
     name: "Cente Manis / Hunkwe",
